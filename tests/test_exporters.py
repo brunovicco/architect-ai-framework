@@ -66,3 +66,30 @@ def test_adr_markdown_contains_core_sections():
     assert "## Decision" in adr
     assert "We will adopt" in adr
     assert "## Consequences" in adr
+
+
+def test_exports_include_entry_point_reference_architecture_feasibility_and_review_placement():
+    case = ArchitectureCase(name="Demo", is_engineering_tool=True, dynamic_tool_choice=True, high_impact_actions=True)
+    plan = DecisionPlan(case=case, recommendation=recommend(case))
+    md = to_markdown(plan)
+    adr = to_adr_markdown(plan)
+    for text in (md, adr):
+        assert "Agentic coding assistant (CLI/IDE)" in text
+        assert "Coding agent" in text
+        assert "Pre-action approval" in text
+
+
+def test_roi_notes_appears_in_exports_when_present():
+    case = ArchitectureCase(name="Demo", roi_notes="Saves 5h/week for the ops team")
+    plan = DecisionPlan(case=case, recommendation=recommend(case))
+    md = to_markdown(plan)
+    adr = to_adr_markdown(plan)
+    assert "Saves 5h/week for the ops team" in md
+    assert "Saves 5h/week for the ops team" in adr
+
+
+def test_roi_notes_omitted_from_markdown_when_blank():
+    case = ArchitectureCase(name="Demo")
+    plan = DecisionPlan(case=case, recommendation=recommend(case))
+    md = to_markdown(plan)
+    assert "Business value / ROI" not in md

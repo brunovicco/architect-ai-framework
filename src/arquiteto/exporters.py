@@ -34,6 +34,7 @@ def to_markdown(plan: DecisionPlan, lang: str = "en") -> str:
         if comparison_lines
         else ""
     )
+    roi_block = f"\n**{e(lang, 'roi_notes')}:** {c.roi_notes}\n" if c.roi_notes else ""
 
     return f"""# {e(lang, 'doc_title')} — {c.name}
 
@@ -50,6 +51,8 @@ def to_markdown(plan: DecisionPlan, lang: str = "en") -> str:
 
 ## {e(lang, 'section_responsibility')}
 - {e(lang, 'recommended_pattern')}: **{translate_pattern(lang, r.architecture_pattern)}**
+- {e(lang, 'entry_point')}: **{translate_pattern(lang, r.entry_point)}**
+- {e(lang, 'reference_architecture')}: **{translate_pattern(lang, r.reference_architecture)}**
 
 ### {e(lang, 'rationale')}
 {_bullets(translate_items(lang, r.rationale), lang)}
@@ -59,9 +62,11 @@ def to_markdown(plan: DecisionPlan, lang: str = "en") -> str:
 {_bullets(translate_items(lang, r.information_strategy), lang)}
 
 ## {e(lang, 'section_model')}
+- {e(lang, 'feasibility_verdict')}: **{translate_pattern(lang, r.feasibility_verdict)}**
 {_bullets(translate_items(lang, r.model_strategy), lang)}
-{comparison_block}
+{comparison_block}{roi_block}
 ## {e(lang, 'section_t')}
+- {e(lang, 'review_placement')}: **{translate_pattern(lang, r.review_placement)}**
 {_bullets(translate_items(lang, r.controls), lang)}
 
 ## {e(lang, 'section_e')}
@@ -113,14 +118,29 @@ def to_docx_bytes(plan: DecisionPlan, lang: str = "en") -> bytes:
         ),
         (
             e(lang, "section_responsibility"),
-            [f"{e(lang, 'recommended_pattern')}: {translate_pattern(lang, r.architecture_pattern)}", *translate_items(lang, r.rationale)],
+            [
+                f"{e(lang, 'recommended_pattern')}: {translate_pattern(lang, r.architecture_pattern)}",
+                f"{e(lang, 'entry_point')}: {translate_pattern(lang, r.entry_point)}",
+                f"{e(lang, 'reference_architecture')}: {translate_pattern(lang, r.reference_architecture)}",
+                *translate_items(lang, r.rationale),
+            ],
         ),
         (
             e(lang, "section_i"),
             [f"{e(lang, 'recommended_integration')}: {translate_pattern(lang, r.integration_pattern)}", *translate_items(lang, r.information_strategy)],
         ),
-        (e(lang, "section_model"), translate_items(lang, r.model_strategy)),
-        (e(lang, "section_t"), translate_items(lang, r.controls)),
+        (
+            e(lang, "section_model"),
+            [
+                f"{e(lang, 'feasibility_verdict')}: {translate_pattern(lang, r.feasibility_verdict)}",
+                *translate_items(lang, r.model_strategy),
+                *([f"{e(lang, 'roi_notes')}: {c.roi_notes}"] if c.roi_notes else []),
+            ],
+        ),
+        (
+            e(lang, "section_t"),
+            [f"{e(lang, 'review_placement')}: {translate_pattern(lang, r.review_placement)}", *translate_items(lang, r.controls)],
+        ),
         (e(lang, "section_e"), translate_items(lang, r.evaluations)),
         (e(lang, "section_operations"), translate_items(lang, r.operations)),
     ]
@@ -224,6 +244,8 @@ def to_pdf_bytes(plan: DecisionPlan, lang: str = "en") -> bytes:
 
     heading(e(lang, "section_responsibility"))
     body(f"{e(lang, 'recommended_pattern')}: {translate_pattern(lang, r.architecture_pattern)}")
+    body(f"{e(lang, 'entry_point')}: {translate_pattern(lang, r.entry_point)}")
+    body(f"{e(lang, 'reference_architecture')}: {translate_pattern(lang, r.reference_architecture)}")
     subheading(e(lang, "rationale"))
     bullets(translate_items(lang, r.rationale))
 
@@ -232,7 +254,10 @@ def to_pdf_bytes(plan: DecisionPlan, lang: str = "en") -> bytes:
     bullets(translate_items(lang, r.information_strategy))
 
     heading(e(lang, "section_model"))
+    body(f"{e(lang, 'feasibility_verdict')}: {translate_pattern(lang, r.feasibility_verdict)}")
     bullets(translate_items(lang, r.model_strategy))
+    if c.roi_notes:
+        body(f"{e(lang, 'roi_notes')}: {c.roi_notes}")
 
     comparison_lines = model_comparison_lines(plan, lang)
     if comparison_lines:
@@ -241,6 +266,7 @@ def to_pdf_bytes(plan: DecisionPlan, lang: str = "en") -> bytes:
             body(line.lstrip("- "))
 
     heading(e(lang, "section_t"))
+    body(f"{e(lang, 'review_placement')}: {translate_pattern(lang, r.review_placement)}")
     bullets(translate_items(lang, r.controls))
 
     heading(e(lang, "section_e"))
@@ -281,6 +307,7 @@ def to_adr_markdown(plan: DecisionPlan, lang: str = "en") -> str:
         architecture=translate_pattern(lang, r.architecture_pattern),
         integration=translate_pattern(lang, r.integration_pattern),
     )
+    roi_line = f"\n**{e(lang, 'roi_notes')}:** {c.roi_notes}\n" if c.roi_notes else ""
 
     return f"""# {e(lang, 'adr_title_prefix')}: {c.name}
 
@@ -296,13 +323,18 @@ def to_adr_markdown(plan: DecisionPlan, lang: str = "en") -> str:
 - {e(lang, 'regulatory_constraints')}: {c.regulatory_constraints or not_defined}
 
 ## {e(lang, 'adr_decision_heading')}
+- {e(lang, 'entry_point')}: **{translate_pattern(lang, r.entry_point)}**
+- {e(lang, 'reference_architecture')}: **{translate_pattern(lang, r.reference_architecture)}**
+- {e(lang, 'feasibility_verdict')}: **{translate_pattern(lang, r.feasibility_verdict)}**
+
 {decision_intro}
 
 {_bullets(translate_items(lang, r.rationale), lang)}
-
+{roi_line}
 ## {e(lang, 'adr_consequences_heading')}
 
 ### {e(lang, 'section_t')}
+- {e(lang, 'review_placement')}: {translate_pattern(lang, r.review_placement)}
 {_bullets(translate_items(lang, r.controls), lang)}
 
 ### {e(lang, 'section_e')}
