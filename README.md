@@ -16,8 +16,7 @@ The project turns architecture reasoning into a repeatable, 9-step workflow, spe
 
 ## Live demo
 
-<!-- TODO: replace with the Streamlit Community Cloud URL once deployed — see "Deploy" below -->
-Not deployed yet — see [Deploy](#deploy) for the one-time setup, or run it locally with [Quick start](#quick-start).
+**[architect-ai-framework.streamlit.app](https://architect-ai-framework.streamlit.app)** — hosted on Streamlit Community Cloud, no install needed.
 
 ## Screenshots
 
@@ -102,17 +101,18 @@ pip install -e '.[dev]'
 pytest
 ruff check .
 mypy src
+pip-audit
 ```
 
-All three run in CI on every push (Python 3.11 and 3.12).
+All four run in CI on every push (Python 3.11 and 3.12), together with Dependabot (weekly updates for pip and GitHub Actions) and pinned, SHA-locked Actions — see [Repository structure](#repository-structure) and `.github/`.
 
 ## Deploy
 
-The app is ready to deploy on [Streamlit Community Cloud](https://streamlit.io/cloud) (free):
+Live at **[architect-ai-framework.streamlit.app](https://architect-ai-framework.streamlit.app)**, hosted on [Streamlit Community Cloud](https://streamlit.io/cloud) (free tier). To deploy your own fork:
 
-1. Push this repo to your own GitHub account (or fork it).
+1. Push the repo to your own GitHub account (or fork it).
 2. Go to [share.streamlit.io](https://share.streamlit.io) and sign in with GitHub.
-3. Click **New app**, pick this repository and branch (`main`), and set the main file path to `app.py`.
+3. Click **New app**, pick your repository and branch (`main`), and set the main file path to `app.py`.
 4. Deploy. Streamlit Cloud installs from `requirements.txt` and reads the Python version from `runtime.txt` automatically — no extra configuration needed.
 
 ## Repository structure
@@ -153,6 +153,8 @@ architect-ai-framework/
 
 - [x] Bilingual UI and exports (pt-BR / en)
 - [x] Interactive architecture diagram (Mermaid)
+- [x] Public deployment (Streamlit Community Cloud)
+- [x] CI/supply-chain hardening (Dependabot, pip-audit, pinned Actions, branch protection)
 - [ ] Import/export existing JSON plans
 - [ ] PDF export
 - [ ] Optional vendor-neutral LLM reviewer via adapter interface

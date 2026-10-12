@@ -16,8 +16,7 @@ O projeto transforma o raciocínio de arquitetura em um workflow repetível de 9
 
 ## Demo ao vivo
 
-<!-- TODO: substituir pela URL do Streamlit Community Cloud depois do deploy — veja "Deploy" abaixo -->
-Ainda não implantado — veja [Deploy](#deploy) para a configuração única, ou rode localmente em [Começando rápido](#começando-rápido).
+**[architect-ai-framework.streamlit.app](https://architect-ai-framework.streamlit.app)** — hospedado no Streamlit Community Cloud, sem precisar instalar nada.
 
 ## Screenshots
 
@@ -102,17 +101,18 @@ pip install -e '.[dev]'
 pytest
 ruff check .
 mypy src
+pip-audit
 ```
 
-Os três rodam no CI a cada push (Python 3.11 e 3.12).
+Os quatro rodam no CI a cada push (Python 3.11 e 3.12), junto com o Dependabot (atualizações semanais de pip e GitHub Actions) e Actions fixadas por SHA — veja [Estrutura do repositório](#estrutura-do-repositório) e `.github/`.
 
 ## Deploy
 
-O app está pronto para deploy no [Streamlit Community Cloud](https://streamlit.io/cloud) (gratuito):
+No ar em **[architect-ai-framework.streamlit.app](https://architect-ai-framework.streamlit.app)**, hospedado no [Streamlit Community Cloud](https://streamlit.io/cloud) (camada gratuita). Para fazer deploy do seu próprio fork:
 
-1. Faça push deste repositório para sua própria conta do GitHub (ou faça um fork).
+1. Faça push do repositório para sua própria conta do GitHub (ou faça um fork).
 2. Acesse [share.streamlit.io](https://share.streamlit.io) e entre com GitHub.
-3. Clique em **New app**, selecione este repositório e a branch (`main`), e defina o caminho do arquivo principal como `app.py`.
+3. Clique em **New app**, selecione seu repositório e a branch (`main`), e defina o caminho do arquivo principal como `app.py`.
 4. Faça o deploy. O Streamlit Cloud instala a partir do `requirements.txt` e lê a versão do Python em `runtime.txt` automaticamente — não precisa de nenhuma configuração extra.
 
 ## Estrutura do repositório
@@ -153,6 +153,8 @@ architect-ai-framework/
 
 - [x] UI e exports bilíngues (pt-BR / en)
 - [x] Diagrama de arquitetura interativo (Mermaid)
+- [x] Deploy público (Streamlit Community Cloud)
+- [x] Hardening de CI/supply chain (Dependabot, pip-audit, Actions fixadas por SHA, branch protection)
 - [ ] Importar/exportar planos JSON existentes
 - [ ] Export em PDF
 - [ ] Revisor de IA opcional e neutro em fornecedor via interface de adaptador
