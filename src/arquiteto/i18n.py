@@ -217,6 +217,10 @@ UI = {
         "pt-BR": "### Estratégia de modelo / fornecedor",
         "en": "### Model / provider strategy",
     },
+    "model_comparison_screen_heading": {
+        "pt-BR": "### Comparação de Modelos / Fornecedores",
+        "en": "### Model / Provider Comparison",
+    },
     "controls_heading": {"pt-BR": "### Trust & controles", "en": "### Trust & controls"},
     "evaluation_heading": {"pt-BR": "### Evaluation", "en": "### Evaluation"},
     "operations_heading": {"pt-BR": "### Operação", "en": "### Operations"},

@@ -12,7 +12,7 @@ def _bullets(items: list[str], lang: str) -> str:
     return "\n".join(f"- {item}" for item in items) if items else f"- {e(lang, 'not_defined')}"
 
 
-def _model_comparison_lines(plan: DecisionPlan, lang: str) -> list[str]:
+def model_comparison_lines(plan: DecisionPlan, lang: str) -> list[str]:
     lines = []
     for row in plan.model_comparison:
         notes = "; ".join(f"{name}: {note}" for name, note in row.notes.items() if note) or e(lang, "not_defined")
@@ -28,7 +28,7 @@ def to_markdown(plan: DecisionPlan, lang: str = "en") -> str:
     for option in plan.option_scores:
         option_lines.append(f"- **{option.name}:** {normalized_score(option.scores):.1%}")
     option_text = "\n".join(option_lines) or f"- {e(lang, 'no_option_matrix')}"
-    comparison_lines = _model_comparison_lines(plan, lang)
+    comparison_lines = model_comparison_lines(plan, lang)
     comparison_block = (
         f"\n## {e(lang, 'model_comparison_heading')}\n" + "\n".join(comparison_lines) + "\n"
         if comparison_lines
@@ -129,7 +129,7 @@ def to_docx_bytes(plan: DecisionPlan, lang: str = "en") -> bytes:
         for item in items:
             doc.add_paragraph(item, style="List Bullet")
 
-    comparison_lines = _model_comparison_lines(plan, lang)
+    comparison_lines = model_comparison_lines(plan, lang)
     if comparison_lines:
         doc.add_heading(e(lang, "model_comparison_heading"), level=1)
         for line in comparison_lines:
@@ -234,7 +234,7 @@ def to_pdf_bytes(plan: DecisionPlan, lang: str = "en") -> bytes:
     heading(e(lang, "section_model"))
     bullets(translate_items(lang, r.model_strategy))
 
-    comparison_lines = _model_comparison_lines(plan, lang)
+    comparison_lines = model_comparison_lines(plan, lang)
     if comparison_lines:
         heading(e(lang, "model_comparison_heading"))
         for line in comparison_lines:

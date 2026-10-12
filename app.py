@@ -10,7 +10,7 @@ if str(SRC) not in sys.path:
 import streamlit as st
 
 from arquiteto.engine import recommend
-from arquiteto.exporters import to_adr_markdown, to_docx_bytes, to_markdown, to_pdf_bytes
+from arquiteto.exporters import model_comparison_lines, to_adr_markdown, to_docx_bytes, to_markdown, to_pdf_bytes
 from arquiteto.i18n import (
     BRAND,
     DEFAULT_LANG,
@@ -346,6 +346,12 @@ with final:
     for item in translate_items(lang, rec.model_strategy):
         st.write(f"- {item}")
 
+    comparison_lines = model_comparison_lines(plan, lang)
+    if comparison_lines:
+        st.markdown(t(lang, "model_comparison_screen_heading"))
+        for line in comparison_lines:
+            st.write(line)
+
     st.markdown(t(lang, "controls_heading"))
     for item in translate_items(lang, rec.controls):
         st.write(f"- {item}")
@@ -381,10 +387,8 @@ with final:
     saved_cases: dict[str, dict] = st.session_state.setdefault("saved_cases", {})
     sc1, sc2 = st.columns([0.6, 0.4])
     with sc1:
-        save_name = st.text_input(
-            "save_case_name", placeholder=t(lang, "saved_case_name_placeholder"),
-            key="save_case_name_input", label_visibility="collapsed",
-        )
+        st.caption(t(lang, "saved_case_name_placeholder"))
+        save_name = st.text_input("save_case_name", key="save_case_name_input", label_visibility="collapsed")
     with sc2:
         if st.button(t(lang, "save_case_button")) and save_name:
             saved_cases[save_name] = plan.model_dump()
