@@ -62,7 +62,9 @@ def _clear_form() -> None:
 
     Iterates `ArchitectureCase().model_dump()` generically rather than a
     hardcoded field list, so a new `ArchitectureCase` field needs no change
-    here - only a widget for it in the relevant tab.
+    here - only a widget for it in the relevant tab. Also drops any stored
+    AI review, since it would otherwise keep describing a plan that no
+    longer exists.
     """
     for field, value in ArchitectureCase().model_dump().items():
         st.session_state[field] = value
@@ -78,6 +80,7 @@ def _clear_form() -> None:
     for crit_key in MODEL_CRITERIA:
         for col in CANDIDATE_COLS:
             st.session_state[f"model_note_{crit_key}_{col}"] = ""
+    st.session_state.pop("ai_review_result", None)
 
 
 def _apply_plan_dict(data: dict) -> None:
@@ -88,7 +91,8 @@ def _apply_plan_dict(data: dict) -> None:
     called before the widgets it targets are instantiated in the current
     script run (e.g. via the pending-flag + `st.rerun()` pattern), since
     Streamlit silently ignores a `session_state` write for an
-    already-instantiated widget.
+    already-instantiated widget. Also drops any stored AI review, since
+    it would otherwise keep describing the plan being replaced.
 
     Args:
         data: A dict shaped like `DecisionPlan.model_dump()` (or a subset
@@ -124,6 +128,7 @@ def _apply_plan_dict(data: dict) -> None:
         for col, cand in zip(CANDIDATE_COLS, candidate_names):
             st.session_state[f"model_note_{crit_key}_{col}"] = row_notes.get(
                 cand, "")
+    st.session_state.pop("ai_review_result", None)
 
 
 def field_text(key: str, label_key: str, *, area: bool = False, placeholder_key: str | None = None, default_text: str | None = None) -> str:
@@ -612,7 +617,16 @@ with final:
                         review = adapter.generate(
                             system=t(lang, "ai_review_system_prompt"), user=md)
                 except (ValueError, AdapterError) as exc:
+                    st.session_state.pop("ai_review_result", None)
                     st.error(t(lang, "ai_review_error").format(error=exc))
                 else:
-                    st.warning(t(lang, "ai_review_disclaimer"))
-                    st.markdown(review)
+                    st.session_state["ai_review_result"] = review
+
+        if st.session_state.get("ai_review_result"):
+            st.warning(t(lang, "ai_review_disclaimer"))
+            st.markdown(st.session_state["ai_review_result"])
+            st.download_button(
+                t(lang, "download_ai_review_label"),
+                st.session_state["ai_review_result"],
+                file_name="ai-review.md", mime="text/markdown",
+            )

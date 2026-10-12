@@ -269,6 +269,7 @@ UI = {
     "preview_expander_label": {"pt-BR": "Pré-visualizar Markdown gerado", "en": "Preview generated Markdown"},
     "download_pdf_label": {"pt-BR": "Baixar PDF", "en": "Download PDF"},
     "download_adr_label": {"pt-BR": "Baixar ADR", "en": "Download ADR"},
+    "download_ai_review_label": {"pt-BR": "Baixar revisão por IA", "en": "Download AI review"},
 
     "tab_7": {"pt-BR": "6 · Modelos", "en": "6 · Models"},
     "models_intro": {
