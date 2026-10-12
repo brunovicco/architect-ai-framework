@@ -15,7 +15,6 @@ import ipaddress
 import json
 import socket
 from typing import Protocol
-from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
 
@@ -94,7 +93,7 @@ class OpenAICompatibleAdapter:
     value comes from the (untrusted) visitor of a publicly hosted instance.
     """
 
-    def __init__(self, base_url: str, api_key: str, model: str, timeout: float = 30.0) -> None:
+    def __init__(self, base_url: str, api_key: str, model: str, timeout: float = 60.0) -> None:
         """Initialize the adapter and validate its target endpoint.
 
         Args:
@@ -103,7 +102,10 @@ class OpenAICompatibleAdapter:
                 `assert_safe_base_url` before being stored.
             api_key: The bearer token sent as the `Authorization` header.
             model: The model identifier to request.
-            timeout: The request timeout, in seconds.
+            timeout: The request timeout, in seconds. Large hosted models
+                can take well over the old 30s default to respond, so this
+                defaults higher; `generate()` always raises `AdapterError`
+                on expiry rather than letting the raw timeout escape.
 
         Raises:
             ValueError: If `base_url` fails the SSRF guard.
@@ -151,7 +153,7 @@ class OpenAICompatibleAdapter:
         try:
             with urlopen(request, timeout=self._timeout) as response:  # noqa: S310 - base_url is validated above
                 body = json.loads(response.read().decode("utf-8"))
-        except (URLError, HTTPError) as exc:
+        except OSError as exc:
             raise AdapterError(
                 f"model endpoint request failed: {exc}") from exc
         except json.JSONDecodeError as exc:
