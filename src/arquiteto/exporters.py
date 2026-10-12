@@ -1,4 +1,5 @@
 from io import BytesIO
+
 from docx import Document
 
 from .models import DecisionPlan

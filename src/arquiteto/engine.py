@@ -1,4 +1,4 @@
-from .models import ArchitectureCase, Recommendation
+from .models import ArchitectureCase, ArchitecturePattern, IntegrationPattern, Recommendation
 
 
 def recommend(case: ArchitectureCase) -> Recommendation:
@@ -6,6 +6,7 @@ def recommend(case: ArchitectureCase) -> Recommendation:
     warnings: list[str] = []
 
     # U — Usage pattern
+    architecture: ArchitecturePattern
     if case.independent_autonomous_domains and case.dynamic_next_steps:
         architecture = "Multi-agent"
         rationale.append(
@@ -34,6 +35,7 @@ def recommend(case: ArchitectureCase) -> Recommendation:
         )
 
     # I — Integration
+    integration: IntegrationPattern
     if case.remote_autonomous_service:
         integration = "Agent-to-Agent"
         rationale.append("A remote capability has its own autonomy and execution lifecycle, favoring agent-to-agent coordination.")

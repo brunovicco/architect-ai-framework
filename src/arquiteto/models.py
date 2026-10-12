@@ -1,6 +1,6 @@
-from typing import Dict, List, Literal
-from pydantic import BaseModel, Field
+from typing import Literal
 
+from pydantic import BaseModel, Field
 
 ArchitecturePattern = Literal["Augmented LLM", "Workflow", "Agent", "Multi-agent"]
 IntegrationPattern = Literal["API / Tool", "Tool Protocol / MCP", "Agent-to-Agent", "None"]
@@ -42,23 +42,23 @@ class ArchitectureCase(BaseModel):
 class Recommendation(BaseModel):
     architecture_pattern: ArchitecturePattern
     integration_pattern: IntegrationPattern
-    information_strategy: List[str] = Field(default_factory=list)
-    model_strategy: List[str] = Field(default_factory=list)
-    controls: List[str] = Field(default_factory=list)
-    evaluations: List[str] = Field(default_factory=list)
-    operations: List[str] = Field(default_factory=list)
-    rationale: List[str] = Field(default_factory=list)
-    warnings: List[str] = Field(default_factory=list)
+    information_strategy: list[str] = Field(default_factory=list)
+    model_strategy: list[str] = Field(default_factory=list)
+    controls: list[str] = Field(default_factory=list)
+    evaluations: list[str] = Field(default_factory=list)
+    operations: list[str] = Field(default_factory=list)
+    rationale: list[str] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
 
 
 class OptionScore(BaseModel):
     name: str
-    scores: Dict[str, int]
+    scores: dict[str, int]
 
 
 class DecisionPlan(BaseModel):
     case: ArchitectureCase
     recommendation: Recommendation
-    option_scores: List[OptionScore] = Field(default_factory=list)
+    option_scores: list[OptionScore] = Field(default_factory=list)
     selected_option: str = ""
     tradeoff_notes: str = ""
