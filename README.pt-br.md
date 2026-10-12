@@ -74,10 +74,18 @@ A escolha do fornecedor é uma **decisão de trade-off**, não uma dependência 
 ## O método em 9 passos
 
 ```mermaid
-flowchart LR
-    A["A · Alvo"] --> R["R · Requisitos"] --> Q["Q · Quem faz o quê"]
-    Q --> U["U · Uso arquitetural"] --> I["I · Integração &amp; Informação"] --> T1["T · Trust &amp; Controls"]
-    T1 --> E["E · Evaluation"] --> T2["T · Trade-offs"] --> O["O · Operação"]
+flowchart TB
+    subgraph Row1[" "]
+        direction LR
+        A["A · Alvo"] --> R["R · Requisitos"] --> Q["Q · Quem faz o quê"] --> U["U · Uso arquitetural"] --> I["I · Integração &amp; Informação"]
+    end
+    subgraph Row2[" "]
+        direction LR
+        T1["T · Trust &amp; Controls"] --> E["E · Evaluation"] --> T2["T · Trade-offs"] --> O["O · Operação"]
+    end
+    Row1 ~~~ Row2
+    style Row1 fill:none,stroke:none
+    style Row2 fill:none,stroke:none
 ```
 
 ## Por que isso existe

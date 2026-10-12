@@ -74,10 +74,18 @@ Provider selection is a **trade-off decision**, not a framework dependency.
 ## The 9-step method
 
 ```mermaid
-flowchart LR
-    A["A · Aim"] --> R["R · Requirements"] --> C1["C · Composition"]
-    C1 --> H["H · Harness"] --> I["I · Integration &amp; Information"] --> T1["T · Trust &amp; Controls"]
-    T1 --> E["E · Evaluation"] --> C2["C · Comparison"] --> T2["T · Telemetry"]
+flowchart TB
+    subgraph Row1[" "]
+        direction LR
+        A["A · Aim"] --> R["R · Requirements"] --> C1["C · Composition"] --> H["H · Harness"] --> I["I · Integration &amp; Information"]
+    end
+    subgraph Row2[" "]
+        direction LR
+        T1["T · Trust &amp; Controls"] --> E["E · Evaluation"] --> C2["C · Comparison"] --> T2["T · Telemetry"]
+    end
+    Row1 ~~~ Row2
+    style Row1 fill:none,stroke:none
+    style Row2 fill:none,stroke:none
 ```
 
 ## Why this exists
