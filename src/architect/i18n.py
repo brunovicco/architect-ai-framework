@@ -334,6 +334,10 @@ UI = {
     "ai_review_api_key_label": {"pt-BR": "Chave de API", "en": "API key"},
     "ai_review_model_label": {"pt-BR": "Nome do modelo", "en": "Model name"},
     "ai_review_button": {"pt-BR": "Obter revisão por IA", "en": "Get AI review"},
+    "ai_review_loading": {
+        "pt-BR": "Aguardando resposta do modelo... modelos maiores podem levar até um minuto.",
+        "en": "Waiting for the model's response... larger models can take up to a minute.",
+    },
     "ai_review_disclaimer": {
         "pt-BR": "⚠️ Conteúdo gerado por IA - não verificado. Revise antes de confiar.",
         "en": "⚠️ AI-generated content - unverified. Review before relying on it.",

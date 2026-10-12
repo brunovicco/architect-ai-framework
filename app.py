@@ -602,10 +602,11 @@ with final:
                 st.warning(t(lang, "ai_review_intro"))
             else:
                 try:
-                    adapter = OpenAICompatibleAdapter(
-                        base_url=ai_base_url, api_key=ai_api_key, model=ai_model)
-                    review = adapter.generate(
-                        system=t(lang, "ai_review_system_prompt"), user=md)
+                    with st.spinner(t(lang, "ai_review_loading")):
+                        adapter = OpenAICompatibleAdapter(
+                            base_url=ai_base_url, api_key=ai_api_key, model=ai_model)
+                        review = adapter.generate(
+                            system=t(lang, "ai_review_system_prompt"), user=md)
                 except (ValueError, AdapterError) as exc:
                     st.error(t(lang, "ai_review_error").format(error=exc))
                 else:
