@@ -1,6 +1,6 @@
 from arquiteto.engine import recommend
-from arquiteto.exporters import to_docx_bytes, to_markdown
-from arquiteto.models import ArchitectureCase, DecisionPlan
+from arquiteto.exporters import to_adr_markdown, to_docx_bytes, to_markdown, to_pdf_bytes
+from arquiteto.models import ArchitectureCase, DecisionPlan, ModelComparisonRow
 
 
 def test_markdown_contains_core_sections():
@@ -28,3 +28,41 @@ def test_docx_bytes_are_generated_for_both_languages():
         docx = to_docx_bytes(plan, lang=lang)
         assert docx.startswith(b"PK")  # docx is a zip archive
         assert len(docx) > 0
+
+
+def test_pdf_bytes_are_generated_for_both_languages():
+    case = ArchitectureCase(name="Demo", business_problem="Reduzir tempo de revisão — ção ãõ")
+    plan = DecisionPlan(case=case, recommendation=recommend(case))
+    for lang in ("en", "pt-BR"):
+        pdf = to_pdf_bytes(plan, lang=lang)
+        assert pdf.startswith(b"%PDF")
+        assert len(pdf) > 0
+
+
+def test_pdf_does_not_crash_on_unsupported_characters():
+    case = ArchitectureCase(name="Demo", business_problem="Emoji test \U0001f3db CJK 中文")
+    plan = DecisionPlan(case=case, recommendation=recommend(case))
+    pdf = to_pdf_bytes(plan)
+    assert pdf.startswith(b"%PDF")
+
+
+def test_markdown_includes_model_comparison_when_present():
+    case = ArchitectureCase(name="Demo")
+    row = ModelComparisonRow(criterion="Latency class", notes={"Provider A": "Low", "Provider B": "Medium"})
+    plan = DecisionPlan(case=case, recommendation=recommend(case), model_comparison=[row])
+    md = to_markdown(plan)
+    assert "Model / Provider Comparison" in md
+    assert "Latency class" in md
+    assert "Provider A: Low" in md
+
+
+def test_adr_markdown_contains_core_sections():
+    case = ArchitectureCase(name="Demo", business_problem="Reduce review time")
+    plan = DecisionPlan(case=case, recommendation=recommend(case))
+    adr = to_adr_markdown(plan)
+    assert "# ADR: Demo" in adr
+    assert "**Status:** Proposed" in adr
+    assert "## Context" in adr
+    assert "## Decision" in adr
+    assert "We will adopt" in adr
+    assert "## Consequences" in adr

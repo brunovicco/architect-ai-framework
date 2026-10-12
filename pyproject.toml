@@ -8,6 +8,7 @@ dependencies = [
   "streamlit>=1.40",
   "pydantic>=2.8",
   "python-docx>=1.1",
+  "fpdf2>=2.8",
 ]
 
 [project.optional-dependencies]
@@ -38,3 +39,11 @@ python_version = "3.11"
 mypy_path = "src"
 ignore_missing_imports = true
 check_untyped_defs = true
+
+[[tool.mypy.overrides]]
+# fpdf2 imports numpy, whose own stubs use 3.12+ syntax that mypy can't even
+# parse under python_version=3.11; skip following the import rather than
+# analyzing (and failing on) numpy's stub files.
+module = "numpy.*"
+follow_imports = "skip"
+follow_imports_for_stubs = true

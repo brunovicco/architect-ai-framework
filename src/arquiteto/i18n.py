@@ -56,6 +56,7 @@ UI = {
         "pt-BR": "📂 Carregar exemplo: Investment Assistant",
         "en": "📂 Load example: Investment Assistant",
     },
+    "clear_form_button": {"pt-BR": "🧹 Limpar formulário", "en": "🧹 Clear form"},
     "app_title": {"pt-BR": "🏛️ ARQUITETO", "en": "🏛️ ARCHITECT"},
     "app_caption": {
         "pt-BR": "Decisões de arquitetura de IA / LLM neutras em relação a fornecedor — do problema de negócio ao plano operacional.",
@@ -224,7 +225,94 @@ UI = {
     "download_docx_label": {"pt-BR": "Baixar DOCX", "en": "Download DOCX"},
     "download_json_label": {"pt-BR": "Baixar JSON", "en": "Download JSON"},
     "preview_expander_label": {"pt-BR": "Pré-visualizar Markdown gerado", "en": "Preview generated Markdown"},
+    "download_pdf_label": {"pt-BR": "Baixar PDF", "en": "Download PDF"},
+    "download_adr_label": {"pt-BR": "Baixar ADR", "en": "Download ADR"},
+
+    "tab_7": {"pt-BR": "7 · Modelos", "en": "7 · Models"},
+    "models_intro": {
+        "pt-BR": "Adicione candidatos de modelo/fornecedor e preencha notas por critério. Isto é só estrutura de comparação — o framework não recomenda qual fornecedor escolher.",
+        "en": "Add model/provider candidates and fill in notes per criterion. This is just comparison structure — the framework doesn't recommend which vendor to pick.",
+    },
+    "model_candidate_a_label": {"pt-BR": "Candidato A", "en": "Candidate A"},
+    "model_candidate_b_label": {"pt-BR": "Candidato B", "en": "Candidate B"},
+    "model_candidate_c_label": {"pt-BR": "Candidato C", "en": "Candidate C"},
+    "model_candidate_a_default": {"pt-BR": "Fornecedor 1", "en": "Provider 1"},
+    "model_candidate_b_default": {"pt-BR": "Fornecedor 2", "en": "Provider 2"},
+    "model_candidate_c_default": {"pt-BR": "Fornecedor 3", "en": "Provider 3"},
+    "model_criterion_task_quality_label": {
+        "pt-BR": "Aderência de qualidade à tarefa",
+        "en": "Task quality fit",
+    },
+    "model_criterion_latency_label": {"pt-BR": "Classe de latência", "en": "Latency class"},
+    "model_criterion_cost_label": {"pt-BR": "Classe de custo", "en": "Cost class"},
+    "model_criterion_context_window_label": {"pt-BR": "Janela de contexto", "en": "Context window"},
+    "model_criterion_structured_output_label": {
+        "pt-BR": "Suporte a saída estruturada",
+        "en": "Structured output support",
+    },
+    "model_criterion_privacy_label": {
+        "pt-BR": "Aderência de privacidade / residência",
+        "en": "Privacy / residency fit",
+    },
+    "model_criterion_rate_limits_label": {
+        "pt-BR": "Limites de taxa / disponibilidade",
+        "en": "Rate limits / availability",
+    },
+    "model_criterion_portability_label": {
+        "pt-BR": "Portabilidade / risco de lock-in",
+        "en": "Portability / lock-in risk",
+    },
+
+    "saved_cases_header": {"pt-BR": "Casos salvos (sessão)", "en": "Saved cases (session)"},
+    "saved_case_name_placeholder": {"pt-BR": "Nome do caso para salvar", "en": "Name to save as"},
+    "save_case_button": {"pt-BR": "💾 Salvar caso atual", "en": "💾 Save current case"},
+    "load_saved_case_label": {"pt-BR": "Carregar caso salvo", "en": "Load a saved case"},
+    "load_saved_case_button": {"pt-BR": "📂 Carregar", "en": "📂 Load"},
+    "delete_saved_case_button": {"pt-BR": "🗑️ Excluir", "en": "🗑️ Delete"},
+    "saved_cases_note": {
+        "pt-BR": "Mantidos só nesta sessão do navegador — nunca gravados no servidor.",
+        "en": "Kept only in this browser session — never written server-side.",
+    },
+    "no_saved_cases": {"pt-BR": "Nenhum caso salvo ainda.", "en": "No saved cases yet."},
+    "case_saved_toast": {"pt-BR": "Caso salvo.", "en": "Case saved."},
+
+    "import_json_label": {"pt-BR": "Importar plano (.json)", "en": "Import plan (.json)"},
+    "import_json_error": {
+        "pt-BR": "Não foi possível importar este arquivo: {error}",
+        "en": "Could not import this file: {error}",
+    },
+    "import_json_success": {"pt-BR": "Plano importado.", "en": "Plan imported."},
+
+    "ai_review_expander_label": {"pt-BR": "🤖 Revisão por IA (opcional)", "en": "🤖 AI Review (optional)"},
+    "ai_review_intro": {
+        "pt-BR": "Opcional e neutro em fornecedor: conecte qualquer endpoint compatível com a API de chat da OpenAI (OpenAI, Ollama, vLLM, gateways...) para obter uma crítica deste plano. Sua chave fica só nesta sessão — nunca é salva nem enviada para mais nenhum lugar.",
+        "en": "Optional and vendor-neutral: connect any OpenAI-chat-completions-compatible endpoint (OpenAI, Ollama, vLLM, gateways...) to get a critique of this plan. Your key stays in this session only — never saved, never sent anywhere else.",
+    },
+    "ai_review_base_url_label": {"pt-BR": "Base URL (https://...)", "en": "Base URL (https://...)"},
+    "ai_review_api_key_label": {"pt-BR": "Chave de API", "en": "API key"},
+    "ai_review_model_label": {"pt-BR": "Nome do modelo", "en": "Model name"},
+    "ai_review_button": {"pt-BR": "Obter revisão por IA", "en": "Get AI review"},
+    "ai_review_disclaimer": {
+        "pt-BR": "⚠️ Conteúdo gerado por IA — não verificado. Revise antes de confiar.",
+        "en": "⚠️ AI-generated content — unverified. Review before relying on it.",
+    },
+    "ai_review_error": {"pt-BR": "Falha ao obter revisão: {error}", "en": "Failed to get a review: {error}"},
+    "ai_review_system_prompt": {
+        "pt-BR": "Você é um revisor sênior de arquitetura de IA/LLM. Analise criticamente o plano de decisão de arquitetura a seguir e aponte riscos, lacunas ou suposições questionáveis. Seja direto e específico. Responda em português.",
+        "en": "You are a senior AI/LLM architecture reviewer. Critically analyze the following architecture decision plan and point out risks, gaps, or questionable assumptions. Be direct and specific. Respond in English.",
+    },
 }
+
+MODEL_CRITERIA = [
+    "model_criterion_task_quality_label",
+    "model_criterion_latency_label",
+    "model_criterion_cost_label",
+    "model_criterion_context_window_label",
+    "model_criterion_structured_output_label",
+    "model_criterion_privacy_label",
+    "model_criterion_rate_limits_label",
+    "model_criterion_portability_label",
+]
 
 # Sidebar step list and tab subheaders are derived from STEPS so the letter
 # names can never go out of sync between the sidebar and the tabs.
@@ -447,6 +535,24 @@ EXPORT = {
     "footer": {
         "pt-BR": "Gerado com o framework ARQUITETO — um método de decisão de arquitetura de IA neutro em fornecedor.",
         "en": "Generated with the ARCHITECT framework — a vendor-neutral AI architecture decision method.",
+    },
+    "model_comparison_heading": {
+        "pt-BR": "Comparação de Modelos / Fornecedores",
+        "en": "Model / Provider Comparison",
+    },
+    "adr_title_prefix": {"pt-BR": "ADR", "en": "ADR"},
+    "adr_status_heading": {"pt-BR": "Status", "en": "Status"},
+    "adr_status_value": {"pt-BR": "Proposto", "en": "Proposed"},
+    "adr_context_heading": {"pt-BR": "Contexto", "en": "Context"},
+    "adr_decision_heading": {"pt-BR": "Decisão", "en": "Decision"},
+    "adr_decision_intro": {
+        "pt-BR": "Adotaremos **{architecture}** com integração **{integration}**.",
+        "en": "We will adopt **{architecture}** with **{integration}** integration.",
+    },
+    "adr_consequences_heading": {"pt-BR": "Consequências", "en": "Consequences"},
+    "adr_alternatives_heading": {
+        "pt-BR": "Alternativas consideradas",
+        "en": "Alternatives considered",
     },
 }
 
