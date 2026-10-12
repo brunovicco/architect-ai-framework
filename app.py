@@ -302,6 +302,7 @@ with models_tab:
         notes: dict[str, str] = {}
         for col, col_letter, cand_name in zip(cols, CANDIDATE_COLS, candidate_names):
             with col:
+                st.caption(cand_name or "—")
                 notes_key = f"model_note_{crit_key}_{col_letter}"
                 value = st.text_input(notes_key, key=notes_key, label_visibility="collapsed")
                 if cand_name:
