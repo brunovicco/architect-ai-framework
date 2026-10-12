@@ -113,6 +113,25 @@ UI = {
         "pt-BR": "ex.: aprovação humana, evidência de auditoria, residência de dados",
         "en": "e.g. human approval, audit evidence, data residency",
     },
+    "discovery_framing_hint": {
+        "pt-BR": "Dica: descreva um requisito testável e delimitado — uma preferência (\"deveria ser rápido\") não é o mesmo que um requisito (\"p95 < 2s\").",
+        "en": "Hint: describe a testable, bounded requirement — a preference (\"it should be fast\") isn't the same as a requirement (\"p95 < 2s\").",
+    },
+    "estimated_monthly_cost_label": {"pt-BR": "Custo mensal estimado (US$)", "en": "Estimated monthly cost (US$)"},
+    "estimated_monthly_cost_placeholder": {
+        "pt-BR": "ex.: 350 — deixe 0 se ainda não estimou",
+        "en": "e.g. 350 — leave 0 if not yet estimated",
+    },
+    "monthly_cost_ceiling_label": {"pt-BR": "Teto de orçamento mensal (US$)", "en": "Monthly budget ceiling (US$)"},
+    "monthly_cost_ceiling_placeholder": {
+        "pt-BR": "ex.: 500 — deixe 0 se ainda não definido",
+        "en": "e.g. 500 — leave 0 if not yet set",
+    },
+    "roi_notes_label": {"pt-BR": "Valor de negócio / ROI", "en": "Business value / ROI"},
+    "roi_notes_placeholder": {
+        "pt-BR": "Os 5 pilares: eficiência, transformação, produtividade, custo da solução, SLAs de performance.",
+        "en": "The 5 pillars: efficiency, transformation, productivity, solution cost, performance SLAs.",
+    },
     "t2_intro": {
         "pt-BR": "Descreva as características de execução; o motor recomenda o menor padrão adequado.",
         "en": "Describe execution characteristics; the engine recommends the smallest fitting pattern.",
@@ -140,6 +159,18 @@ UI = {
     "structured_output_label": {
         "pt-BR": "Sistemas downstream exigem saída estruturada/schema",
         "en": "Downstream systems require structured output/schema",
+    },
+    "is_engineering_tool_label": {
+        "pt-BR": "É uma ferramenta de engenharia, usada por desenvolvedores no próprio fluxo de código/terminal",
+        "en": "Is an engineering tool, used by developers inside their own code/terminal workflow",
+    },
+    "needs_custom_user_experience_label": {
+        "pt-BR": "Precisa de uma experiência de usuário própria, com marca, embutida no produto",
+        "en": "Needs a custom, branded, product-embedded user experience",
+    },
+    "reusable_across_multiple_clients_label": {
+        "pt-BR": "A capacidade precisa ser reaproveitada por múltiplos clientes/agentes diferentes",
+        "en": "The capability needs to be reused by multiple different clients/agents",
     },
     "needs_document_knowledge_label": {
         "pt-BR": "Precisa de conhecimento corporativo/documental (candidato a RAG)",
@@ -186,6 +217,14 @@ UI = {
         "pt-BR": "Coortes/casos de uso críticos devem ser avaliados separadamente",
         "en": "Critical cohorts/use cases must be evaluated separately",
     },
+    "differential_outcomes_risk_label": {
+        "pt-BR": "A decisão pode afetar pessoas/grupos de forma desigual (aprovação, priorização, elegibilidade)",
+        "en": "The decision can affect people/groups unequally (approval, prioritization, eligibility)",
+    },
+    "has_calibrated_confidence_score_label": {
+        "pt-BR": "O sistema produz um score de confiança calibrado, utilizável para rotear revisão",
+        "en": "The system produces a calibrated confidence score usable for routing review",
+    },
     "ops_note": {
         "pt-BR": "Recomendações operacionais são geradas automaticamente para tracing, retries/fallbacks, idempotência e loops de feedback.",
         "en": "Operational recommendations are generated automatically for tracing, retries/fallbacks, idempotency and feedback loops.",
@@ -205,12 +244,17 @@ UI = {
     "selected_option_label": {"pt-BR": "Opção selecionada", "en": "Selected option"},
     "tradeoff_notes_label": {"pt-BR": "Justificativa do trade-off", "en": "Trade-off rationale"},
     "tradeoff_notes_placeholder": {
-        "pt-BR": "Por que essa opção, o que ganhamos, o que aceitamos, quando revisitaríamos essa decisão?",
-        "en": "Why this option, what do we gain, what do we accept, when would we revisit it?",
+        "pt-BR": "Por que essa opção: o que ganhamos, o que abrimos mão, e quanto custaria reverter essa decisão?",
+        "en": "Why this option: what do we gain, what do we give up, and what would reversing it cost?",
     },
     "t6_subheader": {"pt-BR": "Plano de Decisão de Arquitetura", "en": "Architecture Decision Plan"},
     "architecture_metric_label": {"pt-BR": "Arquitetura", "en": "Architecture"},
     "integration_metric_label": {"pt-BR": "Integração", "en": "Integration"},
+    "entry_point_metric_label": {"pt-BR": "Ponto de entrada", "en": "Entry point"},
+    "reference_architecture_metric_label": {"pt-BR": "Arquitetura de referência", "en": "Reference architecture"},
+    "feasibility_verdict_metric_label": {"pt-BR": "Veredito de viabilidade", "en": "Feasibility verdict"},
+    "review_placement_metric_label": {"pt-BR": "Posicionamento de revisão", "en": "Review placement"},
+    "roi_notes_metric_label": {"pt-BR": "Valor de negócio / ROI", "en": "Business value / ROI"},
     "rationale_heading": {"pt-BR": "### Justificativa", "en": "### Rationale"},
     "information_heading": {"pt-BR": "### Estratégia de informação", "en": "### Information strategy"},
     "model_strategy_heading": {
@@ -412,8 +456,18 @@ ENGINE_PT = {
     "Enforce data isolation and access policy outside the model prompt; log access evidence where appropriate.": (
         "Aplique isolamento de dados e política de acesso fora do prompt do modelo; registre evidência de acesso quando apropriado."
     ),
-    "Enforce high-impact action policy in the execution layer; do not depend on prompt compliance.": (
-        "Aplique a política de ações de alto impacto na camada de execução; não dependa da conformidade do prompt."
+    "Input screening: validate and sanitize what reaches the model before it can trigger the action, "
+    "deterministically where the check is unambiguous.": (
+        "Input screening: valide e sanitize o que chega ao modelo antes que isso possa disparar a ação, "
+        "de forma determinística onde a verificação for inequívoca."
+    ),
+    "Output screening: check the model's output against policy before it is shown or executed, not only what goes in.": (
+        "Output screening: verifique a saída do modelo contra a política antes que ela seja exibida ou executada, "
+        "não só o que entra."
+    ),
+    "Authorization: enforce high-impact action policy in the execution layer; do not depend on prompt compliance.": (
+        "Authorization: aplique a política de ações de alto impacto na camada de execução; "
+        "não dependa da conformidade do prompt."
     ),
     "Use fail-closed behavior when authorization or policy evidence is unavailable.": (
         "Use comportamento fail-closed quando a autorização ou evidência de política não estiver disponível."
@@ -447,8 +501,9 @@ ENGINE_PT = {
         "Rastreie chamadas de modelo, recuperação, chamadas de ferramenta, latência, erros e resultados finais "
         "com um ID de correlação/trace compartilhado."
     ),
-    "Define timeout, retry and fallback policies per dependency; avoid unsafe retries for non-idempotent side effects.": (
-        "Defina políticas de timeout, retry e fallback por dependência; evite retries inseguros para efeitos colaterais não idempotentes."
+    "Define timeout, retry, fallback and circuit-breaker policies per dependency; avoid unsafe retries for non-idempotent side effects.": (
+        "Defina políticas de timeout, retry, fallback e circuit-breaker por dependência; "
+        "evite retries inseguros para efeitos colaterais não idempotentes."
     ),
     "Use feedback and production failure modes to drive the next evaluation and architecture iteration.": (
         "Use feedback e modos de falha em produção para orientar a próxima iteração de avaliação e arquitetura."
@@ -456,6 +511,88 @@ ENGINE_PT = {
     "Require idempotency/deduplication for retried side effects and provide a kill-switch/feature flag for risky capabilities.": (
         "Exija idempotência/deduplicação para efeitos colaterais reexecutados e forneça um kill-switch/feature flag "
         "para capacidades de risco."
+    ),
+    # Entry point rationale
+    "The capability needs to be discoverable and reusable by more than one client; expose it "
+    "once through a standardized protocol server instead of rebuilding the integration per client.": (
+        "A capacidade precisa ser descoberta e reaproveitada por mais de um cliente; exponha-a uma vez "
+        "através de um servidor de protocolo padronizado, em vez de reconstruir a integração para cada cliente."
+    ),
+    "This is an engineering workflow where the path through unfamiliar work can't be scripted "
+    "in advance; route it through an agentic coding assistant rather than a bespoke end-user UI.": (
+        "Este é um fluxo de engenharia onde o caminho através de um trabalho desconhecido não pode ser "
+        "roteirizado com antecedência; direcione-o para um assistente de código agêntico em vez de uma "
+        "UI própria para usuário final."
+    ),
+    "A fully custom, branded, product-embedded experience needs direct API/SDK integration; a "
+    "generic hosted chat interface won't carry your brand or business logic.": (
+        "Uma experiência totalmente customizada, com marca própria, embutida no produto, precisa de "
+        "integração direta via API/SDK; uma interface de chat genérica hospedada não carrega sua "
+        "marca nem sua lógica de negócio."
+    ),
+    "No custom experience, engineering workflow or multi-client reuse was identified; a hosted "
+    "chat/web interface has the lowest build cost for this case.": (
+        "Nenhuma experiência customizada, fluxo de engenharia ou reaproveitamento multi-cliente foi "
+        "identificado; uma interface de chat/web hospedada tem o menor custo de construção para este caso."
+    ),
+    # Four model properties, as the decomposition lens
+    "Decide what each piece of context is for using the four model properties as the lens: "
+    "next-token prediction (pattern-rich generation, weak on precise specifics), knowledge "
+    "(reliable on common/stable topics, weak on rare or fast-changing ones), working memory "
+    "(a hard context-window edge, not graceful degradation) and steerability (reliable with "
+    "concrete/verifiable instructions, weak on abstract or long reasoning chains).": (
+        "Decida para que serve cada pedaço de contexto usando as quatro propriedades do modelo como "
+        "lente: previsão do próximo token (geração rica em padrões, fraca em detalhes precisos), "
+        "conhecimento (confiável em tópicos comuns/estáveis, fraco em tópicos raros ou que mudam "
+        "rápido), memória de trabalho (uma borda rígida da janela de contexto, não uma degradação "
+        "gradual) e steerability/direcionabilidade (confiável com instruções concretas/verificáveis, "
+        "fraca em cadeias de raciocínio longas ou abstratas)."
+    ),
+    # Model/provider strategy additions
+    "Compare delivery routes — a provider's direct API, a cloud marketplace/gateway, or a "
+    "self-hosted/open-weight runtime — on compliance, cost and latency before committing to one.": (
+        "Compare rotas de entrega — a API direta de um fornecedor, um marketplace/gateway de nuvem, "
+        "ou um runtime self-hosted/open-weight — em compliance, custo e latência antes de se "
+        "comprometer com uma."
+    ),
+    "Map business value to the five ROI pillars — efficiency, transformation, productivity, "
+    "solution cost and performance SLAs — before treating a feasible design as a funded one.": (
+        "Mapeie o valor de negócio aos cinco pilares de ROI — eficiência, transformação, "
+        "produtividade, custo da solução e SLAs de performance — antes de tratar um design viável "
+        "como um design financiado."
+    ),
+    # Delegation criteria
+    "Justify each model/system/human assignment through reversibility (can a wrong call be "
+    "undone?), stakes (what does a wrong call cost?) and accountability (who must answer for it?).": (
+        "Justifique cada atribuição a modelo/sistema/humano através de reversibilidade (uma decisão "
+        "errada pode ser desfeita?), stakes (quanto custa uma decisão errada?) e accountability "
+        "(quem precisa responder por ela?)."
+    ),
+    # Fairness & transparency
+    "Audit the four common bias injection points: retrieval-corpus representativeness, "
+    "prompt framing, few-shot example selection and downstream routing logic; each can skew "
+    "outcomes independently of model behavior.": (
+        "Audite os quatro pontos comuns de injeção de viés: representatividade do corpus de "
+        "retrieval, framing do prompt, seleção de exemplos few-shot e lógica de roteamento "
+        "downstream; cada um pode enviesar resultados independentemente do comportamento do modelo."
+    ),
+    "Log enough of each decision to reconstruct it afterward for the affected person, a "
+    "regulator and your own debugging team.": (
+        "Registre o suficiente de cada decisão para reconstruí-la depois para a pessoa afetada, "
+        "um regulador e seu próprio time de debug."
+    ),
+    # A/B testing / structured experimentation
+    "Before promoting a model, prompt or retrieval change, run a structured experiment: state the "
+    "hypothesis, pick metrics tied to the eval suite, size the sample, and avoid overclaiming from a single run.": (
+        "Antes de promover uma mudança de modelo, prompt ou retrieval, rode um experimento "
+        "estruturado: declare a hipótese, escolha métricas ligadas à suíte de evals, dimensione a "
+        "amostra, e evite superestimar a partir de uma única rodada."
+    ),
+    # Feasibility warning
+    "Estimated monthly cost exceeds the stated budget ceiling; narrow scope, add caching, or "
+    "raise the budget before committing.": (
+        "O custo mensal estimado excede o teto de orçamento informado; reduza o escopo, adicione "
+        "cache, ou aumente o orçamento antes de se comprometer."
     ),
 }
 
@@ -468,6 +605,30 @@ PATTERN_PT = {
     "Tool Protocol / MCP": "Protocolo de Ferramentas / MCP",
     "Agent-to-Agent": "Agente-a-Agente",
     "None": "Nenhuma",
+    # Entry point
+    "Hosted chat / web UI": "Chat / UI web hospedado",
+    "Agentic coding assistant (CLI/IDE)": "Assistente de código agêntico (CLI/IDE)",
+    "Direct API / SDK integration": "Integração direta via API / SDK",
+    "Protocol server for multi-client reuse": "Servidor de protocolo para reaproveitamento multi-cliente",
+    # Reference architecture
+    "Single augmented call": "Chamada única aumentada",
+    "RAG pipeline": "Pipeline de RAG",
+    "Document processing pipeline": "Pipeline de processamento de documentos",
+    "Routing": "Roteamento",
+    "Chaining": "Encadeamento",
+    "Orchestrator-workers": "Orquestrador-trabalhadores",
+    "Agent (autonomous tool use)": "Agente (uso autônomo de ferramentas)",
+    "Coding agent": "Agente de código",
+    # Feasibility verdict
+    "Feasible as scoped": "Viável como escopado",
+    "Feasible with constraints": "Viável com restrições",
+    "Not feasible as scoped": "Não viável como escopado",
+    "Not assessed": "Não avaliado",
+    # Review placement
+    "Pre-action approval": "Aprovação prévia à ação",
+    "Post-action audit": "Auditoria posterior à ação",
+    "Sampled review": "Revisão por amostragem",
+    "No review needed": "Sem necessidade de revisão",
 }
 
 CRITERIA_PT = {
@@ -558,6 +719,11 @@ EXPORT = {
         "pt-BR": "Alternativas consideradas",
         "en": "Alternatives considered",
     },
+    "entry_point": {"pt-BR": "Ponto de entrada", "en": "Entry point"},
+    "reference_architecture": {"pt-BR": "Arquitetura de referência", "en": "Reference architecture"},
+    "feasibility_verdict": {"pt-BR": "Veredito de viabilidade", "en": "Feasibility verdict"},
+    "review_placement": {"pt-BR": "Posicionamento de revisão", "en": "Review placement"},
+    "roi_notes": {"pt-BR": "Valor de negócio / ROI", "en": "Business value / ROI"},
 }
 
 
