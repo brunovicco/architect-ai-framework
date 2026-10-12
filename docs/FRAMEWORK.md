@@ -122,10 +122,12 @@ When a decision can affect people or groups unevenly — approval/denial,
 prioritization, eligibility — add two obligations on top of the usual
 Trust & Controls set:
 
-- Audit the four common bias injection points: retrieval-corpus
-  representativeness, prompt framing, few-shot example selection and
-  downstream routing logic — each can skew outcomes independently of model
-  behavior.
+- Audit the six common bias injection points: retrieval-corpus
+  representativeness, prompt framing, few-shot example selection,
+  downstream routing logic, temporal/staleness bias (decisions made on
+  outdated data) and interaction/feedback-loop bias (the system
+  reinforcing patterns from past user behavior) — each can skew outcomes
+  independently of model behavior.
 - Log enough of each decision to reconstruct it afterward for the affected
   person, a regulator and your own debugging team.
 

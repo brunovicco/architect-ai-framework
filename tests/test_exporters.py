@@ -154,3 +154,44 @@ def test_roi_notes_omitted_from_markdown_when_blank():
     plan = DecisionPlan(case=case, recommendation=recommend(case))
     md = to_markdown(plan)
     assert "Business value/ROI" not in md
+
+
+def test_recommended_pattern_note_appears_near_selected_option_in_all_formats():
+    """Every export restates the engine's recommended architecture pattern next to
+    the user's selected option, so a divergence between the two (e.g. the engine
+    recommends Agent but the user picked a workflow-only option) is visible without
+    cross-referencing another section.
+    """
+    case = ArchitectureCase(name="Demo", dynamic_tool_choice=True)
+    recommendation = recommend(case)
+    assert recommendation.architecture_pattern == "Agent"
+    plan = DecisionPlan(case=case, recommendation=recommendation, selected_option="Workflow only")
+
+    md = to_markdown(plan)
+    adr = to_adr_markdown(plan)
+    docx_text = _docx_text(to_docx_bytes(plan))
+    pdf_bytes = to_pdf_bytes(plan)
+    for text in (md, adr, docx_text):
+        assert "Engine-recommended pattern" in text
+        assert "Agent" in text
+    assert b"Engine-recommended pattern" in pdf_bytes
+    assert b"Agent" in pdf_bytes
+
+
+def test_feasibility_warnings_hint_shown_only_when_warnings_present():
+    """The feasibility verdict points to the Warnings section only when there
+    actually are warnings to read - not for a clean "Feasible as scoped"/"Not
+    assessed" verdict, which would have nothing to point to.
+    """
+    warned_case = ArchitectureCase(
+        name="Demo", path_known=False, dynamic_next_steps=True, independent_autonomous_domains=True)
+    warned_plan = DecisionPlan(case=warned_case, recommendation=recommend(warned_case))
+    assert warned_plan.recommendation.warnings
+    md_with_warnings = to_markdown(warned_plan)
+    assert "see Warnings below" in md_with_warnings
+
+    clean_case = ArchitectureCase(name="Demo")
+    clean_plan = DecisionPlan(case=clean_case, recommendation=recommend(clean_case))
+    assert not clean_plan.recommendation.warnings
+    md_without_warnings = to_markdown(clean_plan)
+    assert "see Warnings below" not in md_without_warnings

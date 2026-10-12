@@ -6,6 +6,7 @@
     "users": "Retail banking customers",
     "quality_target": "High groundedness and task success on investment queries",
     "latency_target": "Low latency for read-only requests; higher budget for complex analysis",
+    "cost_constraint": "Up to $800/month at current query volume",
     "regulatory_constraints": "Suitability, auditability and human/user confirmation before transactional side effects",
     "path_known": true,
     "dynamic_tool_choice": true,

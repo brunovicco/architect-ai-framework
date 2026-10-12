@@ -80,6 +80,7 @@ def to_markdown(plan: DecisionPlan, lang: str = "en") -> str:
         else ""
     )
     roi_block = f"\n**{e(lang, 'roi_notes')}:** {c.roi_notes}\n" if c.roi_notes else ""
+    feasibility_hint = f" ({e(lang, 'feasibility_warnings_hint')})" if r.warnings else ""
 
     return f"""# {e(lang, 'doc_title')} — {c.name}
 
@@ -107,7 +108,7 @@ def to_markdown(plan: DecisionPlan, lang: str = "en") -> str:
 {_bullets(translate_items(lang, r.information_strategy), lang)}
 
 ## {e(lang, 'section_model')}
-- {e(lang, 'feasibility_verdict')}: **{translate_pattern(lang, r.feasibility_verdict)}**
+- {e(lang, 'feasibility_verdict')}: **{translate_pattern(lang, r.feasibility_verdict)}**{feasibility_hint}
 {_bullets(translate_items(lang, r.model_strategy), lang)}
 {comparison_block}{roi_block}
 ## {e(lang, 'section_t')}
@@ -121,6 +122,7 @@ def to_markdown(plan: DecisionPlan, lang: str = "en") -> str:
 ### {e(lang, 'option_matrix')}
 {option_text}
 
+**{e(lang, 'recommended_pattern_note')}:** {translate_pattern(lang, r.architecture_pattern)}
 **{e(lang, 'selected_option')}:** {plan.selected_option or e(lang, 'not_selected')}
 **{e(lang, 'tradeoff_notes')}:** {plan.tradeoff_notes or not_defined}
 
@@ -187,7 +189,8 @@ def to_docx_bytes(plan: DecisionPlan, lang: str = "en") -> bytes:
         (
             e(lang, "section_model"),
             [
-                f"{e(lang, 'feasibility_verdict')}: {translate_pattern(lang, r.feasibility_verdict)}",
+                f"{e(lang, 'feasibility_verdict')}: {translate_pattern(lang, r.feasibility_verdict)}"
+                + (f" ({e(lang, 'feasibility_warnings_hint')})" if r.warnings else ""),
                 *translate_items(lang, r.model_strategy),
                 *([f"{e(lang, 'roi_notes')}: {c.roi_notes}"]
                   if c.roi_notes else []),
@@ -219,6 +222,8 @@ def to_docx_bytes(plan: DecisionPlan, lang: str = "en") -> bytes:
                 f"{option.name}: {normalized_score(option.scores):.1%}", style="List Bullet")
     else:
         doc.add_paragraph(e(lang, "no_option_matrix"), style="List Bullet")
+    doc.add_paragraph(
+        f"{e(lang, 'recommended_pattern_note')}: {translate_pattern(lang, r.architecture_pattern)}")
     doc.add_paragraph(
         f"{e(lang, 'selected_option')}: {plan.selected_option or e(lang, 'not_selected')}")
     doc.add_paragraph(
@@ -353,7 +358,8 @@ def to_pdf_bytes(plan: DecisionPlan, lang: str = "en") -> bytes:
     bullets(translate_items(lang, r.information_strategy))
 
     heading(e(lang, "section_model"))
-    body(f"{e(lang, 'feasibility_verdict')}: {translate_pattern(lang, r.feasibility_verdict)}")
+    feasibility_hint = f" ({e(lang, 'feasibility_warnings_hint')})" if r.warnings else ""
+    body(f"{e(lang, 'feasibility_verdict')}: {translate_pattern(lang, r.feasibility_verdict)}{feasibility_hint}")
     bullets(translate_items(lang, r.model_strategy))
     if c.roi_notes:
         body(f"{e(lang, 'roi_notes')}: {c.roi_notes}")
@@ -378,6 +384,7 @@ def to_pdf_bytes(plan: DecisionPlan, lang: str = "en") -> bytes:
             body(f"- {option.name}: {normalized_score(option.scores):.1%}")
     else:
         body(f"- {e(lang, 'no_option_matrix')}")
+    body(f"{e(lang, 'recommended_pattern_note')}: {translate_pattern(lang, r.architecture_pattern)}")
     body(f"{e(lang, 'selected_option')}: {plan.selected_option or e(lang, 'not_selected')}")
     body(f"{e(lang, 'tradeoff_notes')}: {plan.tradeoff_notes or not_defined}")
 
@@ -416,6 +423,7 @@ def to_adr_markdown(plan: DecisionPlan, lang: str = "en") -> str:
         integration=translate_pattern(lang, r.integration_pattern),
     )
     roi_line = f"\n**{e(lang, 'roi_notes')}:** {c.roi_notes}\n" if c.roi_notes else ""
+    feasibility_hint = f" ({e(lang, 'feasibility_warnings_hint')})" if r.warnings else ""
 
     return f"""# {e(lang, 'adr_title_prefix')}: {c.name}
 
@@ -433,7 +441,7 @@ def to_adr_markdown(plan: DecisionPlan, lang: str = "en") -> str:
 ## {e(lang, 'adr_decision_heading')}
 - {e(lang, 'entry_point')}: **{translate_pattern(lang, r.entry_point)}**
 - {e(lang, 'reference_architecture')}: **{translate_pattern(lang, r.reference_architecture)}**
-- {e(lang, 'feasibility_verdict')}: **{translate_pattern(lang, r.feasibility_verdict)}**
+- {e(lang, 'feasibility_verdict')}: **{translate_pattern(lang, r.feasibility_verdict)}**{feasibility_hint}
 
 {decision_intro}
 
@@ -454,6 +462,7 @@ def to_adr_markdown(plan: DecisionPlan, lang: str = "en") -> str:
 ## {e(lang, 'adr_alternatives_heading')}
 {option_text}
 
+**{e(lang, 'recommended_pattern_note')}:** {translate_pattern(lang, r.architecture_pattern)}
 **{e(lang, 'selected_option')}:** {plan.selected_option or e(lang, 'not_selected')}
 **{e(lang, 'tradeoff_notes')}:** {plan.tradeoff_notes or not_defined}
 

@@ -28,6 +28,7 @@ from architect.i18n import (
     DEFAULT_LANG,
     LANGS,
     MODEL_CRITERIA,
+    e,
     t,
     translate_criterion,
     translate_items,
@@ -418,6 +419,7 @@ with compare:
     best_name = max(scores, key=scores.get)
     st.metric(t(lang, "highest_score_label"),
               f"{best_name} · {scores[best_name]:.1%}")
+    st.caption(f"{e(lang, 'recommended_pattern_note')}: {translate_pattern(lang, rec.architecture_pattern)}")
     st.markdown(f"**{t(lang, 'selected_option_label')}**")
     selected_option = st.selectbox(
         "selected_option", option_names, index=option_names.index(best_name), label_visibility="collapsed"
@@ -483,6 +485,8 @@ with final:
     with e_:
         st.metric(t(lang, "feasibility_verdict_metric_label"),
                   translate_pattern(lang, rec.feasibility_verdict))
+        if rec.warnings:
+            st.caption(e(lang, "feasibility_warnings_hint"))
     with f_:
         st.metric(t(lang, "review_placement_metric_label"),
                   translate_pattern(lang, rec.review_placement))

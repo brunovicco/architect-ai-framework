@@ -262,9 +262,11 @@ def recommend(case: ArchitectureCase) -> Recommendation:
             "Use progressive capability discovery/exposure so the model sees only relevant tools at each stage.")
     if case.differential_outcomes_risk:
         controls.append(
-            "Audit the four common bias injection points: retrieval-corpus representativeness, "
-            "prompt framing, few-shot example selection and downstream routing logic; each can skew "
-            "outcomes independently of model behavior."
+            "Audit the six common bias injection points: retrieval-corpus representativeness, "
+            "prompt framing, few-shot example selection, downstream routing logic, temporal/staleness "
+            "bias (decisions made on outdated data) and interaction/feedback-loop bias (the system "
+            "reinforcing patterns from past user behavior); each can skew outcomes independently of "
+            "model behavior."
         )
         controls.append(
             "Log enough of each decision to reconstruct it afterward for the affected person, a "

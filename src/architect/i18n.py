@@ -565,12 +565,17 @@ ENGINE_PT = {
         "errada pode ser desfeita?), stakes (quanto custa uma decisão errada?) e accountability "
         "(quem precisa responder por ela?)."
     ),
-    "Audit the four common bias injection points: retrieval-corpus representativeness, "
-    "prompt framing, few-shot example selection and downstream routing logic; each can skew "
-    "outcomes independently of model behavior.": (
-        "Audite os quatro pontos comuns de injeção de viés: representatividade do corpus de "
-        "retrieval, framing do prompt, seleção de exemplos few-shot e lógica de roteamento "
-        "downstream; cada um pode enviesar resultados independentemente do comportamento do modelo."
+    "Audit the six common bias injection points: retrieval-corpus representativeness, "
+    "prompt framing, few-shot example selection, downstream routing logic, temporal/staleness "
+    "bias (decisions made on outdated data) and interaction/feedback-loop bias (the system "
+    "reinforcing patterns from past user behavior); each can skew outcomes independently of "
+    "model behavior.": (
+        "Audite os seis pontos comuns de injeção de viés: representatividade do corpus de "
+        "retrieval, framing do prompt, seleção de exemplos few-shot, lógica de roteamento "
+        "downstream, viés temporal/de desatualização (decisões tomadas com dados defasados) e "
+        "viés de interação/loop de feedback (o sistema reforçando padrões do comportamento "
+        "passado do usuário); cada um pode enviesar resultados independentemente do comportamento "
+        "do modelo."
     ),
     "Log enough of each decision to reconstruct it afterward for the affected person, a "
     "regulator and your own debugging team.": (
@@ -743,8 +748,13 @@ EXPORT = {
     "entry_point": {"pt-BR": "Ponto de entrada", "en": "Entry point"},
     "reference_architecture": {"pt-BR": "Arquitetura de referência", "en": "Reference architecture"},
     "feasibility_verdict": {"pt-BR": "Veredito de viabilidade", "en": "Feasibility verdict"},
+    "feasibility_warnings_hint": {"pt-BR": "ver Avisos abaixo", "en": "see Warnings below"},
     "review_placement": {"pt-BR": "Posicionamento de revisão", "en": "Review placement"},
     "roi_notes": {"pt-BR": "Valor de negócio/ROI", "en": "Business value/ROI"},
+    "recommended_pattern_note": {
+        "pt-BR": "Padrão recomendado pelo motor (ver Q/U acima)",
+        "en": "Engine-recommended pattern (see C/H above)",
+    },
 }
 
 

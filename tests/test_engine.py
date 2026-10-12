@@ -55,6 +55,20 @@ def test_high_impact_splits_controls_into_input_output_authorization():
     assert "Authorization:" in controls
 
 
+def test_differential_outcomes_risk_audits_six_bias_points_including_temporal_and_interaction():
+    """Fairness-risk cases get all six bias injection points, including temporal/staleness
+    and interaction/feedback-loop bias (not just the original four).
+    """
+    result = recommend(ArchitectureCase(differential_outcomes_risk=True))
+    controls = " ".join(result.controls).lower()
+    assert "retrieval-corpus" in controls
+    assert "prompt framing" in controls
+    assert "few-shot" in controls
+    assert "downstream routing" in controls
+    assert "temporal" in controls
+    assert "interaction/feedback-loop" in controls
+
+
 # Entry point
 
 
