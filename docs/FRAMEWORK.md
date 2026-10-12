@@ -159,7 +159,8 @@ Evaluate model/runtime candidates against:
 - residency/compliance constraints;
 - availability and rate limits;
 - observability and operational support;
-- portability and vendor lock-in risk.
+- portability and vendor lock-in risk;
+- explainability and fairness/bias auditability.
 
 A model or provider that violates a hard constraint is eliminated regardless of benchmark score.
 

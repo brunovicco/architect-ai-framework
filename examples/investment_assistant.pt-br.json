@@ -137,6 +137,14 @@
         "Open-weight self-hosted": "Lock-in baixo (pesos abertos)",
         "Provedor regional/soberano": "Moderado (API proprietária regional)"
       }
+    },
+    {
+      "criterion": "Explicabilidade/auditabilidade de viés",
+      "notes": {
+        "Provedor de API gerenciado": "Limitada (caixa-preta); poucos fornecedores expõem atribuição ou pesos para auditoria",
+        "Open-weight self-hosted": "Alta - pesos e dados de treino auditáveis internamente, mas exige expertise própria",
+        "Provedor regional/soberano": "Moderada; depende de certificações e documentação do fornecedor"
+      }
     }
   ]
 }

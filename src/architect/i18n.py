@@ -305,6 +305,10 @@ UI = {
         "pt-BR": "Portabilidade/risco de lock-in",
         "en": "Portability/lock-in risk",
     },
+    "model_criterion_explainability_label": {
+        "pt-BR": "Explicabilidade/auditabilidade de viés",
+        "en": "Explainability/fairness auditability",
+    },
 
     "saved_cases_header": {"pt-BR": "Casos salvos (sessão)", "en": "Saved cases (session)"},
     "saved_case_name_placeholder": {"pt-BR": "Nome do caso para salvar", "en": "Name to save as"},
@@ -359,6 +363,7 @@ MODEL_CRITERIA = [
     "model_criterion_privacy_label",
     "model_criterion_rate_limits_label",
     "model_criterion_portability_label",
+    "model_criterion_explainability_label",
 ]
 
 UI["sidebar_steps"] = {
@@ -422,6 +427,12 @@ ENGINE_PT = {
     ),
     "Use RAG for enterprise/document knowledge; evaluate chunking, indexing, retrieval quality and citations.": (
         "Use RAG para conhecimento corporativo/documental; avalie chunking, indexação, qualidade de recuperação e citações."
+    ),
+    "Define a low-confidence-retrieval fallback up front: when nothing relevant comes back, "
+    "the system should decline or escalate to a human, not let the model guess from its own memory.": (
+        "Defina de antemão um fallback para recuperação de baixa confiança: quando nada relevante "
+        "retornar, o sistema deve recusar ou escalar para um humano, não deixar o modelo adivinhar "
+        "a partir da própria memória."
     ),
     "Use a live operational source/API as source of truth for dynamic data; "
     "do not rely on model memory or stale RAG snapshots.": (
@@ -526,10 +537,12 @@ ENGINE_PT = {
         "UI própria para usuário final."
     ),
     "A fully custom, branded, product-embedded experience needs direct API/SDK integration; a "
-    "generic hosted chat interface won't carry your brand or business logic.": (
+    "generic hosted chat interface won't carry your brand or business logic unless the provider "
+    "offers white-labeled embedding - verify that before ruling it out.": (
         "Uma experiência totalmente customizada, com marca própria, embutida no produto, precisa de "
         "integração direta via API/SDK; uma interface de chat genérica hospedada não carrega sua "
-        "marca nem sua lógica de negócio."
+        "marca nem sua lógica de negócio, a menos que o fornecedor ofereça embedding white-label - "
+        "verifique isso antes de descartar a opção."
     ),
     "No custom experience, engineering workflow or multi-client reuse was identified; a hosted "
     "chat/web interface has the lowest build cost for this case.": (
@@ -593,9 +606,12 @@ ENGINE_PT = {
         "do modelo."
     ),
     "Log enough of each decision to reconstruct it afterward for the affected person, a "
-    "regulator and your own debugging team.": (
+    "regulator and your own debugging team - e.g. the prompt/response content, model/version, "
+    "tool-call IDs, retrieval sources used, and the authorization decision with its evidence.": (
         "Registre o suficiente de cada decisão para reconstruí-la depois para a pessoa afetada, "
-        "um regulador e seu próprio time de debug."
+        "um regulador e seu próprio time de debug - ex.: o conteúdo do prompt/resposta, "
+        "modelo/versão, IDs das chamadas de ferramenta, fontes de retrieval usadas, e a decisão "
+        "de autorização com sua evidência."
     ),
     "Before promoting a model, prompt or retrieval change, run a structured experiment: state the "
     "hypothesis, pick metrics tied to the eval suite, size the sample, and avoid overclaiming from a single run.": (
@@ -731,6 +747,12 @@ EXPORT = {
     "section_e": {"pt-BR": "E - Evaluation", "en": "E - Evaluation"},
     "section_tradeoffs": {"pt-BR": "T - Trade-offs", "en": "C - Comparison"},
     "option_matrix": {"pt-BR": "Matriz de opções", "en": "Option matrix"},
+    "option_matrix_methodology_note": {
+        "pt-BR": "Cada opção recebe nota 1-5 por critério; o percentual é a média ponderada pelos "
+        "pesos de cada critério (ver docs/FRAMEWORK.md).",
+        "en": "Each option is scored 1-5 per criterion; the percentage is the weighted average across "
+        "each criterion's weight (see docs/FRAMEWORK.md).",
+    },
     "selected_option": {"pt-BR": "Opção selecionada", "en": "Selected option"},
     "tradeoff_notes": {"pt-BR": "Notas de trade-off", "en": "Trade-off notes"},
     "section_operations": {"pt-BR": "O - Operação", "en": "T - Telemetry"},

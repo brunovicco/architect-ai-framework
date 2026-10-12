@@ -51,7 +51,8 @@ def _entry_point(case: ArchitectureCase, rationale: list[str]) -> EntryPoint:
     if case.needs_custom_user_experience:
         rationale.append(
             "A fully custom, branded, product-embedded experience needs direct API/SDK integration; a "
-            "generic hosted chat interface won't carry your brand or business logic."
+            "generic hosted chat interface won't carry your brand or business logic unless the provider "
+            "offers white-labeled embedding - verify that before ruling it out."
         )
         return "Direct API/SDK integration"
     rationale.append(
@@ -207,6 +208,9 @@ def recommend(case: ArchitectureCase) -> Recommendation:
     if case.needs_document_knowledge:
         information.append(
             "Use RAG for enterprise/document knowledge; evaluate chunking, indexing, retrieval quality and citations.")
+        information.append(
+            "Define a low-confidence-retrieval fallback up front: when nothing relevant comes back, "
+            "the system should decline or escalate to a human, not let the model guess from its own memory.")
     if case.needs_dynamic_data:
         information.append(
             "Use a live operational source/API as source of truth for dynamic data; do not rely on model memory or stale RAG snapshots.")
@@ -278,7 +282,8 @@ def recommend(case: ArchitectureCase) -> Recommendation:
         )
         controls.append(
             "Log enough of each decision to reconstruct it afterward for the affected person, a "
-            "regulator and your own debugging team."
+            "regulator and your own debugging team - e.g. the prompt/response content, model/version, "
+            "tool-call IDs, retrieval sources used, and the authorization decision with its evidence."
         )
 
     review_placement = _review_placement(case)

@@ -42,7 +42,7 @@ The UI ships with a one-click example case ("Investment Assistant") so you can s
 - Generates security/governance recommendations such as least privilege, execution-layer authorization, HITL and fail-closed behavior, input/output screening, fairness-injection-point auditing, and a stakes-driven review placement (pre-action approval/sampled review/post-action audit).
 - Produces an evaluation and observability plan, including structured A/B-experiment guidance and a feasibility verdict against an optional cost ceiling.
 - Compares up to three architecture options with weighted trade-offs.
-- Compares model/provider candidates across 8 vendor-neutral criteria (quality fit, latency, cost, context window, structured output, privacy/residency, rate limits, portability) - structure only, no opinion on which vendor to pick.
+- Compares model/provider candidates across 9 vendor-neutral criteria (quality fit, latency, cost, context window, structured output, privacy/residency, rate limits, portability, explainability/fairness auditability) - structure only, no opinion on which vendor to pick.
 - Exports the final **Architecture Decision Plan** as Markdown, DOCX, PDF, JSON or a Nygard-style **ADR** - in either language.
 - Round-trips a plan: re-import a previously exported JSON file, or save/load named drafts for the current browser session.
 - Optional, vendor-neutral **AI review**: point it at any OpenAI-chat-completions-compatible endpoint (OpenAI, Ollama, vLLM, a gateway...) to get a critique of the generated plan. Guarded against SSRF - see [Security](#security).

@@ -72,6 +72,7 @@ def to_markdown(plan: DecisionPlan, lang: str = "en") -> str:
         option_lines.append(
             f"- **{option.name}:** {normalized_score(option.scores):.1%}")
     option_text = "\n".join(option_lines) or f"- {e(lang, 'no_option_matrix')}"
+    option_methodology_note = f"*{e(lang, 'option_matrix_methodology_note')}*\n" if plan.option_scores else ""
     comparison_lines = model_comparison_lines(plan, lang)
     comparison_block = (
         f"\n## {e(lang, 'model_comparison_heading')}\n" +
@@ -121,7 +122,7 @@ def to_markdown(plan: DecisionPlan, lang: str = "en") -> str:
 ## {e(lang, 'section_tradeoffs')}
 ### {e(lang, 'option_matrix')}
 {option_text}
-
+{option_methodology_note}
 **{e(lang, 'recommended_pattern_note')}:** {translate_pattern(lang, r.architecture_pattern)}
 **{e(lang, 'selected_option')}:** {plan.selected_option or e(lang, 'not_selected')}
 **{e(lang, 'tradeoff_notes')}:** {plan.tradeoff_notes or not_defined}
@@ -220,6 +221,7 @@ def to_docx_bytes(plan: DecisionPlan, lang: str = "en") -> bytes:
         for option in plan.option_scores:
             doc.add_paragraph(
                 f"{option.name}: {normalized_score(option.scores):.1%}", style="List Bullet")
+        doc.add_paragraph(e(lang, "option_matrix_methodology_note"))
     else:
         doc.add_paragraph(e(lang, "no_option_matrix"), style="List Bullet")
     doc.add_paragraph(
@@ -382,6 +384,7 @@ def to_pdf_bytes(plan: DecisionPlan, lang: str = "en") -> bytes:
     if plan.option_scores:
         for option in plan.option_scores:
             body(f"- {option.name}: {normalized_score(option.scores):.1%}")
+        body(e(lang, "option_matrix_methodology_note"))
     else:
         body(f"- {e(lang, 'no_option_matrix')}")
     body(f"{e(lang, 'recommended_pattern_note')}: {translate_pattern(lang, r.architecture_pattern)}")
@@ -418,6 +421,7 @@ def to_adr_markdown(plan: DecisionPlan, lang: str = "en") -> str:
         option_lines.append(
             f"- **{option.name}:** {normalized_score(option.scores):.1%}")
     option_text = "\n".join(option_lines) or f"- {e(lang, 'no_option_matrix')}"
+    option_methodology_note = f"*{e(lang, 'option_matrix_methodology_note')}*\n" if plan.option_scores else ""
     decision_intro = e(lang, "adr_decision_intro").format(
         architecture=translate_pattern(lang, r.architecture_pattern),
         integration=translate_pattern(lang, r.integration_pattern),
@@ -461,7 +465,7 @@ def to_adr_markdown(plan: DecisionPlan, lang: str = "en") -> str:
 
 ## {e(lang, 'adr_alternatives_heading')}
 {option_text}
-
+{option_methodology_note}
 **{e(lang, 'recommended_pattern_note')}:** {translate_pattern(lang, r.architecture_pattern)}
 **{e(lang, 'selected_option')}:** {plan.selected_option or e(lang, 'not_selected')}
 **{e(lang, 'tradeoff_notes')}:** {plan.tradeoff_notes or not_defined}

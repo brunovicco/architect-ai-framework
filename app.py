@@ -424,6 +424,7 @@ with compare:
     best_name = max(scores, key=scores.get)
     st.metric(t(lang, "highest_score_label"),
               f"{best_name} · {scores[best_name]:.1%}")
+    st.caption(e(lang, "option_matrix_methodology_note"))
     st.caption(f"{e(lang, 'recommended_pattern_note')}: {translate_pattern(lang, rec.architecture_pattern)}")
     st.markdown(f"**{t(lang, 'selected_option_label')}**")
     selected_option = st.selectbox(

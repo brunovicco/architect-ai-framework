@@ -137,6 +137,14 @@
         "Self-hosted open-weight": "Low lock-in (open weights)",
         "Regional/sovereign provider": "Moderate (regional proprietary API)"
       }
+    },
+    {
+      "criterion": "Explainability/fairness auditability",
+      "notes": {
+        "Managed API provider": "Limited (black box); few vendors expose attribution or weights for audit",
+        "Self-hosted open-weight": "High - weights and training data auditable in-house, but requires your own expertise",
+        "Regional/sovereign provider": "Moderate; depends on vendor certifications and documentation"
+      }
     }
   ]
 }

@@ -42,7 +42,7 @@ A interface vem com um caso de exemplo de um clique ("Investment Assistant") par
 - Gera recomendações de segurança/governança como privilégio mínimo, autorização na camada de execução, HITL e comportamento fail-closed, input/output screening, auditoria dos pontos de injeção de viés, e um posicionamento de revisão orientado por stakes (aprovação prévia/revisão por amostragem/auditoria posterior).
 - Produz um plano de avaliação e observabilidade, incluindo orientação de experimento A/B estruturado e um veredito de viabilidade contra um teto de custo opcional.
 - Compara até três opções de arquitetura com trade-offs ponderados.
-- Compara candidatos de modelo/fornecedor em 8 critérios neutros em fornecedor (aderência de qualidade, latência, custo, janela de contexto, saída estruturada, privacidade/residência, limites de taxa, portabilidade) - só estrutura, sem opinião sobre qual fornecedor escolher.
+- Compara candidatos de modelo/fornecedor em 9 critérios neutros em fornecedor (aderência de qualidade, latência, custo, janela de contexto, saída estruturada, privacidade/residência, limites de taxa, portabilidade, explicabilidade/auditabilidade de viés) - só estrutura, sem opinião sobre qual fornecedor escolher.
 - Exporta o **Plano de Decisão de Arquitetura** final em Markdown, DOCX, PDF, JSON ou um **ADR** no estilo Nygard - em qualquer um dos dois idiomas.
 - Permite retomar um plano: reimporte um JSON exportado anteriormente, ou salve/carregue rascunhos nomeados durante a sessão atual do navegador.
 - **Revisão por IA** opcional e neutra em fornecedor: aponte para qualquer endpoint compatível com a API de chat da OpenAI (OpenAI, Ollama, vLLM, um gateway...) para obter uma crítica do plano gerado. Protegida contra SSRF - veja [Segurança](#segurança).
