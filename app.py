@@ -10,6 +10,7 @@ untouched by anything here.
 Run with `streamlit run app.py`.
 """
 
+import datetime
 import json
 import sys
 from pathlib import Path
@@ -45,6 +46,52 @@ EXAMPLE_PATHS = {
 CANDIDATE_KEYS = ("model_candidate_a",
                   "model_candidate_b", "model_candidate_c")
 CANDIDATE_COLS = ("a", "b", "c")
+
+# Shared-credential AI review path (see `docs/PROVIDERS_SECURITY_CHECKLIST.md`
+# control #9): a server-held key is optionally offered so a visitor doesn't
+# have to paste their own, bounded by a global daily cap, a per-browser-session
+# cap, and a response-length cap so one shared key's blast radius stays small.
+AI_REVIEW_SHARED_DAILY_CAP = 20
+AI_REVIEW_SHARED_PER_SESSION_CAP = 3
+AI_REVIEW_SHARED_MAX_TOKENS = 2000
+
+
+@st.cache_resource
+def _ai_review_shared_quota_state() -> dict:
+    """Process-wide (best-effort) counter for the shared AI review credential.
+
+    `st.cache_resource` hands back the same dict to every visitor's session in
+    this process, so it's the global backstop against a runaway bill - it
+    resets whenever the app restarts/redeploys, and isn't safe if this app is
+    ever horizontally scaled to multiple instances. The per-session cap
+    (`AI_REVIEW_SHARED_PER_SESSION_CAP`, tracked in `st.session_state`) is the
+    other half of the check and doesn't share this limitation.
+    """
+    return {"date": None, "count": 0}
+
+
+def _ai_review_shared_quota_exceeded(lang: str) -> str | None:
+    """Return a translated warning if the shared-credential quota is used up,
+    else None. Read-only - call `_ai_review_consume_shared_quota()` only after
+    a successful response, so a failed call never burns a visitor's quota.
+    """
+    state = _ai_review_shared_quota_state()
+    today = datetime.date.today().isoformat()
+    if state["date"] != today:
+        state["date"] = today
+        state["count"] = 0
+    if state["count"] >= AI_REVIEW_SHARED_DAILY_CAP:
+        return t(lang, "ai_review_shared_daily_limit")
+    if st.session_state.get("ai_review_shared_uses", 0) >= AI_REVIEW_SHARED_PER_SESSION_CAP:
+        return t(lang, "ai_review_shared_session_limit")
+    return None
+
+
+def _ai_review_consume_shared_quota() -> None:
+    """Record one successful shared-credential AI review against both caps."""
+    state = _ai_review_shared_quota_state()
+    state["count"] += 1
+    st.session_state["ai_review_shared_uses"] = st.session_state.get("ai_review_shared_uses", 0) + 1
 
 
 def _load_example() -> None:
@@ -593,22 +640,74 @@ with final:
     st.divider()
     with st.expander(t(lang, "ai_review_expander_label")):
         st.write(t(lang, "ai_review_intro"))
-        ac1, ac2, ac3 = st.columns(3)
-        with ac1:
-            st.caption(t(lang, "ai_review_base_url_label"))
-            ai_base_url = st.text_input(
-                "ai_base_url", key="ai_base_url", label_visibility="collapsed")
-        with ac2:
-            st.caption(t(lang, "ai_review_api_key_label"))
-            ai_api_key = st.text_input(
-                "ai_api_key", key="ai_api_key", type="password", label_visibility="collapsed")
-        with ac3:
-            st.caption(t(lang, "ai_review_model_label"))
-            ai_model = st.text_input(
-                "ai_model", key="ai_model", label_visibility="collapsed")
+
+        try:
+            shared_secrets = dict(st.secrets.get("ai_review", {}))
+        except Exception:
+            shared_secrets = {}
+        shared_available = bool(
+            shared_secrets.get("base_url") and shared_secrets.get("api_key") and shared_secrets.get("model"))
+
+        if shared_available:
+            st.caption(t(lang, "ai_review_mode_label"))
+            ai_review_mode = st.radio(
+                "ai_review_mode",
+                options=["shared", "byo"],
+                format_func=lambda v: t(lang, "ai_review_mode_shared") if v == "shared" else t(lang, "ai_review_mode_byo"),
+                key="ai_review_mode",
+                label_visibility="collapsed",
+                horizontal=True,
+            )
+        else:
+            ai_review_mode = "byo"
+
+        if ai_review_mode == "shared":
+            st.caption(
+                t(lang, "ai_review_shared_caption").format(
+                    model=shared_secrets["model"],
+                    daily=AI_REVIEW_SHARED_DAILY_CAP,
+                    session=AI_REVIEW_SHARED_PER_SESSION_CAP,
+                )
+            )
+            ai_base_url = ai_api_key = ai_model = None
+        else:
+            ac1, ac2, ac3 = st.columns(3)
+            with ac1:
+                st.caption(t(lang, "ai_review_base_url_label"))
+                ai_base_url = st.text_input(
+                    "ai_base_url", key="ai_base_url", label_visibility="collapsed")
+            with ac2:
+                st.caption(t(lang, "ai_review_api_key_label"))
+                ai_api_key = st.text_input(
+                    "ai_api_key", key="ai_api_key", type="password", label_visibility="collapsed")
+            with ac3:
+                st.caption(t(lang, "ai_review_model_label"))
+                ai_model = st.text_input(
+                    "ai_model", key="ai_model", label_visibility="collapsed")
 
         if st.button(t(lang, "ai_review_button")):
-            if not (ai_base_url and ai_api_key and ai_model):
+            if ai_review_mode == "shared":
+                quota_error = _ai_review_shared_quota_exceeded(lang)
+                if quota_error:
+                    st.warning(quota_error)
+                else:
+                    try:
+                        with st.spinner(t(lang, "ai_review_loading")):
+                            adapter = OpenAICompatibleAdapter(
+                                base_url=shared_secrets["base_url"],
+                                api_key=shared_secrets["api_key"],
+                                model=shared_secrets["model"],
+                                max_tokens=AI_REVIEW_SHARED_MAX_TOKENS,
+                            )
+                            review = adapter.generate(
+                                system=t(lang, "ai_review_system_prompt"), user=md)
+                    except (ValueError, AdapterError) as exc:
+                        st.session_state.pop("ai_review_result", None)
+                        st.error(t(lang, "ai_review_error").format(error=exc))
+                    else:
+                        _ai_review_consume_shared_quota()
+                        st.session_state["ai_review_result"] = review
+            elif not (ai_base_url and ai_api_key and ai_model):
                 st.warning(t(lang, "ai_review_intro"))
             else:
                 try:

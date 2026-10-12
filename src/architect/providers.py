@@ -93,7 +93,14 @@ class OpenAICompatibleAdapter:
     value comes from the (untrusted) visitor of a publicly hosted instance.
     """
 
-    def __init__(self, base_url: str, api_key: str, model: str, timeout: float = 60.0) -> None:
+    def __init__(
+        self,
+        base_url: str,
+        api_key: str,
+        model: str,
+        timeout: float = 60.0,
+        max_tokens: int | None = None,
+    ) -> None:
         """Initialize the adapter and validate its target endpoint.
 
         Args:
@@ -106,6 +113,12 @@ class OpenAICompatibleAdapter:
                 can take well over the old 30s default to respond, so this
                 defaults higher; `generate()` always raises `AdapterError`
                 on expiry rather than letting the raw timeout escape.
+            max_tokens: Optional cap on the response length, forwarded to
+                the endpoint as-is. Left unset (the default) for a
+                caller-supplied credential, where the visitor bears their
+                own cost; a caller sharing one server-held credential across
+                anonymous visitors should pass a conservative value here to
+                bound per-request cost.
 
         Raises:
             ValueError: If `base_url` fails the SSRF guard.
@@ -115,6 +128,7 @@ class OpenAICompatibleAdapter:
         self._api_key = api_key
         self._model = model
         self._timeout = timeout
+        self._max_tokens = max_tokens
 
     def generate(self, system: str, user: str) -> str:
         """Send a chat-completions request and return the reply's content.
@@ -131,16 +145,17 @@ class OpenAICompatibleAdapter:
                 valid JSON, or it doesn't contain a message in the
                 expected shape.
         """
-        payload = json.dumps(
-            {
-                "model": self._model,
-                "messages": [
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": user},
-                ],
-                "temperature": 0.2,
-            }
-        ).encode("utf-8")
+        body_dict: dict = {
+            "model": self._model,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ],
+            "temperature": 0.2,
+        }
+        if self._max_tokens is not None:
+            body_dict["max_tokens"] = self._max_tokens
+        payload = json.dumps(body_dict).encode("utf-8")
         request = Request(
             f"{self._base_url}/chat/completions",
             data=payload,

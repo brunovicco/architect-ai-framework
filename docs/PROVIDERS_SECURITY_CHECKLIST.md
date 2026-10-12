@@ -20,6 +20,7 @@ what adapters exist. This checklist only governs the optional reviewer path.
 | 6 | The prompt sent to the adapter is built only from this plan's own data (the case + recommendation the user is already looking at) — never from another user's session, never from an uploaded file's raw bytes without having gone through the same `ArchitectureCase`/`DecisionPlan` validation as the rest of the app. | LLM01 Prompt Injection (reduces blast radius; does not eliminate it — the plan's own free-text fields are still user-controlled input to the prompt) |
 | 7 | The dependency used for the HTTP call (today: Python's stdlib `urllib`, so N/A) is covered by the project's existing `pip-audit` CI gate if a third-party HTTP client is ever introduced. | LLM05 Supply Chain Vulnerabilities |
 | 8 | A model/provider is never hardcoded into the adapter class itself — `base_url`/`model` stay caller-supplied parameters, keeping `providers.py` vendor-neutral per the project's core design principle. | N/A (project design constraint, not an OWASP item) |
+| 9 | When a call uses a server-held credential shared across anonymous visitors (`app.py`'s "shared demo key" mode) rather than a visitor-supplied one, the call path enforces a global daily request cap, a per-browser-session request cap, and a `max_tokens` response-size cap, so one shared credential's cost/abuse blast radius stays bounded. The credential itself lives only in the deployment's secret store (never in git, never in a GitHub Actions secret, which the running app can't read anyway). | OWASP API4:2023 Unrestricted Resource Consumption; LLM04 Model Denial of Service (cost exhaustion variant) |
 
 ## Known residual risk
 
@@ -30,3 +31,13 @@ rebinding) is not fully covered by application code alone. A production
 deployment with a real threat model should additionally run this egress
 through a network-level allowlist (e.g. an egress proxy or firewall rule), not
 rely on this check in isolation.
+
+Control #9's caps are deliberately simple, in-process counters (an
+`st.cache_resource` singleton for the global cap, `st.session_state` for the
+per-session cap): they reset on every app restart/redeploy, don't persist
+across horizontally-scaled instances, and the per-session cap is trivially
+reset by a visitor opening a fresh browser session. The global daily cap is
+the real backstop against a runaway bill; the per-session cap is a soft
+deterrent, not a security boundary. A deployment that outgrows a single
+Streamlit Cloud instance should move this to an external store (e.g. Redis)
+before relying on it.

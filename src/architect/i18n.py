@@ -332,8 +332,34 @@ UI = {
 
     "ai_review_expander_label": {"pt-BR": "Revisão por IA (opcional)", "en": "AI Review (optional)"},
     "ai_review_intro": {
-        "pt-BR": "Opcional e neutro em fornecedor: conecte qualquer endpoint compatível com a API de chat da OpenAI (OpenAI, Ollama, vLLM, gateways...) para obter uma crítica deste plano. Sua chave fica só nesta sessão - nunca é salva nem enviada para mais nenhum lugar.",
-        "en": "Optional and vendor-neutral: connect any OpenAI-chat-completions-compatible endpoint (OpenAI, Ollama, vLLM, gateways...) to get a critique of this plan. Your key stays in this session only - never saved, never sent anywhere else.",
+        "pt-BR": "Opcional e neutro em fornecedor: obtenha uma crítica deste plano usando uma chave de demonstração compartilhada (com limite de uso) ou conectando qualquer endpoint compatível com a API de chat da OpenAI (OpenAI, Ollama, vLLM, gateways...) com a sua própria chave. Se você usar sua própria chave, ela fica só nesta sessão - nunca é salva nem enviada para mais nenhum lugar.",
+        "en": "Optional and vendor-neutral: get a critique of this plan using a shared, rate-limited demo key, or by connecting any OpenAI-chat-completions-compatible endpoint (OpenAI, Ollama, vLLM, gateways...) with your own key. If you use your own key, it stays in this session only - never saved, never sent anywhere else.",
+    },
+    "ai_review_mode_label": {"pt-BR": "Modo", "en": "Mode"},
+    "ai_review_mode_shared": {
+        "pt-BR": "Usar chave de demonstração (compartilhada, com limite)",
+        "en": "Use the demo's shared key (rate-limited)",
+    },
+    "ai_review_mode_byo": {"pt-BR": "Usar minha própria chave", "en": "Use my own key"},
+    "ai_review_shared_caption": {
+        "pt-BR": (
+            "Revisão via chave compartilhada de demonstração (modelo {model}) - "
+            "limite de {daily} revisões/dia no total e {session} por sessão de navegador. "
+            "Sem necessidade de colar sua própria chave."
+        ),
+        "en": (
+            "Review via a shared demo credential (model {model}) - capped at "
+            "{daily} reviews/day overall and {session} per browser session. "
+            "No need to paste your own key."
+        ),
+    },
+    "ai_review_shared_daily_limit": {
+        "pt-BR": "Limite diário de revisões compartilhadas atingido por hoje. Tente novamente mais tarde ou use sua própria chave de API.",
+        "en": "The shared demo's daily review limit has been reached for today. Try again later, or use your own API key.",
+    },
+    "ai_review_shared_session_limit": {
+        "pt-BR": "Você já usou suas revisões gratuitas desta sessão. Use sua própria chave de API para continuar.",
+        "en": "You've used this session's free reviews. Use your own API key to continue.",
     },
     "ai_review_base_url_label": {"pt-BR": "Base URL (https://...)", "en": "Base URL (https://...)"},
     "ai_review_api_key_label": {"pt-BR": "Chave de API", "en": "API key"},

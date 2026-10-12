@@ -14,13 +14,28 @@ surface is therefore small and concentrated in three places:
    `contents: read`, and `main` requires its status checks to pass.
 3. **The optional AI reviewer** (`src/architect/providers.py`,
    `OpenAICompatibleAdapter`) — the only code path that makes an outbound
-   network request, and the only one that handles a credential (a
-   user-supplied API key, kept in memory for the duration of one request
-   only — never logged, never persisted, never included in any exported
-   plan). Any change here must pass
+   network request, and the only one that handles a credential. It offers
+   two modes from the same generic, vendor-neutral adapter:
+   - **Bring-your-own key** — a visitor-supplied API key, kept in memory
+     for the duration of one request only — never logged, never persisted,
+     never included in any exported plan.
+   - **Shared demo credential** — a server-held key (currently NVIDIA's
+     OpenAI-compatible endpoint), stored only in the deployment's secret
+     store (Streamlit Community Cloud's own "Secrets" setting, mirrored
+     locally in the gitignored `.streamlit/secrets.toml`) — never in git,
+     never in GitHub Actions secrets (a separate store the running app
+     cannot read anyway). Because this key is shared across every
+     anonymous visitor, its blast radius is bounded by a global daily
+     request cap, a per-browser-session request cap, and a response-length
+     cap (`app.py`'s `AI_REVIEW_SHARED_*` constants) — all best-effort,
+     in-process limits that reset on redeploy and are not safe if this app
+     is ever horizontally scaled to multiple instances.
+
+   Any change to either mode must pass
    [`docs/PROVIDERS_SECURITY_CHECKLIST.md`](docs/PROVIDERS_SECURITY_CHECKLIST.md),
    which maps each control to an OWASP LLM Top 10/MITRE ATLAS risk,
-   including the SSRF guard on the user-supplied endpoint URL.
+   including the SSRF guard on the endpoint URL and the rate/size caps on
+   the shared-credential path.
 
 Data handling note: the public demo deployment is multi-tenant with no
 authentication. "Saved cases" are kept in `st.session_state` only (per
