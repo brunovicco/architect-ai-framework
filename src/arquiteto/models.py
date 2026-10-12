@@ -56,9 +56,15 @@ class OptionScore(BaseModel):
     scores: dict[str, int]
 
 
+class ModelComparisonRow(BaseModel):
+    criterion: str
+    notes: dict[str, str] = Field(default_factory=dict)  # candidate name -> free-text note
+
+
 class DecisionPlan(BaseModel):
     case: ArchitectureCase
     recommendation: Recommendation
     option_scores: list[OptionScore] = Field(default_factory=list)
     selected_option: str = ""
     tradeoff_notes: str = ""
+    model_comparison: list[ModelComparisonRow] = Field(default_factory=list)
