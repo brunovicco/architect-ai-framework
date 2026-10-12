@@ -1,0 +1,20 @@
+{
+  "name": "Investment Assistant",
+  "business_problem": "Help customers understand portfolio information and initiate investment workflows safely.",
+  "desired_outcome": "Fast grounded answers with controlled transactional side effects.",
+  "users": "Retail banking customers",
+  "quality_target": "High groundedness and task success on investment queries",
+  "latency_target": "Low latency for read-only requests; higher budget for complex analysis",
+  "regulatory_constraints": "Suitability, auditability and human/user confirmation before transactional side effects",
+  "path_known": true,
+  "dynamic_tool_choice": true,
+  "needs_document_knowledge": true,
+  "needs_dynamic_data": true,
+  "existing_api": true,
+  "sensitive_data": true,
+  "high_impact_actions": true,
+  "human_approval_required": true,
+  "strict_auditability": true,
+  "structured_output": true,
+  "critical_cohorts": true
+}

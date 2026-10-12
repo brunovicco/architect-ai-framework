@@ -1,0 +1,20 @@
+[project]
+name = "arquiteto-ai-framework"
+version = "0.2.0"
+description = "Vendor-neutral decision framework for AI/LLM architecture using the ARQUITETO method."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "streamlit>=1.40",
+  "pydantic>=2.8",
+  "python-docx>=1.1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
