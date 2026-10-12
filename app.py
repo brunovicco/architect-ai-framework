@@ -10,12 +10,24 @@ if str(SRC) not in sys.path:
 import streamlit as st
 
 from arquiteto.engine import recommend
-from arquiteto.exporters import to_docx_bytes, to_markdown
-from arquiteto.i18n import BRAND, DEFAULT_LANG, LANGS, t, translate_criterion, translate_items, translate_pattern
-from arquiteto.models import ArchitectureCase, DecisionPlan, OptionScore
+from arquiteto.exporters import to_adr_markdown, to_docx_bytes, to_markdown, to_pdf_bytes
+from arquiteto.i18n import (
+    BRAND,
+    DEFAULT_LANG,
+    LANGS,
+    MODEL_CRITERIA,
+    t,
+    translate_criterion,
+    translate_items,
+    translate_pattern,
+)
+from arquiteto.models import ArchitectureCase, DecisionPlan, ModelComparisonRow, OptionScore
+from arquiteto.providers import AdapterError, OpenAICompatibleAdapter
 from arquiteto.scoring import DEFAULT_WEIGHTS, normalized_score
 
 EXAMPLE_PATH = ROOT / "examples" / "investment_assistant.json"
+CANDIDATE_KEYS = ("model_candidate_a", "model_candidate_b", "model_candidate_c")
+CANDIDATE_COLS = ("a", "b", "c")
 
 
 def _load_example() -> None:
@@ -23,6 +35,57 @@ def _load_example() -> None:
     data = json.loads(EXAMPLE_PATH.read_text(encoding="utf-8"))
     for field, value in {**defaults, **data}.items():
         st.session_state[field] = value
+
+
+def _clear_form() -> None:
+    for field, value in ArchitectureCase().model_dump().items():
+        st.session_state[field] = value
+    st.session_state["option_a_name"] = t(DEFAULT_LANG, "option_a_default")
+    st.session_state["option_b_name"] = t(DEFAULT_LANG, "option_b_default")
+    st.session_state["option_c_name"] = t(DEFAULT_LANG, "option_c_default")
+    st.session_state["tradeoff_notes"] = ""
+    for idx in range(3):
+        for criterion in DEFAULT_WEIGHTS:
+            st.session_state[f"{idx}-{criterion}"] = 3
+    for key in CANDIDATE_KEYS:
+        st.session_state[key] = ""
+    for crit_key in MODEL_CRITERIA:
+        for col in CANDIDATE_COLS:
+            st.session_state[f"model_note_{crit_key}_{col}"] = ""
+
+
+def _apply_plan_dict(data: dict) -> None:
+    """Seed session_state from a DecisionPlan-shaped dict (model_dump()).
+
+    Shared by "load a saved case" and "import a JSON plan" — both just need
+    to populate the same widget keys before the next rerun.
+    """
+    case_data = {**ArchitectureCase().model_dump(), **(data.get("case") or {})}
+    for field, value in case_data.items():
+        st.session_state[field] = value
+
+    option_scores = data.get("option_scores") or []
+    option_name_keys = ("option_a_name", "option_b_name", "option_c_name")
+    for idx, key in enumerate(option_name_keys):
+        entry = option_scores[idx] if idx < len(option_scores) else {}
+        st.session_state[key] = entry.get("name", "")
+        for criterion in DEFAULT_WEIGHTS:
+            st.session_state[f"{idx}-{criterion}"] = entry.get("scores", {}).get(criterion, 3)
+
+    st.session_state["tradeoff_notes"] = data.get("tradeoff_notes", "")
+
+    comparison = data.get("model_comparison") or []
+    candidate_names: list[str] = []
+    for row in comparison:
+        for name in row.get("notes", {}):
+            if name and name not in candidate_names:
+                candidate_names.append(name)
+    for idx, key in enumerate(CANDIDATE_KEYS):
+        st.session_state[key] = candidate_names[idx] if idx < len(candidate_names) else ""
+    for idx, crit_key in enumerate(MODEL_CRITERIA):
+        row_notes = comparison[idx].get("notes", {}) if idx < len(comparison) else {}
+        for col, cand in zip(CANDIDATE_COLS, candidate_names):
+            st.session_state[f"model_note_{crit_key}_{col}"] = row_notes.get(cand, "")
 
 
 def field_text(key: str, label_key: str, *, area: bool = False, placeholder_key: str | None = None, default_text: str | None = None) -> str:
@@ -68,6 +131,34 @@ lang = st.sidebar.selectbox(
 if st.sidebar.button(t(lang, "load_example_button")):
     _load_example()
     st.rerun()
+if st.sidebar.button(t(lang, "clear_form_button")):
+    _clear_form()
+    st.rerun()
+
+# A "load this saved case" click happens inside the Plan tab (tab 6), which
+# renders *after* the Models tab in script order. Setting session_state for
+# a widget key (e.g. "model_candidate_a") that was already instantiated
+# earlier in that same run has no effect in Streamlit, so the click only
+# records which case to load + triggers a rerun; the actual
+# _apply_plan_dict() runs here, at the top of the *next* run, before any
+# tab's widgets exist yet.
+pending_case_name = st.session_state.pop("_pending_saved_case_load", None)
+if pending_case_name is not None:
+    saved = st.session_state.get("saved_cases", {})
+    if pending_case_name in saved:
+        _apply_plan_dict(saved[pending_case_name])
+
+uploaded_plan = st.sidebar.file_uploader(t(lang, "import_json_label"), type=["json"], key="import_json_uploader")
+if uploaded_plan is not None and st.session_state.get("_last_import_name") != uploaded_plan.name:
+    try:
+        validated = DecisionPlan.model_validate_json(uploaded_plan.getvalue())
+    except Exception as exc:  # noqa: BLE001 - surfaced to the user, not swallowed
+        st.sidebar.error(t(lang, "import_json_error").format(error=exc))
+    else:
+        _apply_plan_dict(validated.model_dump())
+        st.session_state["_last_import_name"] = uploaded_plan.name
+        st.sidebar.success(t(lang, "import_json_success"))
+        st.rerun()
 
 st.title(t(lang, "app_title"))
 st.caption(t(lang, "app_caption"))
@@ -77,8 +168,9 @@ with st.sidebar:
     st.markdown(t(lang, "sidebar_steps"))
     st.info(t(lang, "sidebar_rule"))
 
-basic, execution, info, risk_eval, compare, final = st.tabs([
-    t(lang, "tab_1"), t(lang, "tab_2"), t(lang, "tab_3"), t(lang, "tab_4"), t(lang, "tab_5"), t(lang, "tab_6")
+basic, execution, info, risk_eval, compare, models_tab, final = st.tabs([
+    t(lang, "tab_1"), t(lang, "tab_2"), t(lang, "tab_3"), t(lang, "tab_4"),
+    t(lang, "tab_5"), t(lang, "tab_7"), t(lang, "tab_6"),
 ])
 
 with basic:
@@ -191,12 +283,38 @@ with compare:
     )
     tradeoff_notes = field_text("tradeoff_notes", "tradeoff_notes_label", area=True, placeholder_key="tradeoff_notes_placeholder")
 
+with models_tab:
+    st.subheader(t(lang, "tab_7"))
+    st.write(t(lang, "models_intro"))
+    candidate_names = [
+        field_text("model_candidate_a", "model_candidate_a_label", default_text=t(DEFAULT_LANG, "model_candidate_a_default")),
+        field_text("model_candidate_b", "model_candidate_b_label", default_text=t(DEFAULT_LANG, "model_candidate_b_default")),
+        field_text("model_candidate_c", "model_candidate_c_label", default_text=t(DEFAULT_LANG, "model_candidate_c_default")),
+    ]
+    model_comparison_rows: list[ModelComparisonRow] = []
+    for crit_key in MODEL_CRITERIA:
+        st.markdown(f"**{t(lang, crit_key)}**")
+        cols = st.columns(3)
+        notes: dict[str, str] = {}
+        for col, col_letter, cand_name in zip(cols, CANDIDATE_COLS, candidate_names):
+            with col:
+                notes_key = f"model_note_{crit_key}_{col_letter}"
+                value = st.text_input(notes_key, key=notes_key, label_visibility="collapsed")
+                if cand_name:
+                    # Always record the candidate name as a key, even with an
+                    # empty note: _apply_plan_dict() infers candidate names
+                    # from these keys on load, so a name-only candidate (no
+                    # notes filled in yet) must still round-trip correctly.
+                    notes[cand_name] = value
+        model_comparison_rows.append(ModelComparisonRow(criterion=t(lang, crit_key), notes=notes))
+
 plan = DecisionPlan(
     case=case,
     recommendation=rec,
     option_scores=option_scores,
     selected_option=selected_option,
     tradeoff_notes=tradeoff_notes,
+    model_comparison=model_comparison_rows,
 )
 
 with final:
@@ -237,13 +355,76 @@ with final:
 
     md = to_markdown(plan, lang)
     docx = to_docx_bytes(plan, lang)
+    pdf = to_pdf_bytes(plan, lang)
+    adr = to_adr_markdown(plan, lang)
     json_bytes = plan.model_dump_json(indent=2).encode("utf-8")
 
     st.markdown(t(lang, "export_heading"))
-    d1, d2, d3 = st.columns(3)
+    d1, d2, d3, d4, d5 = st.columns(5)
     d1.download_button(t(lang, "download_markdown_label"), md, file_name="architecture-decision-plan.md", mime="text/markdown")
     d2.download_button(t(lang, "download_docx_label"), docx, file_name="architecture-decision-plan.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-    d3.download_button(t(lang, "download_json_label"), json_bytes, file_name="architecture-decision-plan.json", mime="application/json")
+    d3.download_button(t(lang, "download_pdf_label"), pdf, file_name="architecture-decision-plan.pdf", mime="application/pdf")
+    d4.download_button(t(lang, "download_adr_label"), adr, file_name="adr.md", mime="text/markdown")
+    d5.download_button(t(lang, "download_json_label"), json_bytes, file_name="architecture-decision-plan.json", mime="application/json")
 
     with st.expander(t(lang, "preview_expander_label")):
         st.code(md, language="markdown")
+
+    st.divider()
+    st.markdown(f"**{t(lang, 'saved_cases_header')}**")
+    st.caption(t(lang, "saved_cases_note"))
+    saved_cases: dict[str, dict] = st.session_state.setdefault("saved_cases", {})
+    sc1, sc2 = st.columns([0.6, 0.4])
+    with sc1:
+        save_name = st.text_input(
+            "save_case_name", placeholder=t(lang, "saved_case_name_placeholder"),
+            key="save_case_name_input", label_visibility="collapsed",
+        )
+    with sc2:
+        if st.button(t(lang, "save_case_button")) and save_name:
+            saved_cases[save_name] = plan.model_dump()
+            st.toast(t(lang, "case_saved_toast"))
+    if saved_cases:
+        lc1, lc2, lc3 = st.columns([0.5, 0.25, 0.25])
+        with lc1:
+            chosen = st.selectbox(
+                t(lang, "load_saved_case_label"), list(saved_cases.keys()),
+                key="saved_case_select", label_visibility="collapsed",
+            )
+        with lc2:
+            if st.button(t(lang, "load_saved_case_button")) and chosen:
+                st.session_state["_pending_saved_case_load"] = chosen
+                st.rerun()
+        with lc3:
+            if st.button(t(lang, "delete_saved_case_button")) and chosen:
+                del saved_cases[chosen]
+                st.rerun()
+    else:
+        st.caption(t(lang, "no_saved_cases"))
+
+    st.divider()
+    with st.expander(t(lang, "ai_review_expander_label")):
+        st.write(t(lang, "ai_review_intro"))
+        ac1, ac2, ac3 = st.columns(3)
+        with ac1:
+            st.caption(t(lang, "ai_review_base_url_label"))
+            ai_base_url = st.text_input("ai_base_url", key="ai_base_url", label_visibility="collapsed")
+        with ac2:
+            st.caption(t(lang, "ai_review_api_key_label"))
+            ai_api_key = st.text_input("ai_api_key", key="ai_api_key", type="password", label_visibility="collapsed")
+        with ac3:
+            st.caption(t(lang, "ai_review_model_label"))
+            ai_model = st.text_input("ai_model", key="ai_model", label_visibility="collapsed")
+
+        if st.button(t(lang, "ai_review_button")):
+            if not (ai_base_url and ai_api_key and ai_model):
+                st.warning(t(lang, "ai_review_intro"))
+            else:
+                try:
+                    adapter = OpenAICompatibleAdapter(base_url=ai_base_url, api_key=ai_api_key, model=ai_model)
+                    review = adapter.generate(system=t(lang, "ai_review_system_prompt"), user=md)
+                except (ValueError, AdapterError) as exc:
+                    st.error(t(lang, "ai_review_error").format(error=exc))
+                else:
+                    st.warning(t(lang, "ai_review_disclaimer"))
+                    st.markdown(review)
