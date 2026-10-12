@@ -2,109 +2,133 @@ from io import BytesIO
 
 from docx import Document
 
+from .i18n import e, translate_items, translate_pattern
 from .models import DecisionPlan
 from .scoring import normalized_score
 
 
-def _bullets(items: list[str]) -> str:
-    return "\n".join(f"- {item}" for item in items) if items else "- Not defined"
+def _bullets(items: list[str], lang: str) -> str:
+    return "\n".join(f"- {item}" for item in items) if items else f"- {e(lang, 'not_defined')}"
 
 
-def to_markdown(plan: DecisionPlan) -> str:
+def to_markdown(plan: DecisionPlan, lang: str = "en") -> str:
     c = plan.case
     r = plan.recommendation
+    not_defined = e(lang, "not_defined")
     option_lines = []
     for option in plan.option_scores:
         option_lines.append(f"- **{option.name}:** {normalized_score(option.scores):.1%}")
-    option_text = "\n".join(option_lines) or "- No option matrix supplied"
+    option_text = "\n".join(option_lines) or f"- {e(lang, 'no_option_matrix')}"
 
-    return f"""# Architecture Decision Plan — {c.name}
+    return f"""# {e(lang, 'doc_title')} — {c.name}
 
-## A — Alvo
-**Business problem:** {c.business_problem or 'Not defined'}  
-**Desired outcome:** {c.desired_outcome or 'Not defined'}  
-**Users / audience:** {c.users or 'Not defined'}
+## {e(lang, 'section_a')}
+**{e(lang, 'business_problem')}:** {c.business_problem or not_defined}
+**{e(lang, 'desired_outcome')}:** {c.desired_outcome or not_defined}
+**{e(lang, 'users')}:** {c.users or not_defined}
 
-## R — Requisitos
-- Quality target: {c.quality_target or 'Not defined'}
-- Latency target: {c.latency_target or 'Not defined'}
-- Cost constraint: {c.cost_constraint or 'Not defined'}
-- Regulatory constraints: {c.regulatory_constraints or 'Not defined'}
+## {e(lang, 'section_r')}
+- {e(lang, 'quality_target')}: {c.quality_target or not_defined}
+- {e(lang, 'latency_target')}: {c.latency_target or not_defined}
+- {e(lang, 'cost_constraint')}: {c.cost_constraint or not_defined}
+- {e(lang, 'regulatory_constraints')}: {c.regulatory_constraints or not_defined}
 
-## Q/U — Responsibility and architecture
-- Recommended pattern: **{r.architecture_pattern}**
+## {e(lang, 'section_responsibility')}
+- {e(lang, 'recommended_pattern')}: **{translate_pattern(lang, r.architecture_pattern)}**
 
-### Rationale
-{_bullets(r.rationale)}
+### {e(lang, 'rationale')}
+{_bullets(translate_items(lang, r.rationale), lang)}
 
-## I — Integration & Information
-- Recommended integration: **{r.integration_pattern}**
-{_bullets(r.information_strategy)}
+## {e(lang, 'section_i')}
+- {e(lang, 'recommended_integration')}: **{translate_pattern(lang, r.integration_pattern)}**
+{_bullets(translate_items(lang, r.information_strategy), lang)}
 
-## Model / Provider Strategy
-{_bullets(r.model_strategy)}
+## {e(lang, 'section_model')}
+{_bullets(translate_items(lang, r.model_strategy), lang)}
 
-## T — Trust & Controls
-{_bullets(r.controls)}
+## {e(lang, 'section_t')}
+{_bullets(translate_items(lang, r.controls), lang)}
 
-## E — Evaluation
-{_bullets(r.evaluations)}
+## {e(lang, 'section_e')}
+{_bullets(translate_items(lang, r.evaluations), lang)}
 
-## T — Trade-offs
-### Option matrix
+## {e(lang, 'section_tradeoffs')}
+### {e(lang, 'option_matrix')}
 {option_text}
 
-**Selected option:** {plan.selected_option or 'Not selected'}  
-**Trade-off notes:** {plan.tradeoff_notes or 'Not defined'}
+**{e(lang, 'selected_option')}:** {plan.selected_option or e(lang, 'not_selected')}
+**{e(lang, 'tradeoff_notes')}:** {plan.tradeoff_notes or not_defined}
 
-## O — Operations
-{_bullets(r.operations)}
+## {e(lang, 'section_operations')}
+{_bullets(translate_items(lang, r.operations), lang)}
 
-## Warnings / decisions to validate
-{_bullets(r.warnings)}
+## {e(lang, 'warnings')}
+{_bullets(translate_items(lang, r.warnings), lang)}
 
 ---
-Generated with the ARQUITETO framework — a vendor-neutral AI architecture decision method.
+{e(lang, 'footer')}
 """
 
 
-def to_docx_bytes(plan: DecisionPlan) -> bytes:
+def to_docx_bytes(plan: DecisionPlan, lang: str = "en") -> bytes:
     doc = Document()
     c = plan.case
     r = plan.recommendation
+    not_defined = e(lang, "not_defined")
 
-    doc.add_heading(f"Architecture Decision Plan — {c.name}", 0)
+    doc.add_heading(f"{e(lang, 'doc_title')} — {c.name}", 0)
 
     sections = [
-        ("A — Alvo", [f"Business problem: {c.business_problem or 'Not defined'}", f"Desired outcome: {c.desired_outcome or 'Not defined'}", f"Users / audience: {c.users or 'Not defined'}"]),
-        ("R — Requisitos", [f"Quality target: {c.quality_target or 'Not defined'}", f"Latency target: {c.latency_target or 'Not defined'}", f"Cost constraint: {c.cost_constraint or 'Not defined'}", f"Regulatory constraints: {c.regulatory_constraints or 'Not defined'}"]),
-        ("Q/U — Responsibility and architecture", [f"Recommended pattern: {r.architecture_pattern}", *r.rationale]),
-        ("I — Integration & Information", [f"Recommended integration: {r.integration_pattern}", *r.information_strategy]),
-        ("Model / Provider Strategy", r.model_strategy),
-        ("T — Trust & Controls", r.controls),
-        ("E — Evaluation", r.evaluations),
-        ("O — Operations", r.operations),
+        (
+            e(lang, "section_a"),
+            [
+                f"{e(lang, 'business_problem')}: {c.business_problem or not_defined}",
+                f"{e(lang, 'desired_outcome')}: {c.desired_outcome or not_defined}",
+                f"{e(lang, 'users')}: {c.users or not_defined}",
+            ],
+        ),
+        (
+            e(lang, "section_r"),
+            [
+                f"{e(lang, 'quality_target')}: {c.quality_target or not_defined}",
+                f"{e(lang, 'latency_target')}: {c.latency_target or not_defined}",
+                f"{e(lang, 'cost_constraint')}: {c.cost_constraint or not_defined}",
+                f"{e(lang, 'regulatory_constraints')}: {c.regulatory_constraints or not_defined}",
+            ],
+        ),
+        (
+            e(lang, "section_responsibility"),
+            [f"{e(lang, 'recommended_pattern')}: {translate_pattern(lang, r.architecture_pattern)}", *translate_items(lang, r.rationale)],
+        ),
+        (
+            e(lang, "section_i"),
+            [f"{e(lang, 'recommended_integration')}: {translate_pattern(lang, r.integration_pattern)}", *translate_items(lang, r.information_strategy)],
+        ),
+        (e(lang, "section_model"), translate_items(lang, r.model_strategy)),
+        (e(lang, "section_t"), translate_items(lang, r.controls)),
+        (e(lang, "section_e"), translate_items(lang, r.evaluations)),
+        (e(lang, "section_operations"), translate_items(lang, r.operations)),
     ]
     for heading, items in sections:
         doc.add_heading(heading, level=1)
         for item in items:
             doc.add_paragraph(item, style="List Bullet")
 
-    doc.add_heading("T — Trade-offs", level=1)
+    doc.add_heading(e(lang, "section_tradeoffs"), level=1)
     if plan.option_scores:
         for option in plan.option_scores:
             doc.add_paragraph(f"{option.name}: {normalized_score(option.scores):.1%}", style="List Bullet")
     else:
-        doc.add_paragraph("No option matrix supplied", style="List Bullet")
-    doc.add_paragraph(f"Selected option: {plan.selected_option or 'Not selected'}")
-    doc.add_paragraph(f"Trade-off notes: {plan.tradeoff_notes or 'Not defined'}")
+        doc.add_paragraph(e(lang, "no_option_matrix"), style="List Bullet")
+    doc.add_paragraph(f"{e(lang, 'selected_option')}: {plan.selected_option or e(lang, 'not_selected')}")
+    doc.add_paragraph(f"{e(lang, 'tradeoff_notes')}: {plan.tradeoff_notes or not_defined}")
 
     if r.warnings:
-        doc.add_heading("Warnings / decisions to validate", level=1)
-        for item in r.warnings:
+        doc.add_heading(e(lang, "warnings"), level=1)
+        for item in translate_items(lang, r.warnings):
             doc.add_paragraph(item, style="List Bullet")
 
-    doc.add_paragraph("Generated with the ARQUITETO framework — a vendor-neutral AI architecture decision method.")
+    doc.add_paragraph(e(lang, "footer"))
 
     stream = BytesIO()
     doc.save(stream)

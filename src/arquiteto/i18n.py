@@ -52,6 +52,10 @@ _TAB_STEP_INDEXES = {
 
 UI = {
     "lang_label": {"pt-BR": "Idioma", "en": "Language"},
+    "load_example_button": {
+        "pt-BR": "📂 Carregar exemplo: Investment Assistant",
+        "en": "📂 Load example: Investment Assistant",
+    },
     "app_title": {"pt-BR": "🏛️ ARQUITETO", "en": "🏛️ ARCHITECT"},
     "app_caption": {
         "pt-BR": "Decisões de arquitetura de IA / LLM neutras em relação a fornecedor — do problema de negócio ao plano operacional.",
@@ -404,3 +408,48 @@ def translate_criterion(lang: str, criterion: str) -> str:
     if lang == "en":
         return criterion
     return CRITERIA_PT.get(criterion, criterion)
+
+
+# Labels specific to the exported Markdown/DOCX document (distinct from the
+# UI's "###"-prefixed heading strings in UI, since the document builds its
+# own heading levels). Letter prefixes mirror BRAND/STEPS for each language.
+EXPORT = {
+    "doc_title": {"pt-BR": "Plano de Decisão de Arquitetura", "en": "Architecture Decision Plan"},
+    "section_a": {"pt-BR": "A — Alvo", "en": "A — Aim"},
+    "business_problem": {"pt-BR": "Problema de negócio", "en": "Business problem"},
+    "desired_outcome": {"pt-BR": "Resultado desejado", "en": "Desired outcome"},
+    "users": {"pt-BR": "Usuários / público", "en": "Users / audience"},
+    "section_r": {"pt-BR": "R — Requisitos", "en": "R — Requirements"},
+    "quality_target": {"pt-BR": "Meta de qualidade", "en": "Quality target"},
+    "latency_target": {"pt-BR": "Meta de latência", "en": "Latency target"},
+    "cost_constraint": {"pt-BR": "Restrição de custo", "en": "Cost constraint"},
+    "regulatory_constraints": {"pt-BR": "Restrições regulatórias", "en": "Regulatory constraints"},
+    "section_responsibility": {
+        "pt-BR": "Q/U — Responsabilidade e arquitetura",
+        "en": "C/H — Responsibility and architecture",
+    },
+    "recommended_pattern": {"pt-BR": "Padrão recomendado", "en": "Recommended pattern"},
+    "rationale": {"pt-BR": "Justificativa", "en": "Rationale"},
+    "section_i": {"pt-BR": "I — Integração & Informação", "en": "I — Integration & Information"},
+    "recommended_integration": {"pt-BR": "Integração recomendada", "en": "Recommended integration"},
+    "section_model": {"pt-BR": "Estratégia de Modelo / Fornecedor", "en": "Model / Provider Strategy"},
+    "section_t": {"pt-BR": "T — Trust & Controls", "en": "T — Trust & Controls"},
+    "section_e": {"pt-BR": "E — Evaluation", "en": "E — Evaluation"},
+    "section_tradeoffs": {"pt-BR": "T — Trade-offs", "en": "C — Comparison"},
+    "option_matrix": {"pt-BR": "Matriz de opções", "en": "Option matrix"},
+    "selected_option": {"pt-BR": "Opção selecionada", "en": "Selected option"},
+    "tradeoff_notes": {"pt-BR": "Notas de trade-off", "en": "Trade-off notes"},
+    "section_operations": {"pt-BR": "O — Operação", "en": "T — Telemetry"},
+    "warnings": {"pt-BR": "Avisos / decisões a validar", "en": "Warnings / decisions to validate"},
+    "not_defined": {"pt-BR": "Não definido", "en": "Not defined"},
+    "not_selected": {"pt-BR": "Não selecionada", "en": "Not selected"},
+    "no_option_matrix": {"pt-BR": "Nenhuma matriz de opções informada", "en": "No option matrix supplied"},
+    "footer": {
+        "pt-BR": "Gerado com o framework ARQUITETO — um método de decisão de arquitetura de IA neutro em fornecedor.",
+        "en": "Generated with the ARCHITECT framework — a vendor-neutral AI architecture decision method.",
+    },
+}
+
+
+def e(lang: str, key: str) -> str:
+    return EXPORT[key][lang]
