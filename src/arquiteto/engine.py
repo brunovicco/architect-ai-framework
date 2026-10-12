@@ -159,7 +159,7 @@ def recommend(case: ArchitectureCase) -> Recommendation:
     controls: list[str] = [
         "Apply least privilege to tools, data and capabilities.",
         "Propagate real user/service identity to authorization checks at execution time.",
-        "Justify each Claude/system/human assignment through reversibility (can a wrong call be "
+        "Justify each model/system/human assignment through reversibility (can a wrong call be "
         "undone?), stakes (what does a wrong call cost?) and accountability (who must answer for it?).",
     ]
     if case.sensitive_data:

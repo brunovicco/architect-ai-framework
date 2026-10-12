@@ -17,7 +17,12 @@
     "human_approval_required": true,
     "strict_auditability": true,
     "structured_output": true,
-    "critical_cohorts": true
+    "critical_cohorts": true,
+    "needs_custom_user_experience": true,
+    "differential_outcomes_risk": true,
+    "estimated_monthly_cost": 650.0,
+    "monthly_cost_ceiling": 800.0,
+    "roi_notes": "Efficiency: cuts average portfolio-question handling time from ~6 minutes (human) to under 30 seconds. Productivity: frees advisors to focus on complex/high-value cases. Solution cost: estimated at $650/month at current volume, within the $800 budget ceiling."
   },
   "option_scores": [
     {

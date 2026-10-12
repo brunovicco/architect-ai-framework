@@ -17,7 +17,12 @@
     "human_approval_required": true,
     "strict_auditability": true,
     "structured_output": true,
-    "critical_cohorts": true
+    "critical_cohorts": true,
+    "needs_custom_user_experience": true,
+    "differential_outcomes_risk": true,
+    "estimated_monthly_cost": 650.0,
+    "monthly_cost_ceiling": 800.0,
+    "roi_notes": "Eficiência: reduz o tempo médio de atendimento a perguntas de portfólio de ~6 minutos (humano) para menos de 30 segundos. Produtividade: libera assessores para casos complexos/de alto valor. Custo da solução: estimado em US$ 650/mês no volume atual, dentro do teto de US$ 800."
   },
   "option_scores": [
     {

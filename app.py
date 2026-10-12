@@ -368,7 +368,12 @@ with final:
         st.metric(t(lang, "review_placement_metric_label"), translate_pattern(lang, rec.review_placement))
 
     if plan.case.roi_notes:
-        st.markdown(f"**{t(lang, 'roi_notes_metric_label')}:** {plan.case.roi_notes}")
+        # Escape "$" in free text: Streamlit's markdown renderer treats a
+        # "$...$" pair as inline LaTeX, so an unescaped dollar amount (e.g.
+        # "$650/mo ... $800") silently mangles everything between the two
+        # signs instead of rendering as plain text.
+        roi_notes_safe = plan.case.roi_notes.replace("$", "\\$")
+        st.markdown(f"**{t(lang, 'roi_notes_metric_label')}:** {roi_notes_safe}")
 
     if rec.warnings:
         for warning in translate_items(lang, rec.warnings):
