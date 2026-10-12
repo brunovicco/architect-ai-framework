@@ -31,10 +31,8 @@ CANDIDATE_COLS = ("a", "b", "c")
 
 
 def _load_example() -> None:
-    defaults = ArchitectureCase().model_dump()
     data = json.loads(EXAMPLE_PATH.read_text(encoding="utf-8"))
-    for field, value in {**defaults, **data}.items():
-        st.session_state[field] = value
+    _apply_plan_dict(data)
 
 
 def _clear_form() -> None:
@@ -135,8 +133,8 @@ if st.sidebar.button(t(lang, "clear_form_button")):
     _clear_form()
     st.rerun()
 
-# A "load this saved case" click happens inside the Plan tab (tab 6), which
-# renders *after* the Models tab in script order. Setting session_state for
+# A "load this saved case" click happens inside the Plan tab (tab 7), which
+# renders *after* the Models tab (tab 6) in script order. Setting session_state for
 # a widget key (e.g. "model_candidate_a") that was already instantiated
 # earlier in that same run has no effect in Streamlit, so the click only
 # records which case to load + triggers a rerun; the actual

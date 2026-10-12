@@ -1,20 +1,136 @@
 {
-  "name": "Investment Assistant",
-  "business_problem": "Help customers understand portfolio information and initiate investment workflows safely.",
-  "desired_outcome": "Fast grounded answers with controlled transactional side effects.",
-  "users": "Retail banking customers",
-  "quality_target": "High groundedness and task success on investment queries",
-  "latency_target": "Low latency for read-only requests; higher budget for complex analysis",
-  "regulatory_constraints": "Suitability, auditability and human/user confirmation before transactional side effects",
-  "path_known": true,
-  "dynamic_tool_choice": true,
-  "needs_document_knowledge": true,
-  "needs_dynamic_data": true,
-  "existing_api": true,
-  "sensitive_data": true,
-  "high_impact_actions": true,
-  "human_approval_required": true,
-  "strict_auditability": true,
-  "structured_output": true,
-  "critical_cohorts": true
+  "case": {
+    "name": "Investment Assistant",
+    "business_problem": "Help customers understand portfolio information and initiate investment workflows safely.",
+    "desired_outcome": "Fast grounded answers with controlled transactional side effects.",
+    "users": "Retail banking customers",
+    "quality_target": "High groundedness and task success on investment queries",
+    "latency_target": "Low latency for read-only requests; higher budget for complex analysis",
+    "regulatory_constraints": "Suitability, auditability and human/user confirmation before transactional side effects",
+    "path_known": true,
+    "dynamic_tool_choice": true,
+    "needs_document_knowledge": true,
+    "needs_dynamic_data": true,
+    "existing_api": true,
+    "sensitive_data": true,
+    "high_impact_actions": true,
+    "human_approval_required": true,
+    "strict_auditability": true,
+    "structured_output": true,
+    "critical_cohorts": true
+  },
+  "option_scores": [
+    {
+      "name": "Agent + API tools",
+      "scores": {
+        "Quality / task success": 4,
+        "Latency": 3,
+        "Cost": 3,
+        "Risk / control": 4,
+        "Auditability / predictability": 3,
+        "Maintainability": 4,
+        "Observability / debugging": 4,
+        "Privacy / residency / compliance": 4,
+        "Portability / lock-in": 4,
+        "Fit with hard constraints": 5
+      }
+    },
+    {
+      "name": "Workflow-only",
+      "scores": {
+        "Quality / task success": 3,
+        "Latency": 5,
+        "Cost": 4,
+        "Risk / control": 5,
+        "Auditability / predictability": 5,
+        "Maintainability": 5,
+        "Observability / debugging": 4,
+        "Privacy / residency / compliance": 4,
+        "Portability / lock-in": 4,
+        "Fit with hard constraints": 3
+      }
+    },
+    {
+      "name": "Multi-agent",
+      "scores": {
+        "Quality / task success": 4,
+        "Latency": 2,
+        "Cost": 2,
+        "Risk / control": 2,
+        "Auditability / predictability": 2,
+        "Maintainability": 2,
+        "Observability / debugging": 3,
+        "Privacy / residency / compliance": 3,
+        "Portability / lock-in": 3,
+        "Fit with hard constraints": 3
+      }
+    }
+  ],
+  "tradeoff_notes": "Workflow is simpler and more auditable but can't dynamically choose which internal tool/API to call for ad-hoc portfolio questions; multi-agent adds coordination overhead we don't need yet. Revisit if the catalog of callable tools grows beyond a handful.",
+  "model_comparison": [
+    {
+      "criterion": "Task quality fit",
+      "notes": {
+        "Managed API provider": "Strong on complex reasoning and tool use",
+        "Self-hosted open-weight": "Good enough for routine queries, weaker on edge cases",
+        "Regional/sovereign provider": "Adequate; smaller model family"
+      }
+    },
+    {
+      "criterion": "Latency class",
+      "notes": {
+        "Managed API provider": "Low (hosted, optimized)",
+        "Self-hosted open-weight": "Medium (depends on our GPU capacity)",
+        "Regional/sovereign provider": "Medium-high"
+      }
+    },
+    {
+      "criterion": "Cost class",
+      "notes": {
+        "Managed API provider": "Pay-per-token, higher at scale",
+        "Self-hosted open-weight": "Upfront infra cost, lower marginal cost at volume",
+        "Regional/sovereign provider": "Premium pricing for compliance guarantees"
+      }
+    },
+    {
+      "criterion": "Context window",
+      "notes": {
+        "Managed API provider": "Large (128k+ tokens)",
+        "Self-hosted open-weight": "Moderate (32k typical)",
+        "Regional/sovereign provider": "Moderate (32k-64k)"
+      }
+    },
+    {
+      "criterion": "Structured output support",
+      "notes": {
+        "Managed API provider": "Native JSON schema / tool calling",
+        "Self-hosted open-weight": "Workable via constrained decoding",
+        "Regional/sovereign provider": "Basic JSON mode"
+      }
+    },
+    {
+      "criterion": "Privacy / residency fit",
+      "notes": {
+        "Managed API provider": "Depends on vendor DPA; data leaves our infra",
+        "Self-hosted open-weight": "Full control, data never leaves our VPC",
+        "Regional/sovereign provider": "In-region by default, meets our residency constraint"
+      }
+    },
+    {
+      "criterion": "Rate limits / availability",
+      "notes": {
+        "Managed API provider": "High (vendor SLA)",
+        "Self-hosted open-weight": "Limited by our own capacity",
+        "Regional/sovereign provider": "Moderate, smaller provider"
+      }
+    },
+    {
+      "criterion": "Portability / lock-in risk",
+      "notes": {
+        "Managed API provider": "Higher lock-in (proprietary API)",
+        "Self-hosted open-weight": "Low lock-in (open weights)",
+        "Regional/sovereign provider": "Moderate (regional proprietary API)"
+      }
+    }
+  ]
 }

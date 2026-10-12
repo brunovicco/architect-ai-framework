@@ -27,7 +27,7 @@ The project turns architecture reasoning into a repeatable, 9-step workflow, spe
 </tr>
 <tr>
 <td><img src="docs/screenshots/en/tab-5-tradeoffs.png" width="420" alt="Tab 5: Comparison"><br><sub>5 · Comparison — weighted trade-offs</sub></td>
-<td><img src="docs/screenshots/en/tab-6-plan.png" width="420" alt="Tab 6: Architecture Decision Plan"><br><sub>6 · Plan — the generated decision plan</sub></td>
+<td><img src="docs/screenshots/en/tab-6-plan.png" width="420" alt="Plan tab: Architecture Decision Plan"><br><sub>7 · Plan — the generated decision plan</sub></td>
 </tr>
 </table>
 

@@ -72,7 +72,7 @@ UI = {
     "tab_3": {"pt-BR": "3 · I", "en": "3 · I"},
     "tab_4": {"pt-BR": "4 · T/E/O", "en": "4 · T/E/T"},
     "tab_5": {"pt-BR": "5 · Trade-offs", "en": "5 · Comparison"},
-    "tab_6": {"pt-BR": "6 · Plano", "en": "6 · Plan"},
+    "tab_6": {"pt-BR": "7 · Plano", "en": "7 · Plan"},
     "case_name_label": {"pt-BR": "Nome do caso", "en": "Case name"},
     "case_name_default": {"pt-BR": "Caso de Arquitetura de IA", "en": "AI Architecture Case"},
     "business_problem_label": {"pt-BR": "Problema de negócio", "en": "Business problem"},
@@ -228,7 +228,7 @@ UI = {
     "download_pdf_label": {"pt-BR": "Baixar PDF", "en": "Download PDF"},
     "download_adr_label": {"pt-BR": "Baixar ADR", "en": "Download ADR"},
 
-    "tab_7": {"pt-BR": "7 · Modelos", "en": "7 · Models"},
+    "tab_7": {"pt-BR": "6 · Modelos", "en": "6 · Models"},
     "models_intro": {
         "pt-BR": "Adicione candidatos de modelo/fornecedor e preencha notas por critério. Isto é só estrutura de comparação — o framework não recomenda qual fornecedor escolher.",
         "en": "Add model/provider candidates and fill in notes per criterion. This is just comparison structure — the framework doesn't recommend which vendor to pick.",

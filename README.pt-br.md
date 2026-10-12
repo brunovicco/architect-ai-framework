@@ -27,7 +27,7 @@ O projeto transforma o raciocínio de arquitetura em um workflow repetível de 9
 </tr>
 <tr>
 <td><img src="docs/screenshots/pt-br/tab-5-tradeoffs.png" width="420" alt="Aba 5: Trade-offs"><br><sub>5 · Trade-offs — comparação ponderada</sub></td>
-<td><img src="docs/screenshots/pt-br/tab-6-plan.png" width="420" alt="Aba 6: Plano de Decisão de Arquitetura"><br><sub>6 · Plano — o plano de decisão gerado</sub></td>
+<td><img src="docs/screenshots/pt-br/tab-6-plan.png" width="420" alt="Aba Plano: Plano de Decisão de Arquitetura"><br><sub>7 · Plano — o plano de decisão gerado</sub></td>
 </tr>
 </table>
 
