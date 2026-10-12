@@ -234,6 +234,8 @@ def recommend(case: ArchitectureCase) -> Recommendation:
         "self-hosted/open-weight runtime - on compliance, cost and latency before committing to one.",
         "Map business value to the five ROI pillars - efficiency, transformation, productivity, "
         "solution cost and performance SLAs - before treating a feasible design as a funded one.",
+        "Define a model/prompt/retrieval versioning and rollback policy; treat any update to one as "
+        "a change that goes through the same evaluation gate as a new deployment, not a silent swap.",
     ]
 
     controls: list[str] = [
@@ -242,6 +244,12 @@ def recommend(case: ArchitectureCase) -> Recommendation:
         "Justify each model/system/human assignment through reversibility (can a wrong call be "
         "undone?), stakes (what does a wrong call cost?) and accountability (who must answer for it?).",
     ]
+    if architecture in ("Agent", "Multi-agent"):
+        controls.append(
+            "Define what 'bounded' autonomy means concretely: cap tool calls per turn, set a max "
+            "planning/turn budget, and persist intermediate state/decisions so a run can be audited "
+            "or resumed - don't leave the bound undefined."
+        )
     if case.sensitive_data:
         controls.append(
             "Enforce data isolation and access policy outside the model prompt; log access evidence where appropriate.")

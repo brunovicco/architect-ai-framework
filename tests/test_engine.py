@@ -69,6 +69,41 @@ def test_differential_outcomes_risk_audits_six_bias_points_including_temporal_an
     assert "interaction/feedback-loop" in controls
 
 
+def test_agent_architecture_defines_bounded_autonomy_concretely():
+    """Agent/Multi-agent cases get a control spelling out what 'bounded' autonomy
+    means (tool-call cap, planning/turn budget, persisted state) rather than
+    leaving the term undefined.
+    """
+    agent_result = recommend(ArchitectureCase(dynamic_tool_choice=True))
+    assert agent_result.architecture_pattern == "Agent"
+    controls = " ".join(agent_result.controls).lower()
+    assert "bounded" in controls
+    assert "tool calls per turn" in controls
+    assert "persist intermediate state" in controls
+
+    multi_agent_result = recommend(ArchitectureCase(
+        path_known=False, dynamic_next_steps=True, independent_autonomous_domains=True))
+    assert multi_agent_result.architecture_pattern == "Multi-agent"
+    assert "bounded" in " ".join(multi_agent_result.controls).lower()
+
+
+def test_workflow_architecture_has_no_bounded_autonomy_control():
+    """Workflow (no agentic autonomy) doesn't get the agent-bounding control."""
+    result = recommend(ArchitectureCase(path_known=True))
+    assert result.architecture_pattern == "Workflow"
+    assert "bounded" not in " ".join(result.controls).lower()
+
+
+def test_model_strategy_always_includes_versioning_and_rollback_policy():
+    """Every recommendation asks for a model/prompt/retrieval versioning and
+    rollback policy, regardless of the case's other signals.
+    """
+    result = recommend(ArchitectureCase())
+    model_strategy = " ".join(result.model_strategy).lower()
+    assert "versioning and rollback policy" in model_strategy
+    assert "same evaluation gate as a new deployment" in model_strategy
+
+
 # Entry point
 
 

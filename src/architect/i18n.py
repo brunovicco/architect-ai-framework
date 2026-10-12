@@ -560,6 +560,20 @@ ENGINE_PT = {
         "produtividade, custo da solução e SLAs de performance - antes de tratar um design viável "
         "como um design financiado."
     ),
+    "Define a model/prompt/retrieval versioning and rollback policy; treat any update to one as "
+    "a change that goes through the same evaluation gate as a new deployment, not a silent swap.": (
+        "Defina uma política de versionamento e rollback para modelo/prompt/retrieval; trate "
+        "qualquer atualização de um deles como uma mudança que passa pelo mesmo portão de "
+        "avaliação de um novo deploy, não como uma troca silenciosa."
+    ),
+    "Define what 'bounded' autonomy means concretely: cap tool calls per turn, set a max "
+    "planning/turn budget, and persist intermediate state/decisions so a run can be audited "
+    "or resumed - don't leave the bound undefined.": (
+        "Defina concretamente o que significa autonomia 'limitada': um teto de chamadas de "
+        "ferramenta por turno, um orçamento máximo de passos de planejamento/turno, e persista "
+        "estado/decisões intermediárias para que uma execução possa ser auditada ou retomada - "
+        "não deixe o limite indefinido."
+    ),
     "Justify each model/system/human assignment through reversibility (can a wrong call be "
     "undone?), stakes (what does a wrong call cost?) and accountability (who must answer for it?).": (
         "Justifique cada atribuição a modelo/sistema/humano através de reversibilidade (uma decisão "

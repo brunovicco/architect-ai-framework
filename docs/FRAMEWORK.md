@@ -80,6 +80,12 @@ tool call belongs: RAG answers questions about *stable* knowledge; live,
 transactional state (order status, inventory, account balance) needs a
 direct call to the system of record, never a cached index.
 
+For Agent and Multi-agent, "bounded" is a requirement, not a figure of
+speech: define it concretely — a cap on tool calls per turn, a max
+planning/turn budget, and persisted intermediate state/decisions so a run
+can be audited or resumed. An agent whose bound is never written down
+usually turns out to have none.
+
 ## Entry point
 
 Independently of the architecture pattern, name which delivery surface the
@@ -161,6 +167,11 @@ Before committing to one, compare delivery routes on compliance, cost and
 latency — a provider's direct API, a cloud marketplace/gateway, or a
 self-hosted/open-weight runtime — rather than defaulting to whichever route
 was easiest to try first.
+
+Selection doesn't end at launch: define a versioning and rollback policy
+for the model, prompt and retrieval configuration up front. An update to
+any of them is a change, and goes through the same evaluation gate as a
+new deployment — never a silent swap.
 
 ## Return on investment
 
