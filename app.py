@@ -25,13 +25,19 @@ from arquiteto.models import ArchitectureCase, DecisionPlan, ModelComparisonRow,
 from arquiteto.providers import AdapterError, OpenAICompatibleAdapter
 from arquiteto.scoring import DEFAULT_WEIGHTS, normalized_score
 
-EXAMPLE_PATH = ROOT / "examples" / "investment_assistant.json"
+EXAMPLE_PATHS = {
+    "en": ROOT / "examples" / "investment_assistant.json",
+    "pt-BR": ROOT / "examples" / "investment_assistant.pt-br.json",
+}
 CANDIDATE_KEYS = ("model_candidate_a", "model_candidate_b", "model_candidate_c")
 CANDIDATE_COLS = ("a", "b", "c")
 
 
 def _load_example() -> None:
-    data = json.loads(EXAMPLE_PATH.read_text(encoding="utf-8"))
+    # Pick the example matching the currently selected UI language so its
+    # free-text fields (business problem, model-comparison notes, ...) read
+    # naturally instead of always showing up in English.
+    data = json.loads(EXAMPLE_PATHS[lang].read_text(encoding="utf-8"))
     _apply_plan_dict(data)
 
 

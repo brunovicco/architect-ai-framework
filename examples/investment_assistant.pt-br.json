@@ -1,0 +1,136 @@
+{
+  "case": {
+    "name": "Assistente de Investimentos",
+    "business_problem": "Ajudar clientes a entender informações de portfólio e iniciar operações de investimento com segurança.",
+    "desired_outcome": "Respostas rápidas e fundamentadas, com efeitos colaterais transacionais controlados.",
+    "users": "Clientes de varejo bancário",
+    "quality_target": "Alta fundamentação e sucesso de tarefa em consultas de investimento",
+    "latency_target": "Baixa latência para consultas somente leitura; orçamento maior para análises complexas",
+    "regulatory_constraints": "Adequação (suitability), auditabilidade e confirmação humana/do usuário antes de efeitos colaterais transacionais",
+    "path_known": true,
+    "dynamic_tool_choice": true,
+    "needs_document_knowledge": true,
+    "needs_dynamic_data": true,
+    "existing_api": true,
+    "sensitive_data": true,
+    "high_impact_actions": true,
+    "human_approval_required": true,
+    "strict_auditability": true,
+    "structured_output": true,
+    "critical_cohorts": true
+  },
+  "option_scores": [
+    {
+      "name": "Agente + ferramentas de API",
+      "scores": {
+        "Quality / task success": 4,
+        "Latency": 3,
+        "Cost": 3,
+        "Risk / control": 4,
+        "Auditability / predictability": 3,
+        "Maintainability": 4,
+        "Observability / debugging": 4,
+        "Privacy / residency / compliance": 4,
+        "Portability / lock-in": 4,
+        "Fit with hard constraints": 5
+      }
+    },
+    {
+      "name": "Somente workflow",
+      "scores": {
+        "Quality / task success": 3,
+        "Latency": 5,
+        "Cost": 4,
+        "Risk / control": 5,
+        "Auditability / predictability": 5,
+        "Maintainability": 5,
+        "Observability / debugging": 4,
+        "Privacy / residency / compliance": 4,
+        "Portability / lock-in": 4,
+        "Fit with hard constraints": 3
+      }
+    },
+    {
+      "name": "Multiagente",
+      "scores": {
+        "Quality / task success": 4,
+        "Latency": 2,
+        "Cost": 2,
+        "Risk / control": 2,
+        "Auditability / predictability": 2,
+        "Maintainability": 2,
+        "Observability / debugging": 3,
+        "Privacy / residency / compliance": 3,
+        "Portability / lock-in": 3,
+        "Fit with hard constraints": 3
+      }
+    }
+  ],
+  "tradeoff_notes": "Workflow é mais simples e auditável, mas não consegue escolher dinamicamente qual ferramenta/API interna chamar para perguntas ad-hoc sobre portfólio; multiagente adiciona uma sobrecarga de coordenação que ainda não precisamos. Revisitar se o catálogo de ferramentas chamáveis crescer além de um punhado.",
+  "model_comparison": [
+    {
+      "criterion": "Aderência de qualidade à tarefa",
+      "notes": {
+        "Provedor de API gerenciado": "Forte em raciocínio complexo e uso de ferramentas",
+        "Open-weight self-hosted": "Suficiente para consultas rotineiras, mais fraco em casos de borda",
+        "Provedor regional/soberano": "Adequado; família de modelos menor"
+      }
+    },
+    {
+      "criterion": "Classe de latência",
+      "notes": {
+        "Provedor de API gerenciado": "Baixa (hospedado, otimizado)",
+        "Open-weight self-hosted": "Média (depende da nossa capacidade de GPU)",
+        "Provedor regional/soberano": "Média-alta"
+      }
+    },
+    {
+      "criterion": "Classe de custo",
+      "notes": {
+        "Provedor de API gerenciado": "Pago por token, maior em escala",
+        "Open-weight self-hosted": "Custo inicial de infraestrutura, custo marginal menor em volume",
+        "Provedor regional/soberano": "Preço premium pelas garantias de compliance"
+      }
+    },
+    {
+      "criterion": "Janela de contexto",
+      "notes": {
+        "Provedor de API gerenciado": "Grande (128k+ tokens)",
+        "Open-weight self-hosted": "Moderada (32k típico)",
+        "Provedor regional/soberano": "Moderada (32k-64k)"
+      }
+    },
+    {
+      "criterion": "Suporte a saída estruturada",
+      "notes": {
+        "Provedor de API gerenciado": "JSON schema / tool calling nativos",
+        "Open-weight self-hosted": "Viável via decodificação restrita (constrained decoding)",
+        "Provedor regional/soberano": "Modo JSON básico"
+      }
+    },
+    {
+      "criterion": "Aderência de privacidade / residência",
+      "notes": {
+        "Provedor de API gerenciado": "Depende do DPA do fornecedor; dados saem da nossa infraestrutura",
+        "Open-weight self-hosted": "Controle total, dados nunca saem da nossa VPC",
+        "Provedor regional/soberano": "Em região por padrão, atende nossa restrição de residência"
+      }
+    },
+    {
+      "criterion": "Limites de taxa / disponibilidade",
+      "notes": {
+        "Provedor de API gerenciado": "Alta (SLA do fornecedor)",
+        "Open-weight self-hosted": "Limitada pela nossa própria capacidade",
+        "Provedor regional/soberano": "Moderada, fornecedor menor"
+      }
+    },
+    {
+      "criterion": "Portabilidade / risco de lock-in",
+      "notes": {
+        "Provedor de API gerenciado": "Lock-in maior (API proprietária)",
+        "Open-weight self-hosted": "Lock-in baixo (pesos abertos)",
+        "Provedor regional/soberano": "Moderado (API proprietária regional)"
+      }
+    }
+  ]
+}
