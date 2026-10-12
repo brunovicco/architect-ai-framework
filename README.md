@@ -36,11 +36,11 @@ The UI is fully bilingual (pt-BR / en) and ships with a one-click example case (
 ## What the app does
 
 - Guides discovery of business outcomes, SLAs and hard constraints.
-- Recommends a starting architecture: Augmented LLM, Workflow, Agent or Multi-agent.
-- Separates responsibilities between probabilistic models, deterministic software and humans.
+- Recommends a starting architecture: Augmented LLM, Workflow, Agent or Multi-agent — plus a named reference architecture (RAG pipeline, routing, coding agent, orchestrator-workers, ...) and a vendor-neutral entry-point category (hosted chat/web UI, agentic coding assistant, direct API/SDK, protocol server for multi-client reuse).
+- Separates responsibilities between probabilistic models, deterministic software and humans, justified through reversibility/stakes/accountability and named against the four model properties (next-token prediction, knowledge, working memory, steerability).
 - Helps decide between RAG, APIs/tools, protocol-based tool discovery and agent-to-agent integration.
-- Generates security/governance recommendations such as least privilege, execution-layer authorization, HITL and fail-closed behavior.
-- Produces an evaluation and observability plan.
+- Generates security/governance recommendations such as least privilege, execution-layer authorization, HITL and fail-closed behavior, input/output screening, fairness-injection-point auditing, and a stakes-driven review placement (pre-action approval / sampled review / post-action audit).
+- Produces an evaluation and observability plan, including structured A/B-experiment guidance and a feasibility verdict against an optional cost ceiling.
 - Compares up to three architecture options with weighted trade-offs.
 - Compares model/provider candidates across 8 vendor-neutral criteria (quality fit, latency, cost, context window, structured output, privacy/residency, rate limits, portability) — structure only, no opinion on which vendor to pick.
 - Exports the final **Architecture Decision Plan** as Markdown, DOCX, PDF, JSON or a Nygard-style **ADR** — in either language.

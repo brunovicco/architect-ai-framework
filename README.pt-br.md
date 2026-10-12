@@ -36,11 +36,11 @@ A interface é totalmente bilíngue (pt-BR / en) e vem com um caso de exemplo de
 ## O que o app faz
 
 - Guia a descoberta de resultados de negócio, SLAs e restrições obrigatórias.
-- Recomenda uma arquitetura inicial: LLM Aumentado, Workflow, Agente ou Multiagente.
-- Separa responsabilidades entre modelos probabilísticos, software determinístico e humanos.
+- Recomenda uma arquitetura inicial: LLM Aumentado, Workflow, Agente ou Multiagente — além de uma reference architecture nomeada (pipeline de RAG, roteamento, agente de código, orquestrador-trabalhadores, ...) e uma categoria de ponto de entrada neutra em fornecedor (chat/UI web hospedado, assistente de código agêntico, API/SDK direto, servidor de protocolo para reaproveitamento multi-cliente).
+- Separa responsabilidades entre modelos probabilísticos, software determinístico e humanos, justificadas por reversibilidade/stakes/accountability e nomeadas conforme as quatro propriedades do modelo (previsão do próximo token, conhecimento, memória de trabalho, steerability).
 - Ajuda a decidir entre RAG, APIs/ferramentas, descoberta de ferramentas via protocolo e integração agente-a-agente.
-- Gera recomendações de segurança/governança como privilégio mínimo, autorização na camada de execução, HITL e comportamento fail-closed.
-- Produz um plano de avaliação e observabilidade.
+- Gera recomendações de segurança/governança como privilégio mínimo, autorização na camada de execução, HITL e comportamento fail-closed, input/output screening, auditoria dos pontos de injeção de viés, e um posicionamento de revisão orientado por stakes (aprovação prévia / revisão por amostragem / auditoria posterior).
+- Produz um plano de avaliação e observabilidade, incluindo orientação de experimento A/B estruturado e um veredito de viabilidade contra um teto de custo opcional.
 - Compara até três opções de arquitetura com trade-offs ponderados.
 - Compara candidatos de modelo/fornecedor em 8 critérios neutros em fornecedor (aderência de qualidade, latência, custo, janela de contexto, saída estruturada, privacidade/residência, limites de taxa, portabilidade) — só estrutura, sem opinião sobre qual fornecedor escolher.
 - Exporta o **Plano de Decisão de Arquitetura** final em Markdown, DOCX, PDF, JSON ou um **ADR** no estilo Nygard — em qualquer um dos dois idiomas.

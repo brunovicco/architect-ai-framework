@@ -5,11 +5,11 @@ ARQUITETO is a repeatable, vendor-neutral decision flow for AI/LLM architecture.
 | Step | Question | Output |
 |---|---|---|
 | **A — Alvo** | What business outcome must change? | Problem + measurable success |
-| **R — Requisitos** | What are the hard constraints and SLAs? | Decision criteria |
+| **R — Requisitos** | What are the hard constraints and SLAs? | Decision criteria + feasibility verdict |
 | **Q — Quem faz o quê?** | Probabilistic model, deterministic software or human? | Responsibility boundaries |
-| **U — Uso arquitetural** | Augmented LLM, workflow, agent or multi-agent? | Architecture pattern |
+| **U — Uso arquitetural** | Augmented LLM, workflow, agent or multi-agent? | Architecture pattern + named reference architecture + entry point |
 | **I — Integração & Informação** | Prompt/context, RAG, API/tool, tool protocol or A2A? | Context + integration map |
-| **T — Trust & Controls** | What happens when model/tool behavior is wrong? | Auth, least privilege, HITL, fail-closed |
+| **T — Trust & Controls** | What happens when model/tool behavior is wrong? | Auth, least privilege, HITL, fail-closed + review placement |
 | **E — Evaluation** | How do we prove the system works? | Dataset, metrics and evaluators |
 | **T — Trade-offs** | What do we gain and what do we pay? | Decision rationale |
 | **O — Operação** | How do we observe and evolve it? | Operational plan + feedback loop |
@@ -27,6 +27,92 @@ ARQUITETO is a repeatable, vendor-neutral decision flow for AI/LLM architecture.
 - Objective constraints → deterministic evaluators first.
 - Subjective quality → calibrated model-based judge and/or human evaluation.
 - Aggregate scores can hide critical failures → segment important cohorts.
+
+## The four model properties (the decomposition lens)
+
+Before deciding what the model should own versus a deterministic system or a
+human, name which of these four properties the task actually depends on —
+each is a capability paired with a matching limitation:
+
+| Property | Strong on | Weak on | Compensate with |
+|---|---|---|---|
+| Next-token prediction | Pattern-rich generation: summarizing, reformatting, drafting | Precision on specific values (names, dates, figures) | Citations, generator-verifier loops, tool calls for exact data |
+| Knowledge | Common, recent, well-represented topics | Rare, niche, contested or fast-changing topics | RAG, web search, tool calls, MCP — make an external system the source of truth |
+| Working memory | Anything that fits the context window | The context window is a hard edge, not a soft degradation | Chunking, progressive context loading, summarization across turns |
+| Steerability | Short, concrete, verifiable instructions | Abstract/ambiguous instructions, long reasoning chains, precise computation | System prompts, structured outputs, code execution |
+
+A task that depends on a property's weak side needs a compensating control,
+not a bigger model.
+
+## Delegation criteria
+
+For each piece of work, justify the model/system/human assignment through:
+
+- **Reversibility** — can a wrong call be undone?
+- **Stakes** — what does a wrong call cost?
+- **Accountability** — who must answer for it?
+
+High stakes, low reversibility and unclear accountability all push toward a
+human-in-the-loop or a deterministic system, regardless of how capable the
+model is at the task in isolation.
+
+## Reference architectures
+
+`U — Uso arquitetural` picks one of four abstract patterns (Augmented LLM /
+Workflow / Agent / Multi-agent). Within that, a reference architecture names
+the concrete, recognizable shape:
+
+| Reference architecture | Typical `architecture_pattern` | Fits when |
+|---|---|---|
+| Single augmented call | Augmented LLM | One bounded, verifiable task, no document knowledge needed |
+| RAG pipeline | Augmented LLM | The task needs stable document/knowledge-base context |
+| Chaining | Workflow | The task decomposes into stages with clean handoffs |
+| Routing | Workflow | Inputs vary in kind and need different downstream handling |
+| Document processing pipeline | Workflow | Structured extraction from semi-structured documents, with a schema check |
+| Agent (autonomous tool use) | Agent | The path can't be enumerated in advance, bounded by tool scope and turn budget |
+| Coding agent | Agent | The work is an engineering workflow with agentic exploration and deterministic edit/test/review steps |
+| Orchestrator-workers | Multi-agent | Separate autonomous domains with clear ownership and contracts |
+
+The most common reference-architecture mistake is using retrieval where a
+tool call belongs: RAG answers questions about *stable* knowledge; live,
+transactional state (order status, inventory, account balance) needs a
+direct call to the system of record, never a cached index.
+
+## Entry point
+
+Independently of the architecture pattern, name which delivery surface the
+solution needs — generic categories, not a vendor product:
+
+- **Hosted chat / web UI** — lowest build cost; default when nothing else applies.
+- **Agentic coding assistant (CLI/IDE)** — the work is an engineering workflow inside a developer's own code/terminal loop.
+- **Direct API / SDK integration** — a fully custom, branded, product-embedded experience.
+- **Protocol server for multi-client reuse** — the capability must be discoverable and reusable by more than one client (e.g. exposed via MCP or an equivalent tool protocol), not rebuilt per integration.
+
+## Feasibility verdict
+
+Once cost, scope and risk are known, state one of four verdicts rather than
+leaving feasibility implicit:
+
+- **Feasible as scoped** — no open warning, and (if supplied) estimated cost is within the budget ceiling.
+- **Feasible with constraints** — workable, but at least one warning or boundary condition must be tracked (e.g. multi-agent complexity, an auditability/autonomy tension).
+- **Not feasible as scoped** — a hard constraint is violated, most commonly estimated cost exceeding the stated ceiling.
+- **Not assessed** — neither a cost estimate/ceiling nor any other warning was supplied; there isn't enough information for a verdict yet.
+
+## Review placement
+
+`human_approval_required`/`irreversible_actions`/`high_impact_actions` say
+*whether* a human reviews a decision; review placement says *where* in the
+flow, driven by reversibility, cost and whether a calibrated confidence
+signal exists to route on:
+
+- **Pre-action approval** — anything irreversible, or high-impact without a calibrated confidence score to route by.
+- **Sampled review** — high-impact, but a calibrated confidence score lets you gate only the low-confidence fraction and sample the rest.
+- **Post-action audit** — sensitive but reversible, lower-cost decisions; the action runs, a person checks afterward.
+- **No review needed** — none of the above risk signals are present.
+
+Routing everything to a person by volume (instead of by stakes) overwhelms
+reviewers and degrades review quality; routing nothing lets a high-stakes,
+irreversible action through ungated. Neither is a review *strategy*.
 
 ## Model/provider decision
 
