@@ -25,6 +25,34 @@ def _load_example() -> None:
         st.session_state[field] = value
 
 
+def field_text(key: str, label_key: str, *, area: bool = False, placeholder_key: str | None = None, default_text: str | None = None) -> str:
+    # Every widget argument below must stay identical across reruns (only
+    # `key` may vary): Streamlit resets a widget's stored value whenever any
+    # of its other parameters change between runs, which breaks state when
+    # the label/placeholder text is translated on a language switch. So the
+    # translated label/placeholder are rendered as plain text next to a
+    # label_visibility="collapsed" widget instead of being passed into it.
+    st.markdown(f"**{t(lang, label_key)}**")
+    if default_text is not None and key not in st.session_state:
+        st.session_state[key] = default_text
+    widget = st.text_area if area else st.text_input
+    value = widget(key, key=key, label_visibility="collapsed")
+    if placeholder_key:
+        st.caption(t(lang, placeholder_key))
+    return value
+
+
+def field_checkbox(key: str, label_key: str, *, default: bool = False) -> bool:
+    if default and key not in st.session_state:
+        st.session_state[key] = True
+    box_col, label_col = st.columns([0.08, 0.92])
+    with box_col:
+        value = st.checkbox(key, key=key, label_visibility="collapsed")
+    with label_col:
+        st.markdown(t(lang, label_key))
+    return value
+
+
 if "lang" not in st.session_state:
     st.session_state["lang"] = DEFAULT_LANG
 
@@ -57,52 +85,52 @@ with basic:
     st.subheader(t(lang, "t1_subheader"))
     left, right = st.columns(2)
     with left:
-        name = st.text_input(t(lang, "case_name_label"), t(lang, "case_name_default"), key="name")
-        business_problem = st.text_area(t(lang, "business_problem_label"), placeholder=t(lang, "business_problem_placeholder"), key="business_problem")
-        desired_outcome = st.text_area(t(lang, "desired_outcome_label"), placeholder=t(lang, "desired_outcome_placeholder"), key="desired_outcome")
-        users = st.text_input(t(lang, "users_label"), placeholder=t(lang, "users_placeholder"), key="users")
+        name = field_text("name", "case_name_label", default_text=t(DEFAULT_LANG, "case_name_default"))
+        business_problem = field_text("business_problem", "business_problem_label", area=True, placeholder_key="business_problem_placeholder")
+        desired_outcome = field_text("desired_outcome", "desired_outcome_label", area=True, placeholder_key="desired_outcome_placeholder")
+        users = field_text("users", "users_label", placeholder_key="users_placeholder")
     with right:
-        quality_target = st.text_input(t(lang, "quality_target_label"), placeholder=t(lang, "quality_target_placeholder"), key="quality_target")
-        latency_target = st.text_input(t(lang, "latency_target_label"), placeholder=t(lang, "latency_target_placeholder"), key="latency_target")
-        cost_constraint = st.text_input(t(lang, "cost_constraint_label"), placeholder=t(lang, "cost_constraint_placeholder"), key="cost_constraint")
-        regulatory_constraints = st.text_area(t(lang, "regulatory_constraints_label"), placeholder=t(lang, "regulatory_constraints_placeholder"), key="regulatory_constraints")
+        quality_target = field_text("quality_target", "quality_target_label", placeholder_key="quality_target_placeholder")
+        latency_target = field_text("latency_target", "latency_target_label", placeholder_key="latency_target_placeholder")
+        cost_constraint = field_text("cost_constraint", "cost_constraint_label", placeholder_key="cost_constraint_placeholder")
+        regulatory_constraints = field_text("regulatory_constraints", "regulatory_constraints_label", area=True, placeholder_key="regulatory_constraints_placeholder")
 
 with execution:
     st.subheader(t(lang, "t2_subheader"))
     st.write(t(lang, "t2_intro"))
     c1, c2 = st.columns(2)
     with c1:
-        path_known = st.checkbox(t(lang, "path_known_label"), value=True, key="path_known")
-        dynamic_next_steps = st.checkbox(t(lang, "dynamic_next_steps_label"), key="dynamic_next_steps")
-        dynamic_tool_choice = st.checkbox(t(lang, "dynamic_tool_choice_label"), key="dynamic_tool_choice")
+        path_known = field_checkbox("path_known", "path_known_label", default=True)
+        dynamic_next_steps = field_checkbox("dynamic_next_steps", "dynamic_next_steps_label")
+        dynamic_tool_choice = field_checkbox("dynamic_tool_choice", "dynamic_tool_choice_label")
     with c2:
-        independent_autonomous_domains = st.checkbox(t(lang, "independent_autonomous_domains_label"), key="independent_autonomous_domains")
-        strict_auditability = st.checkbox(t(lang, "strict_auditability_label"), key="strict_auditability")
-        structured_output = st.checkbox(t(lang, "structured_output_label"), key="structured_output")
+        independent_autonomous_domains = field_checkbox("independent_autonomous_domains", "independent_autonomous_domains_label")
+        strict_auditability = field_checkbox("strict_auditability", "strict_auditability_label")
+        structured_output = field_checkbox("structured_output", "structured_output_label")
 
 with info:
     st.subheader(t(lang, "t3_subheader"))
     c1, c2 = st.columns(2)
     with c1:
-        needs_document_knowledge = st.checkbox(t(lang, "needs_document_knowledge_label"), key="needs_document_knowledge")
-        needs_dynamic_data = st.checkbox(t(lang, "needs_dynamic_data_label"), key="needs_dynamic_data")
-        long_running_context = st.checkbox(t(lang, "long_running_context_label"), key="long_running_context")
+        needs_document_knowledge = field_checkbox("needs_document_knowledge", "needs_document_knowledge_label")
+        needs_dynamic_data = field_checkbox("needs_dynamic_data", "needs_dynamic_data_label")
+        long_running_context = field_checkbox("long_running_context", "long_running_context_label")
     with c2:
-        existing_api = st.checkbox(t(lang, "existing_api_label"), key="existing_api")
-        many_external_capabilities = st.checkbox(t(lang, "many_external_capabilities_label"), key="many_external_capabilities")
-        remote_autonomous_service = st.checkbox(t(lang, "remote_autonomous_service_label"), key="remote_autonomous_service")
+        existing_api = field_checkbox("existing_api", "existing_api_label")
+        many_external_capabilities = field_checkbox("many_external_capabilities", "many_external_capabilities_label")
+        remote_autonomous_service = field_checkbox("remote_autonomous_service", "remote_autonomous_service_label")
 
 with risk_eval:
     st.subheader(t(lang, "t4_subheader"))
     c1, c2 = st.columns(2)
     with c1:
-        sensitive_data = st.checkbox(t(lang, "sensitive_data_label"), key="sensitive_data")
-        high_impact_actions = st.checkbox(t(lang, "high_impact_actions_label"), key="high_impact_actions")
-        irreversible_actions = st.checkbox(t(lang, "irreversible_actions_label"), key="irreversible_actions")
-        human_approval_required = st.checkbox(t(lang, "human_approval_required_label"), key="human_approval_required")
+        sensitive_data = field_checkbox("sensitive_data", "sensitive_data_label")
+        high_impact_actions = field_checkbox("high_impact_actions", "high_impact_actions_label")
+        irreversible_actions = field_checkbox("irreversible_actions", "irreversible_actions_label")
+        human_approval_required = field_checkbox("human_approval_required", "human_approval_required_label")
     with c2:
-        subjective_quality = st.checkbox(t(lang, "subjective_quality_label"), value=True, key="subjective_quality")
-        critical_cohorts = st.checkbox(t(lang, "critical_cohorts_label"), key="critical_cohorts")
+        subjective_quality = field_checkbox("subjective_quality", "subjective_quality_label", default=True)
+        critical_cohorts = field_checkbox("critical_cohorts", "critical_cohorts_label")
         st.markdown(t(lang, "ops_note"))
 
 case = ArchitectureCase(
@@ -139,9 +167,9 @@ with compare:
     st.subheader(t(lang, "t5_subheader"))
     st.write(t(lang, "t5_intro"))
     option_names = [
-        st.text_input(t(lang, "option_a_label"), t(lang, "option_a_default")),
-        st.text_input(t(lang, "option_b_label"), t(lang, "option_b_default")),
-        st.text_input(t(lang, "option_c_label"), t(lang, "option_c_default")),
+        field_text("option_a_name", "option_a_label", default_text=t(DEFAULT_LANG, "option_a_default")),
+        field_text("option_b_name", "option_b_label", default_text=t(DEFAULT_LANG, "option_b_default")),
+        field_text("option_c_name", "option_c_label", default_text=t(DEFAULT_LANG, "option_c_default")),
     ]
     all_option_scores: list[dict[str, int]] = [dict(), dict(), dict()]
     for criterion, weight in DEFAULT_WEIGHTS.items():
@@ -157,8 +185,11 @@ with compare:
     scores = {o.name: normalized_score(o.scores) for o in option_scores}
     best_name = max(scores, key=scores.get)
     st.metric(t(lang, "highest_score_label"), f"{best_name} · {scores[best_name]:.1%}")
-    selected_option = st.selectbox(t(lang, "selected_option_label"), option_names, index=option_names.index(best_name))
-    tradeoff_notes = st.text_area(t(lang, "tradeoff_notes_label"), placeholder=t(lang, "tradeoff_notes_placeholder"))
+    st.markdown(f"**{t(lang, 'selected_option_label')}**")
+    selected_option = st.selectbox(
+        "selected_option", option_names, index=option_names.index(best_name), label_visibility="collapsed"
+    )
+    tradeoff_notes = field_text("tradeoff_notes", "tradeoff_notes_label", area=True, placeholder_key="tradeoff_notes_placeholder")
 
 plan = DecisionPlan(
     case=case,
