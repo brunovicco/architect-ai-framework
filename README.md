@@ -45,7 +45,7 @@ The UI ships with a one-click example case ("Investment Assistant") so you can s
 - Compares model/provider candidates across 9 vendor-neutral criteria (quality fit, latency, cost, context window, structured output, privacy/residency, rate limits, portability, explainability/fairness auditability) - structure only, no opinion on which vendor to pick.
 - Exports the final **Architecture Decision Plan** as Markdown, DOCX, PDF, JSON or a Nygard-style **ADR** - in either language.
 - Round-trips a plan: re-import a previously exported JSON file, or save/load named drafts for the current browser session.
-- Optional, vendor-neutral **AI review**: point it at any OpenAI-chat-completions-compatible endpoint (OpenAI, Ollama, vLLM, a gateway...) to get a critique of the generated plan. Guarded against SSRF - see [Security](#security).
+- Optional, vendor-neutral **AI review**: use a shared, rate-limited demo key when available, or point it at any OpenAI-chat-completions-compatible endpoint (OpenAI, Ollama, vLLM, a gateway...) with your own key, to get a critique of the generated plan. Guarded against SSRF - see [Security](#security).
 
 ## Vendor-neutral by design
 
@@ -107,20 +107,21 @@ Open the local Streamlit URL and walk through the seven tabs (or click **Load ex
 
 ## Using the AI review
 
-The Plan tab includes an optional, vendor-neutral **AI Review** panel that sends the generated plan to any OpenAI-chat-completions-compatible endpoint and returns a critique inside the app.
+The Plan tab includes an optional, vendor-neutral **AI Review** panel that sends the generated plan to an OpenAI-chat-completions-compatible endpoint and returns a critique inside the app. Two modes:
 
-1. Open the **Plan** tab and expand **AI Review (optional)**.
-2. Fill in:
-   - **Base URL** - the endpoint's base URL, e.g. `https://api.openai.com/v1` for OpenAI, or the public HTTPS URL of any OpenAI-compatible gateway (Ollama, vLLM, LM Studio, a self-hosted proxy...).
-   - **API key** - your key for that endpoint.
-   - **Model name** - the model identifier the endpoint expects, e.g. `gpt-4o-mini`.
-3. Click **Get AI review**.
+- **Shared demo key** - appears automatically when the deployment has a credential configured (see `docs/PROVIDERS_SECURITY_CHECKLIST.md`, control #9). Nothing to paste: just click **Get AI review**. It's capped by a global daily limit and a per-browser-session limit, to keep a credential shared across anonymous visitors from being abused.
+- **My own key** - always available. Fill in:
+  - **Base URL** - the endpoint's base URL, e.g. `https://api.openai.com/v1` for OpenAI, or the public HTTPS URL of any OpenAI-compatible gateway (Ollama, vLLM, LM Studio, a self-hosted proxy...).
+  - **API key** - your key for that endpoint.
+  - **Model name** - the model identifier the endpoint expects, e.g. `gpt-4o-mini`.
+
+Either way, the last step is clicking **Get AI review**.
 
 A few things worth knowing:
 
 - The endpoint must be reachable over **public HTTPS** - `localhost` and private/internal addresses are rejected outright by the built-in SSRF guard, so a purely local Ollama/vLLM instance needs to sit behind a public hostname (a tunnel or reverse proxy) to be usable here.
 - It's entirely optional: the deterministic plan - architecture, controls, evaluation, operations - is already complete without it. The AI review only adds a second opinion on top.
-- The API key stays in memory for that one request only; it's never logged or persisted, and nothing is sent anywhere until all three fields are filled in and the button is clicked. See [Security](#security) for the full guarantee.
+- In "my own key" mode, the API key stays in memory for that one request only; it's never logged or persisted, and nothing is sent anywhere until all three fields are filled in and the button is clicked. In shared-key mode, the credential lives only in the deployment's secret store (never in the repo, never in the browser). See [Security](#security) for the full guarantee.
 
 ## Run tests/lint/type-check
 
@@ -149,8 +150,12 @@ The deterministic core never calls a model or makes a network request. The
 only network-calling, credential-handling code path is the optional AI
 review (`OpenAICompatibleAdapter`), which validates its target URL against
 an SSRF guard (rejects non-`https`, localhost, private/loopback/link-local
-addresses, including the cloud metadata IP) before ever connecting - API
-keys stay in-memory for one request and are never logged or persisted.
+addresses, including the cloud metadata IP) before ever connecting. In "my
+own key" mode, the key stays in-memory for one request and is never logged
+or persisted; in shared-demo-key mode, the credential lives only in the
+deployment's secret store and calls are bounded by daily/session request
+caps and a response-size cap, to contain the blast radius of a credential
+shared across anonymous visitors.
 
 See [SECURITY.md](SECURITY.md) for the full threat model and how to report
 a vulnerability, and

@@ -53,7 +53,7 @@ CANDIDATE_COLS = ("a", "b", "c")
 # cap, and a response-length cap so one shared key's blast radius stays small.
 AI_REVIEW_SHARED_DAILY_CAP = 20
 AI_REVIEW_SHARED_PER_SESSION_CAP = 3
-AI_REVIEW_SHARED_MAX_TOKENS = 2000
+AI_REVIEW_SHARED_MAX_TOKENS = 5000
 
 
 @st.cache_resource

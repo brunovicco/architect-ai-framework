@@ -45,7 +45,7 @@ A interface vem com um caso de exemplo de um clique ("Investment Assistant") par
 - Compara candidatos de modelo/fornecedor em 9 critérios neutros em fornecedor (aderência de qualidade, latência, custo, janela de contexto, saída estruturada, privacidade/residência, limites de taxa, portabilidade, explicabilidade/auditabilidade de viés) - só estrutura, sem opinião sobre qual fornecedor escolher.
 - Exporta o **Plano de Decisão de Arquitetura** final em Markdown, DOCX, PDF, JSON ou um **ADR** no estilo Nygard - em qualquer um dos dois idiomas.
 - Permite retomar um plano: reimporte um JSON exportado anteriormente, ou salve/carregue rascunhos nomeados durante a sessão atual do navegador.
-- **Revisão por IA** opcional e neutra em fornecedor: aponte para qualquer endpoint compatível com a API de chat da OpenAI (OpenAI, Ollama, vLLM, um gateway...) para obter uma crítica do plano gerado. Protegida contra SSRF - veja [Segurança](#segurança).
+- **Revisão por IA** opcional e neutra em fornecedor: use uma chave de demonstração compartilhada (com limite de uso) quando disponível, ou aponte para qualquer endpoint compatível com a API de chat da OpenAI (OpenAI, Ollama, vLLM, um gateway...) com sua própria chave, para obter uma crítica do plano gerado. Protegida contra SSRF - veja [Segurança](#segurança).
 
 ## Neutro em fornecedor por design
 
@@ -107,20 +107,21 @@ Abra a URL local do Streamlit e percorra as sete abas (ou clique em **Carregar e
 
 ## Usando a revisão por IA
 
-A aba Plano tem um painel opcional e neutro em fornecedor, **Revisão por IA**, que envia o plano gerado para qualquer endpoint compatível com a API de chat da OpenAI e devolve uma crítica dentro do próprio app.
+A aba Plano tem um painel opcional e neutro em fornecedor, **Revisão por IA**, que envia o plano gerado para um endpoint compatível com a API de chat da OpenAI e devolve uma crítica dentro do próprio app. Dois modos:
 
-1. Abra a aba **Plano** e expanda **Revisão por IA (opcional)**.
-2. Preencha:
-   - **Base URL** - a URL base do endpoint, ex.: `https://api.openai.com/v1` para a OpenAI, ou a URL HTTPS pública de qualquer gateway compatível (Ollama, vLLM, LM Studio, um proxy self-hosted...).
-   - **Chave de API** - sua chave para esse endpoint.
-   - **Nome do modelo** - o identificador de modelo que o endpoint espera, ex.: `gpt-4o-mini`.
-3. Clique em **Obter revisão por IA**.
+- **Chave de demonstração (compartilhada)** - aparece automaticamente quando o deploy tem uma credencial configurada (veja `docs/PROVIDERS_SECURITY_CHECKLIST.md`, controle #9). Não precisa colar nada: é só clicar em **Obter revisão por IA**. É limitada por um teto diário global e um teto por sessão de navegador, para manter o custo/abuso de uma credencial compartilhada entre visitantes anônimos sob controle.
+- **Minha própria chave** - sempre disponível. Preencha:
+  - **Base URL** - a URL base do endpoint, ex.: `https://api.openai.com/v1` para a OpenAI, ou a URL HTTPS pública de qualquer gateway compatível (Ollama, vLLM, LM Studio, um proxy self-hosted...).
+  - **Chave de API** - sua chave para esse endpoint.
+  - **Nome do modelo** - o identificador de modelo que o endpoint espera, ex.: `gpt-4o-mini`.
+
+Em qualquer um dos dois modos, o passo final é clicar em **Obter revisão por IA**.
 
 Alguns pontos importantes:
 
 - O endpoint precisa estar acessível por **HTTPS público** - `localhost` e endereços privados/internos são rejeitados de cara pela guarda SSRF embutida, então uma instância local de Ollama/vLLM precisa ficar atrás de um hostname público (um túnel ou proxy reverso) para poder ser usada aqui.
 - É totalmente opcional: o plano determinístico - arquitetura, controles, avaliação, operação - já sai completo sem isso. A revisão por IA só acrescenta uma segunda opinião por cima.
-- A chave de API fica em memória só durante aquela requisição; nunca é logada nem persistida, e nada é enviado a lugar nenhum até os três campos serem preenchidos e o botão ser clicado. Veja [Segurança](#segurança) para a garantia completa.
+- No modo "minha própria chave", a chave de API fica em memória só durante aquela requisição; nunca é logada nem persistida, e nada é enviado a lugar nenhum até os três campos serem preenchidos e o botão ser clicado. No modo compartilhado, a credencial vive só no secret store do deploy (nunca no repositório, nunca no navegador). Veja [Segurança](#segurança) para a garantia completa.
 
 ## Rodar testes/lint/type-check
 
@@ -150,8 +151,12 @@ O núcleo determinístico nunca chama um modelo nem faz requisição de rede. O
 revisão por IA opcional (`OpenAICompatibleAdapter`), que valida a URL de
 destino contra uma guarda SSRF (rejeita não-`https`, localhost, endereços
 privados/loopback/link-local, incluindo o IP de metadados de nuvem) antes de
-conectar - a chave de API fica em memória só durante a requisição e nunca é
-logada nem persistida.
+conectar. No modo "minha própria chave", a chave fica em memória só durante
+a requisição e nunca é logada nem persistida; no modo de demonstração
+compartilhada, a credencial vive só no secret store do deploy e as chamadas
+são limitadas por tetos diário/por sessão e por tamanho de resposta, para
+conter o raio de impacto de uma credencial compartilhada entre visitantes
+anônimos.
 
 Veja [SECURITY.md](SECURITY.md) (em inglês) para o modelo de ameaça completo
 e como reportar uma vulnerabilidade, e

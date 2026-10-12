@@ -5,7 +5,7 @@
     "desired_outcome": "Fast grounded answers with controlled transactional side effects.",
     "users": "Retail banking customers",
     "quality_target": "High groundedness and task success on investment queries",
-    "latency_target": "Low latency for read-only requests; higher budget for complex analysis",
+    "latency_target": "p95 < 2s for read-only requests; p95 < 8s for complex analysis",
     "cost_constraint": "Up to $800/month at current query volume",
     "regulatory_constraints": "Suitability, auditability and human/user confirmation before transactional side effects",
     "path_known": true,

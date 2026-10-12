@@ -5,7 +5,7 @@
     "desired_outcome": "Respostas rápidas e fundamentadas, com efeitos colaterais transacionais controlados.",
     "users": "Clientes de varejo bancário",
     "quality_target": "Alta fundamentação e sucesso de tarefa em consultas de investimento",
-    "latency_target": "Baixa latência para consultas somente leitura; orçamento maior para análises complexas",
+    "latency_target": "p95 < 2s para consultas somente leitura; p95 < 8s para análises complexas",
     "cost_constraint": "Até US$ 800/mês no volume atual de consultas",
     "regulatory_constraints": "Adequação (suitability), auditabilidade e confirmação humana/do usuário antes de efeitos colaterais transacionais",
     "path_known": true,
@@ -72,7 +72,7 @@
       }
     }
   ],
-  "tradeoff_notes": "Workflow é mais simples e auditável, mas não consegue escolher dinamicamente qual ferramenta/API interna chamar para perguntas ad-hoc sobre portfólio; multiagente adiciona uma sobrecarga de coordenação que ainda não precisamos. Revisitar se o catálogo de ferramentas chamáveis crescer além de um punhado.",
+  "tradeoff_notes": "Workflow é mais simples e auditável, mas não consegue escolher dinamicamente qual ferramenta/API interna chamar para perguntas ad-hoc sobre portfólio; multiagente adiciona uma sobrecarga de coordenação que ainda não precisamos. Revisitar se o catálogo de ferramentas chamáveis crescer.",
   "model_comparison": [
     {
       "criterion": "Aderência de qualidade à tarefa",
