@@ -42,7 +42,10 @@ A interface é totalmente bilíngue (pt-BR / en) e vem com um caso de exemplo de
 - Gera recomendações de segurança/governança como privilégio mínimo, autorização na camada de execução, HITL e comportamento fail-closed.
 - Produz um plano de avaliação e observabilidade.
 - Compara até três opções de arquitetura com trade-offs ponderados.
-- Exporta o **Plano de Decisão de Arquitetura** final em Markdown, DOCX ou JSON — em qualquer um dos dois idiomas.
+- Compara candidatos de modelo/fornecedor em 8 critérios neutros em fornecedor (aderência de qualidade, latência, custo, janela de contexto, saída estruturada, privacidade/residência, limites de taxa, portabilidade) — só estrutura, sem opinião sobre qual fornecedor escolher.
+- Exporta o **Plano de Decisão de Arquitetura** final em Markdown, DOCX, PDF, JSON ou um **ADR** no estilo Nygard — em qualquer um dos dois idiomas.
+- Permite retomar um plano: reimporte um JSON exportado anteriormente, ou salve/carregue rascunhos nomeados durante a sessão atual do navegador.
+- **Revisão por IA** opcional e neutra em fornecedor: aponte para qualquer endpoint compatível com a API de chat da OpenAI (OpenAI, Ollama, vLLM, um gateway...) para obter uma crítica do plano gerado. Protegida contra SSRF — veja [Segurança](#segurança).
 
 ## Neutro em fornecedor por design
 
@@ -92,7 +95,7 @@ pip install -e .
 streamlit run app.py
 ```
 
-Abra a URL local do Streamlit e percorra as seis abas (ou clique em **Carregar exemplo: Investment Assistant** no menu lateral). A última aba oferece Markdown, DOCX e JSON para download, traduzidos para o idioma selecionado.
+Abra a URL local do Streamlit e percorra as sete abas (ou clique em **Carregar exemplo: Investment Assistant** no menu lateral). A aba Plano oferece Markdown, DOCX, PDF, ADR e JSON para download, traduzidos para o idioma selecionado — além de uma biblioteca de casos salvos (só na sessão) e uma revisão por IA opcional.
 
 ## Rodar testes / lint / type-check
 
@@ -115,6 +118,22 @@ No ar em **[architect-ai-framework.streamlit.app](https://architect-ai-framework
 3. Clique em **New app**, selecione seu repositório e a branch (`main`), e defina o caminho do arquivo principal como `app.py`.
 4. Faça o deploy. O Streamlit Cloud instala a partir do `requirements.txt` e lê a versão do Python em `runtime.txt` automaticamente — não precisa de nenhuma configuração extra.
 
+## Segurança
+
+O núcleo determinístico nunca chama um modelo nem faz requisição de rede. O
+único trecho de código que faz chamada de rede e lida com credencial é a
+revisão por IA opcional (`OpenAICompatibleAdapter`), que valida a URL de
+destino contra uma guarda SSRF (rejeita não-`https`, localhost, endereços
+privados/loopback/link-local, incluindo o IP de metadados de nuvem) antes de
+conectar — a chave de API fica em memória só durante a requisição e nunca é
+logada nem persistida.
+
+Veja [SECURITY.md](SECURITY.md) (em inglês) para o modelo de ameaça completo
+e como reportar uma vulnerabilidade, e
+[docs/PROVIDERS_SECURITY_CHECKLIST.md](docs/PROVIDERS_SECURITY_CHECKLIST.md)
+para o checklist mapeado ao OWASP LLM Top 10 / MITRE ATLAS que qualquer novo
+adaptador precisa satisfazer.
+
 ## Estrutura do repositório
 
 ```text
@@ -122,20 +141,24 @@ architect-ai-framework/
 ├── app.py
 ├── src/arquiteto/
 │   ├── engine.py       # motor de recomendação determinístico
-│   ├── exporters.py    # geração bilíngue de Markdown e DOCX
+│   ├── exporters.py    # geração bilíngue de Markdown, DOCX, PDF e ADR
 │   ├── i18n.py          # textos da UI, palavras do método, traduções
 │   ├── models.py       # modelos de domínio
-│   ├── providers.py    # contrato opcional de adaptador de modelo (não usado pelo motor)
+│   ├── providers.py    # contrato de adaptador + adaptador protegido contra SSRF
 │   └── scoring.py      # matriz de trade-off ponderada
 ├── docs/
 │   ├── FRAMEWORK.md
 │   ├── PROVIDER_NEUTRALITY.md
+│   ├── PROVIDERS_SECURITY_CHECKLIST.md
 │   └── screenshots/     # screenshots do README, pt-br/ e en/
 ├── examples/
 │   └── investment_assistant.json
 ├── assets/
 │   └── Framework_ARQUITETO_AI.xlsx
-├── .github/workflows/ci.yml
+├── .github/
+│   ├── workflows/ci.yml
+│   └── dependabot.yml
+├── SECURITY.md
 └── tests/
 ```
 
@@ -155,12 +178,12 @@ architect-ai-framework/
 - [x] Diagrama de arquitetura interativo (Mermaid)
 - [x] Deploy público (Streamlit Community Cloud)
 - [x] Hardening de CI/supply chain (Dependabot, pip-audit, Actions fixadas por SHA, branch protection)
-- [ ] Importar/exportar planos JSON existentes
-- [ ] Export em PDF
-- [ ] Revisor de IA opcional e neutro em fornecedor via interface de adaptador
-- [ ] Matriz de comparação de modelo/fornecedor
-- [ ] Biblioteca de casos salvos
-- [ ] Export de Architecture Decision Record (ADR)
+- [x] Importar/exportar planos JSON existentes
+- [x] Export em PDF
+- [x] Revisor de IA opcional e neutro em fornecedor via interface de adaptador (protegido contra SSRF)
+- [x] Matriz de comparação de modelo/fornecedor
+- [x] Biblioteca de casos salvos (só na sessão, por design — veja [Segurança](#segurança))
+- [x] Export de Architecture Decision Record (ADR)
 
 ## Contribuindo
 

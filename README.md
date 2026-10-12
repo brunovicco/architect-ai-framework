@@ -42,7 +42,10 @@ The UI is fully bilingual (pt-BR / en) and ships with a one-click example case (
 - Generates security/governance recommendations such as least privilege, execution-layer authorization, HITL and fail-closed behavior.
 - Produces an evaluation and observability plan.
 - Compares up to three architecture options with weighted trade-offs.
-- Exports the final **Architecture Decision Plan** as Markdown, DOCX or JSON — in either language.
+- Compares model/provider candidates across 8 vendor-neutral criteria (quality fit, latency, cost, context window, structured output, privacy/residency, rate limits, portability) — structure only, no opinion on which vendor to pick.
+- Exports the final **Architecture Decision Plan** as Markdown, DOCX, PDF, JSON or a Nygard-style **ADR** — in either language.
+- Round-trips a plan: re-import a previously exported JSON file, or save/load named drafts for the current browser session.
+- Optional, vendor-neutral **AI review**: point it at any OpenAI-chat-completions-compatible endpoint (OpenAI, Ollama, vLLM, a gateway...) to get a critique of the generated plan. Guarded against SSRF — see [Security](#security).
 
 ## Vendor-neutral by design
 
@@ -92,7 +95,7 @@ pip install -e .
 streamlit run app.py
 ```
 
-Open the local Streamlit URL and walk through the six tabs (or click **Load example: Investment Assistant** in the sidebar). The final tab provides downloadable Markdown, DOCX and JSON artifacts, translated into whichever language is selected.
+Open the local Streamlit URL and walk through the seven tabs (or click **Load example: Investment Assistant** in the sidebar). The Plan tab provides downloadable Markdown, DOCX, PDF, ADR and JSON artifacts, translated into whichever language is selected — plus a session-only saved-case library and an optional AI review.
 
 ## Run tests / lint / type-check
 
@@ -115,6 +118,21 @@ Live at **[architect-ai-framework.streamlit.app](https://architect-ai-framework.
 3. Click **New app**, pick your repository and branch (`main`), and set the main file path to `app.py`.
 4. Deploy. Streamlit Cloud installs from `requirements.txt` and reads the Python version from `runtime.txt` automatically — no extra configuration needed.
 
+## Security
+
+The deterministic core never calls a model or makes a network request. The
+only network-calling, credential-handling code path is the optional AI
+review (`OpenAICompatibleAdapter`), which validates its target URL against
+an SSRF guard (rejects non-`https`, localhost, private/loopback/link-local
+addresses, including the cloud metadata IP) before ever connecting — API
+keys stay in-memory for one request and are never logged or persisted.
+
+See [SECURITY.md](SECURITY.md) for the full threat model and how to report
+a vulnerability, and
+[docs/PROVIDERS_SECURITY_CHECKLIST.md](docs/PROVIDERS_SECURITY_CHECKLIST.md)
+for the OWASP LLM Top 10 / MITRE ATLAS-mapped checklist any new adapter must
+satisfy.
+
 ## Repository structure
 
 ```text
@@ -122,20 +140,24 @@ architect-ai-framework/
 ├── app.py
 ├── src/arquiteto/
 │   ├── engine.py       # deterministic recommendation engine
-│   ├── exporters.py    # bilingual Markdown and DOCX generation
+│   ├── exporters.py    # bilingual Markdown, DOCX, PDF and ADR generation
 │   ├── i18n.py          # UI strings, ARQUITETO/ARCHITECT step words, translations
 │   ├── models.py       # domain models
-│   ├── providers.py    # optional model-adapter contract (unused by the engine)
+│   ├── providers.py    # optional model-adapter contract + SSRF-guarded adapter
 │   └── scoring.py      # weighted trade-off matrix
 ├── docs/
 │   ├── FRAMEWORK.md
 │   ├── PROVIDER_NEUTRALITY.md
+│   ├── PROVIDERS_SECURITY_CHECKLIST.md
 │   └── screenshots/     # README screenshots, pt-br/ and en/
 ├── examples/
 │   └── investment_assistant.json
 ├── assets/
 │   └── Framework_ARQUITETO_AI.xlsx
-├── .github/workflows/ci.yml
+├── .github/
+│   ├── workflows/ci.yml
+│   └── dependabot.yml
+├── SECURITY.md
 └── tests/
 ```
 
@@ -155,12 +177,12 @@ architect-ai-framework/
 - [x] Interactive architecture diagram (Mermaid)
 - [x] Public deployment (Streamlit Community Cloud)
 - [x] CI/supply-chain hardening (Dependabot, pip-audit, pinned Actions, branch protection)
-- [ ] Import/export existing JSON plans
-- [ ] PDF export
-- [ ] Optional vendor-neutral LLM reviewer via adapter interface
-- [ ] Model/provider comparison matrix
-- [ ] Saved case library
-- [ ] Architecture Decision Record (ADR) export
+- [x] Import/export existing JSON plans
+- [x] PDF export
+- [x] Optional vendor-neutral LLM reviewer via adapter interface (SSRF-guarded)
+- [x] Model/provider comparison matrix
+- [x] Saved case library (session-only, by design — see [Security](#security))
+- [x] Architecture Decision Record (ADR) export
 
 ## Contributing
 
