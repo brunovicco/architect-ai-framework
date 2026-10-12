@@ -1,7 +1,7 @@
 [project]
-name = "arquiteto-ai-framework"
+name = "architect-ai-framework"
 version = "0.2.0"
-description = "Vendor-neutral decision framework for AI/LLM architecture using the ARQUITETO method."
+description = "Vendor-neutral decision framework for AI/LLM architecture using the ARCHITECT method (ARQUITETO in Portuguese)."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

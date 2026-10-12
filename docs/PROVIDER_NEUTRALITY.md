@@ -1,6 +1,6 @@
 # Provider Neutrality
 
-ARQUITETO is intentionally independent of model vendors and hosting platforms.
+ARCHITECT is intentionally independent of model vendors and hosting platforms.
 
 ## Core boundary
 
@@ -38,7 +38,7 @@ class ModelAdapter(Protocol):
     def generate(self, system: str, user: str) -> str: ...
 ```
 
-Concrete adapters can then implement any provider or local runtime without changing the ARQUITETO engine.
+Concrete adapters can then implement any provider or local runtime without changing the ARCHITECT engine.
 
 ## Tool integration is also provider-neutral
 

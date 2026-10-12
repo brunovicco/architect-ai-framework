@@ -1,18 +1,18 @@
-# ARQUITETO Framework
+# ARCHITECT Framework
 
-ARQUITETO is a repeatable, vendor-neutral decision flow for AI/LLM architecture.
+ARCHITECT is a repeatable, vendor-neutral decision flow for AI/LLM architecture.
 
 | Step | Question | Output |
-|---|---|---|
-| **A — Alvo** | What business outcome must change? | Problem + measurable success |
-| **R — Requisitos** | What are the hard constraints and SLAs? | Decision criteria + feasibility verdict |
-| **Q — Quem faz o quê?** | Probabilistic model, deterministic software or human? | Responsibility boundaries |
-| **U — Uso arquitetural** | Augmented LLM, workflow, agent or multi-agent? | Architecture pattern + named reference architecture + entry point |
-| **I — Integração & Informação** | Prompt/context, RAG, API/tool, tool protocol or A2A? | Context + integration map |
-| **T — Trust & Controls** | What happens when model/tool behavior is wrong? | Auth, least privilege, HITL, fail-closed + review placement |
-| **E — Evaluation** | How do we prove the system works? | Dataset, metrics and evaluators |
-| **T — Trade-offs** | What do we gain and what do we pay? | Decision rationale |
-| **O — Operação** | How do we observe and evolve it? | Operational plan + feedback loop |
+| --- | --- | --- |
+| **A - Aim** | What business outcome must change? | Problem + measurable success |
+| **R - Requirements** | What are the hard constraints and SLAs? | Decision criteria + feasibility verdict |
+| **C - Composition** | Probabilistic model, deterministic software or human? | Responsibility boundaries |
+| **H - Harness** | Augmented LLM, workflow, agent or multi-agent? | Architecture pattern + named reference architecture + entry point |
+| **I - Integration & Information** | Prompt/context, RAG, API/tool, tool protocol or A2A? | Context + integration map |
+| **T - Trust & Controls** | What happens when model/tool behavior is wrong? | Auth, least privilege, HITL, fail-closed + review placement |
+| **E - Evaluation** | How do we prove the system works? | Dataset, metrics and evaluators |
+| **C - Comparison** | What do we gain and what do we pay? | Decision rationale |
+| **T - Telemetry** | How do we observe and evolve it? | Operational plan + feedback loop |
 
 ## Decision heuristics
 
@@ -27,6 +27,8 @@ ARQUITETO is a repeatable, vendor-neutral decision flow for AI/LLM architecture.
 - Objective constraints → deterministic evaluators first.
 - Subjective quality → calibrated model-based judge and/or human evaluation.
 - Aggregate scores can hide critical failures → segment important cohorts.
+- Promoting a model/prompt/retrieval change → run a structured experiment first (hypothesis, metrics tied to the eval suite, sized sample), not a single anecdotal run.
+- Agent or multi-agent operations → define circuit-breaker policy alongside retry/fallback; never retry non-idempotent side effects unsafely.
 
 ## The four model properties (the decomposition lens)
 
@@ -35,7 +37,7 @@ human, name which of these four properties the task actually depends on —
 each is a capability paired with a matching limitation:
 
 | Property | Strong on | Weak on | Compensate with |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Next-token prediction | Pattern-rich generation: summarizing, reformatting, drafting | Precision on specific values (names, dates, figures) | Citations, generator-verifier loops, tool calls for exact data |
 | Knowledge | Common, recent, well-represented topics | Rare, niche, contested or fast-changing topics | RAG, web search, tool calls, MCP — make an external system the source of truth |
 | Working memory | Anything that fits the context window | The context window is a hard edge, not a soft degradation | Chunking, progressive context loading, summarization across turns |
@@ -58,12 +60,12 @@ model is at the task in isolation.
 
 ## Reference architectures
 
-`U — Uso arquitetural` picks one of four abstract patterns (Augmented LLM /
-Workflow / Agent / Multi-agent). Within that, a reference architecture names
+`H — Harness` picks one of four abstract patterns (Augmented LLM /
+Workflow/Agent/Multi-agent). Within that, a reference architecture names
 the concrete, recognizable shape:
 
 | Reference architecture | Typical `architecture_pattern` | Fits when |
-|---|---|---|
+| --- | --- | --- |
 | Single augmented call | Augmented LLM | One bounded, verifiable task, no document knowledge needed |
 | RAG pipeline | Augmented LLM | The task needs stable document/knowledge-base context |
 | Chaining | Workflow | The task decomposes into stages with clean handoffs |
@@ -83,9 +85,9 @@ direct call to the system of record, never a cached index.
 Independently of the architecture pattern, name which delivery surface the
 solution needs — generic categories, not a vendor product:
 
-- **Hosted chat / web UI** — lowest build cost; default when nothing else applies.
+- **Hosted chat/web UI** — lowest build cost; default when nothing else applies.
 - **Agentic coding assistant (CLI/IDE)** — the work is an engineering workflow inside a developer's own code/terminal loop.
-- **Direct API / SDK integration** — a fully custom, branded, product-embedded experience.
+- **Direct API/SDK integration** — a fully custom, branded, product-embedded experience.
 - **Protocol server for multi-client reuse** — the capability must be discoverable and reusable by more than one client (e.g. exposed via MCP or an equivalent tool protocol), not rebuilt per integration.
 
 ## Feasibility verdict
@@ -114,9 +116,29 @@ Routing everything to a person by volume (instead of by stakes) overwhelms
 reviewers and degrades review quality; routing nothing lets a high-stakes,
 irreversible action through ungated. Neither is a review *strategy*.
 
+## Fairness and auditability
+
+When a decision can affect people or groups unevenly — approval/denial,
+prioritization, eligibility — add two obligations on top of the usual
+Trust & Controls set:
+
+- Audit the four common bias injection points: retrieval-corpus
+  representativeness, prompt framing, few-shot example selection and
+  downstream routing logic — each can skew outcomes independently of model
+  behavior.
+- Log enough of each decision to reconstruct it afterward for the affected
+  person, a regulator and your own debugging team.
+
+For high-impact or irreversible actions, Trust & Controls is three distinct
+layers, not one combined check: **input screening** (sanitize what reaches
+the model before it can trigger the action), **output screening** (check
+what the model produced against policy before it is shown or executed) and
+**authorization** (enforce policy in the execution layer, fail-closed when
+authorization or policy evidence is unavailable).
+
 ## Model/provider decision
 
-ARQUITETO does not prescribe a model vendor. Select the runtime after requirements are clear.
+ARCHITECT does not prescribe a model vendor. Select the runtime after requirements are clear.
 
 Evaluate model/runtime candidates against:
 
@@ -132,6 +154,22 @@ Evaluate model/runtime candidates against:
 - portability and vendor lock-in risk.
 
 A model or provider that violates a hard constraint is eliminated regardless of benchmark score.
+
+Before committing to one, compare delivery routes on compliance, cost and
+latency — a provider's direct API, a cloud marketplace/gateway, or a
+self-hosted/open-weight runtime — rather than defaulting to whichever route
+was easiest to try first.
+
+## Return on investment
+
+A feasible design is not automatically a funded one. Map business value to
+five ROI pillars before treating it as such: **efficiency** (time/cost saved on existing work), **transformation**
+(work that was not possible before), **productivity** (output per person),
+**solution cost** (build + run, compared against `estimated_monthly_cost`/
+`monthly_cost_ceiling`) and **performance SLAs** (the latency/quality bar the
+business actually needs, not the best the model can do). `feasibility_verdict`
+is the scope/budget gate; ROI is the separate question of whether the gate is
+worth clearing at all.
 
 ## Central rule
 

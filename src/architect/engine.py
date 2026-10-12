@@ -1,3 +1,18 @@
+"""The deterministic ARCHITECT decision engine.
+
+`recommend()` is the only public entry point: it maps an `ArchitectureCase`
+to a `Recommendation` through pure, rule-based logic with no I/O and no
+model/LLM calls (enforced by `tests/test_vendor_neutral.py`). All returned
+strings are plain, static English so `i18n.translate_items()` can look them
+up verbatim for pt-BR display - never interpolate a number or user-supplied
+value into a string returned from here.
+
+The private `_entry_point`/`_reference_architecture`/`_review_placement`/
+`_feasibility_verdict` helpers each compute one field of `Recommendation`;
+`_feasibility_verdict` must run last since it reads the fully-built
+`warnings` list.
+"""
+
 from .models import (
     ArchitectureCase,
     ArchitecturePattern,
@@ -11,6 +26,16 @@ from .models import (
 
 
 def _entry_point(case: ArchitectureCase, rationale: list[str]) -> EntryPoint:
+    """Pick the vendor-neutral delivery surface and append its rationale.
+
+    Args:
+        case: The questionnaire answers to decide on.
+        rationale: The recommendation's rationale list; mutated in place
+            with one sentence explaining the choice made here.
+
+    Returns:
+        The recommended `EntryPoint` category.
+    """
     if case.reusable_across_multiple_clients:
         rationale.append(
             "The capability needs to be discoverable and reusable by more than one client; expose it "
@@ -28,15 +53,26 @@ def _entry_point(case: ArchitectureCase, rationale: list[str]) -> EntryPoint:
             "A fully custom, branded, product-embedded experience needs direct API/SDK integration; a "
             "generic hosted chat interface won't carry your brand or business logic."
         )
-        return "Direct API / SDK integration"
+        return "Direct API/SDK integration"
     rationale.append(
         "No custom experience, engineering workflow or multi-client reuse was identified; a hosted "
         "chat/web interface has the lowest build cost for this case."
     )
-    return "Hosted chat / web UI"
+    return "Hosted chat/web UI"
 
 
 def _reference_architecture(case: ArchitectureCase, architecture: ArchitecturePattern) -> ReferenceArchitecture:
+    """Name the concrete reference architecture within an abstract pattern.
+
+    Args:
+        case: The questionnaire answers to decide on.
+        architecture: The abstract `ArchitecturePattern` already chosen by
+            `recommend()`.
+
+    Returns:
+        The named `ReferenceArchitecture` that fits `case` within
+        `architecture` (e.g. "RAG pipeline" within "Augmented LLM").
+    """
     if architecture == "Multi-agent":
         return "Orchestrator-workers"
     if architecture == "Agent":
@@ -51,6 +87,19 @@ def _reference_architecture(case: ArchitectureCase, architecture: ArchitecturePa
 
 
 def _review_placement(case: ArchitectureCase) -> ReviewPlacement:
+    """Decide where in the flow a human should review the action.
+
+    Driven by reversibility, impact and whether a calibrated confidence
+    score exists to route on - distinct from *whether* a human reviews at
+    all, which `case.human_approval_required`/`irreversible_actions`/
+    `high_impact_actions` already capture.
+
+    Args:
+        case: The questionnaire answers to decide on.
+
+    Returns:
+        The recommended `ReviewPlacement`.
+    """
     if case.irreversible_actions:
         return "Pre-action approval"
     if case.high_impact_actions:
@@ -61,6 +110,20 @@ def _review_placement(case: ArchitectureCase) -> ReviewPlacement:
 
 
 def _feasibility_verdict(case: ArchitectureCase, warnings: list[str]) -> FeasibilityVerdict:
+    """Decide the overall feasibility verdict.
+
+    Must be called last in `recommend()`: it reads `warnings` after every
+    other warning-producing check has already run, and may itself append
+    one more warning when the stated cost ceiling is exceeded.
+
+    Args:
+        case: The questionnaire answers to decide on.
+        warnings: The recommendation's warnings list so far; mutated in
+            place when the estimated cost exceeds the ceiling.
+
+    Returns:
+        The `FeasibilityVerdict` for this case.
+    """
     cost_provided = case.monthly_cost_ceiling > 0 and case.estimated_monthly_cost > 0
     if cost_provided and case.estimated_monthly_cost > case.monthly_cost_ceiling:
         warnings.append(
@@ -76,10 +139,23 @@ def _feasibility_verdict(case: ArchitectureCase, warnings: list[str]) -> Feasibi
 
 
 def recommend(case: ArchitectureCase) -> Recommendation:
+    """Compute the full architecture recommendation for a case.
+
+    Pure and deterministic: the same `case` always yields the same
+    `Recommendation`, with no I/O and no model/LLM call.
+
+    Args:
+        case: The questionnaire answers to decide on.
+
+    Returns:
+        The complete `Recommendation`, including the chosen architecture
+        and integration patterns, entry point, reference architecture,
+        feasibility verdict, review placement, and the rationale/controls/
+        evaluations/operations/warnings lists.
+    """
     rationale: list[str] = []
     warnings: list[str] = []
 
-    # U — Usage pattern
     architecture: ArchitecturePattern
     if case.independent_autonomous_domains and case.dynamic_next_steps:
         architecture = "Multi-agent"
@@ -108,17 +184,19 @@ def recommend(case: ArchitectureCase) -> Recommendation:
             "Validate that multi-agent autonomy is necessary. Prefer workflow + tools when it provides the same outcome with less complexity."
         )
 
-    # I — Integration
     integration: IntegrationPattern
     if case.remote_autonomous_service:
         integration = "Agent-to-Agent"
-        rationale.append("A remote capability has its own autonomy and execution lifecycle, favoring agent-to-agent coordination.")
+        rationale.append(
+            "A remote capability has its own autonomy and execution lifecycle, favoring agent-to-agent coordination.")
     elif case.many_external_capabilities:
-        integration = "Tool Protocol / MCP"
-        rationale.append("Multiple model-facing capabilities benefit from standardized discovery and contracts; a tool protocol such as MCP can be a candidate interface.")
+        integration = "Tool Protocol/MCP"
+        rationale.append(
+            "Multiple model-facing capabilities benefit from standardized discovery and contracts; a tool protocol such as MCP can be a candidate interface.")
     elif case.existing_api or case.needs_dynamic_data:
-        integration = "API / Tool"
-        rationale.append("Existing operational sources should remain the source of truth and be exposed as tools/APIs.")
+        integration = "API/Tool"
+        rationale.append(
+            "Existing operational sources should remain the source of truth and be exposed as tools/APIs.")
     else:
         integration = "None"
 
@@ -127,13 +205,17 @@ def recommend(case: ArchitectureCase) -> Recommendation:
 
     information: list[str] = []
     if case.needs_document_knowledge:
-        information.append("Use RAG for enterprise/document knowledge; evaluate chunking, indexing, retrieval quality and citations.")
+        information.append(
+            "Use RAG for enterprise/document knowledge; evaluate chunking, indexing, retrieval quality and citations.")
     if case.needs_dynamic_data:
-        information.append("Use a live operational source/API as source of truth for dynamic data; do not rely on model memory or stale RAG snapshots.")
+        information.append(
+            "Use a live operational source/API as source of truth for dynamic data; do not rely on model memory or stale RAG snapshots.")
     if case.long_running_context:
-        information.append("Use progressive context loading and preserve critical state separately from disposable conversation history.")
+        information.append(
+            "Use progressive context loading and preserve critical state separately from disposable conversation history.")
     if not information:
-        information.append("Keep context minimal; add retrieval or state only when the use case requires it.")
+        information.append(
+            "Keep context minimal; add retrieval or state only when the use case requires it.")
     information.append(
         "Decide what each piece of context is for using the four model properties as the lens: "
         "next-token prediction (pattern-rich generation, weak on precise specifics), knowledge "
@@ -142,20 +224,18 @@ def recommend(case: ArchitectureCase) -> Recommendation:
         "concrete/verifiable instructions, weak on abstract or long reasoning chains)."
     )
 
-    # Model / provider strategy — deliberately vendor-neutral
     model_strategy: list[str] = [
         "Evaluate model/runtime candidates only after hard requirements are clear.",
         "Compare task quality, latency/throughput and total cost per successful task on representative evals.",
         "Validate context, structured-output and tool-use capabilities required by the architecture.",
         "Treat privacy, data residency, retention and compliance requirements as hard constraints when applicable.",
         "Assess rate limits, availability, observability, operational support and portability/vendor lock-in before selection.",
-        "Compare delivery routes — a provider's direct API, a cloud marketplace/gateway, or a "
-        "self-hosted/open-weight runtime — on compliance, cost and latency before committing to one.",
-        "Map business value to the five ROI pillars — efficiency, transformation, productivity, "
-        "solution cost and performance SLAs — before treating a feasible design as a funded one.",
+        "Compare delivery routes - a provider's direct API, a cloud marketplace/gateway, or a "
+        "self-hosted/open-weight runtime - on compliance, cost and latency before committing to one.",
+        "Map business value to the five ROI pillars - efficiency, transformation, productivity, "
+        "solution cost and performance SLAs - before treating a feasible design as a funded one.",
     ]
 
-    # T — Trust
     controls: list[str] = [
         "Apply least privilege to tools, data and capabilities.",
         "Propagate real user/service identity to authorization checks at execution time.",
@@ -163,16 +243,23 @@ def recommend(case: ArchitectureCase) -> Recommendation:
         "undone?), stakes (what does a wrong call cost?) and accountability (who must answer for it?).",
     ]
     if case.sensitive_data:
-        controls.append("Enforce data isolation and access policy outside the model prompt; log access evidence where appropriate.")
+        controls.append(
+            "Enforce data isolation and access policy outside the model prompt; log access evidence where appropriate.")
     if case.high_impact_actions or case.irreversible_actions:
-        controls.append("Input screening: validate and sanitize what reaches the model before it can trigger the action, deterministically where the check is unambiguous.")
-        controls.append("Output screening: check the model's output against policy before it is shown or executed, not only what goes in.")
-        controls.append("Authorization: enforce high-impact action policy in the execution layer; do not depend on prompt compliance.")
-        controls.append("Use fail-closed behavior when authorization or policy evidence is unavailable.")
+        controls.append(
+            "Input screening: validate and sanitize what reaches the model before it can trigger the action, deterministically where the check is unambiguous.")
+        controls.append(
+            "Output screening: check the model's output against policy before it is shown or executed, not only what goes in.")
+        controls.append(
+            "Authorization: enforce high-impact action policy in the execution layer; do not depend on prompt compliance.")
+        controls.append(
+            "Use fail-closed behavior when authorization or policy evidence is unavailable.")
     if case.human_approval_required or case.irreversible_actions:
-        controls.append("Place human approval immediately before the governed side effect, with the final action details visible to the reviewer.")
+        controls.append(
+            "Place human approval immediately before the governed side effect, with the final action details visible to the reviewer.")
     if case.many_external_capabilities:
-        controls.append("Use progressive capability discovery/exposure so the model sees only relevant tools at each stage.")
+        controls.append(
+            "Use progressive capability discovery/exposure so the model sees only relevant tools at each stage.")
     if case.differential_outcomes_risk:
         controls.append(
             "Audit the four common bias injection points: retrieval-corpus representativeness, "
@@ -186,7 +273,6 @@ def recommend(case: ArchitectureCase) -> Recommendation:
 
     review_placement = _review_placement(case)
 
-    # E — Evaluation
     evaluations: list[str] = [
         "Create a representative evaluation dataset before production promotion.",
         "Track quality/task success, latency, cost and relevant safety/security metrics.",
@@ -194,22 +280,26 @@ def recommend(case: ArchitectureCase) -> Recommendation:
         "hypothesis, pick metrics tied to the eval suite, size the sample, and avoid overclaiming from a single run.",
     ]
     if case.structured_output:
-        evaluations.append("Use deterministic/code-based checks for schema, required fields and other objective constraints.")
+        evaluations.append(
+            "Use deterministic/code-based checks for schema, required fields and other objective constraints.")
     if case.subjective_quality:
-        evaluations.append("Use calibrated LLM-as-a-judge and/or human evaluation for subjective quality dimensions.")
+        evaluations.append(
+            "Use calibrated LLM-as-a-judge and/or human evaluation for subjective quality dimensions.")
     if case.critical_cohorts:
-        evaluations.append("Segment evaluation by critical cohorts/use cases so aggregate metrics do not hide failure modes.")
+        evaluations.append(
+            "Segment evaluation by critical cohorts/use cases so aggregate metrics do not hide failure modes.")
     if case.high_impact_actions:
-        evaluations.append("Add adversarial and policy-bypass cases focused on unauthorized or unsafe actions.")
+        evaluations.append(
+            "Add adversarial and policy-bypass cases focused on unauthorized or unsafe actions.")
 
-    # O — Operations
     operations = [
         "Trace model calls, retrieval, tool calls, latency, errors and final outcomes with a shared correlation/trace ID.",
         "Define timeout, retry, fallback and circuit-breaker policies per dependency; avoid unsafe retries for non-idempotent side effects.",
         "Use feedback and production failure modes to drive the next evaluation and architecture iteration.",
     ]
     if case.high_impact_actions or case.irreversible_actions:
-        operations.append("Require idempotency/deduplication for retried side effects and provide a kill-switch/feature flag for risky capabilities.")
+        operations.append(
+            "Require idempotency/deduplication for retried side effects and provide a kill-switch/feature flag for risky capabilities.")
 
     if case.strict_auditability and architecture == "Agent":
         warnings.append(

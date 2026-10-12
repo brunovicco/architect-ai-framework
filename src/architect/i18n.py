@@ -1,4 +1,4 @@
-"""Bilingual (pt-BR / en) UI strings for the Streamlit app.
+"""Bilingual (pt-BR/en) UI strings for the Streamlit app.
 
 This module only affects presentation. The decision engine (`engine.py`)
 always computes and returns English strings so its behavior and tests stay
@@ -9,11 +9,6 @@ map that fixed set of English strings to Portuguese for display only.
 LANGS = ("pt-BR", "en")
 DEFAULT_LANG = "pt-BR"
 
-# Single source of truth for the method's 9 steps (letter + name), in order.
-# The sidebar list and every tab subheader are built from this so the two
-# can never drift apart (e.g. "Trust" vs "Trust & Controls"). Each language
-# spells its own real word: ARQUITETO in Portuguese, ARCHITECT (its literal
-# English translation) in English — not a letter-by-letter transliteration.
 STEPS = {
     "pt-BR": [
         ("A", "Alvo"),
@@ -41,7 +36,6 @@ STEPS = {
 
 BRAND = {"pt-BR": "ARQUITETO", "en": "ARCHITECT"}
 
-# Which STEPS indexes (0-based, in method order) each tab's subheader covers.
 _TAB_STEP_INDEXES = {
     "t1_subheader": (0, 1),  # A, R
     "t2_subheader": (2, 3),  # who-does-what, usage pattern
@@ -53,14 +47,14 @@ _TAB_STEP_INDEXES = {
 UI = {
     "lang_label": {"pt-BR": "Idioma", "en": "Language"},
     "load_example_button": {
-        "pt-BR": "📂 Carregar exemplo: Investment Assistant",
-        "en": "📂 Load example: Investment Assistant",
+        "pt-BR": "Carregar exemplo: Investment Assistant",
+        "en": "Load example: Investment Assistant",
     },
-    "clear_form_button": {"pt-BR": "🧹 Limpar formulário", "en": "🧹 Clear form"},
-    "app_title": {"pt-BR": "🏛️ ARQUITETO", "en": "🏛️ ARCHITECT"},
+    "clear_form_button": {"pt-BR": "Limpar formulário", "en": "Clear form"},
+    "app_title": {"pt-BR": "ARQUITETO", "en": "ARCHITECT"},
     "app_caption": {
-        "pt-BR": "Decisões de arquitetura de IA / LLM neutras em relação a fornecedor — do problema de negócio ao plano operacional.",
-        "en": "Vendor-neutral AI / LLM architecture decisions — from business problem to operating plan. (English rendition of the ARQUITETO method.)",
+        "pt-BR": "Decisões de arquitetura de IA/LLM neutras em relação a fornecedor - do problema de negócio ao plano operacional.",
+        "en": "Vendor-neutral AI/LLM architecture decisions - from business problem to operating plan. (English rendition of the ARQUITETO method.)",
     },
     "sidebar_header": {"pt-BR": "Framework", "en": "Framework"},
     "sidebar_rule": {
@@ -85,7 +79,7 @@ UI = {
         "pt-BR": "Qual resultado mensurável define sucesso?",
         "en": "What measurable result defines success?",
     },
-    "users_label": {"pt-BR": "Usuários / público", "en": "Users / audience"},
+    "users_label": {"pt-BR": "Usuários/público", "en": "Users/audience"},
     "users_placeholder": {
         "pt-BR": "Quem usa ou é afetado pelo sistema?",
         "en": "Who uses or is affected by the system?",
@@ -106,28 +100,28 @@ UI = {
         "en": "e.g. target cost per successful task",
     },
     "regulatory_constraints_label": {
-        "pt-BR": "Restrições regulatórias / de política",
-        "en": "Regulatory / policy constraints",
+        "pt-BR": "Restrições regulatórias/de política",
+        "en": "Regulatory/policy constraints",
     },
     "regulatory_constraints_placeholder": {
         "pt-BR": "ex.: aprovação humana, evidência de auditoria, residência de dados",
         "en": "e.g. human approval, audit evidence, data residency",
     },
     "discovery_framing_hint": {
-        "pt-BR": "Dica: descreva um requisito testável e delimitado — uma preferência (\"deveria ser rápido\") não é o mesmo que um requisito (\"p95 < 2s\").",
-        "en": "Hint: describe a testable, bounded requirement — a preference (\"it should be fast\") isn't the same as a requirement (\"p95 < 2s\").",
+        "pt-BR": "Dica: descreva um requisito testável e delimitado - uma preferência (\"deveria ser rápido\") não é o mesmo que um requisito (\"p95 < 2s\").",
+        "en": "Hint: describe a testable, bounded requirement - a preference (\"it should be fast\") isn't the same as a requirement (\"p95 < 2s\").",
     },
     "estimated_monthly_cost_label": {"pt-BR": "Custo mensal estimado (US$)", "en": "Estimated monthly cost (US$)"},
     "estimated_monthly_cost_placeholder": {
-        "pt-BR": "ex.: 350 — deixe 0 se ainda não estimou",
-        "en": "e.g. 350 — leave 0 if not yet estimated",
+        "pt-BR": "ex.: 350 - deixe 0 se ainda não estimou",
+        "en": "e.g. 350 - leave 0 if not yet estimated",
     },
     "monthly_cost_ceiling_label": {"pt-BR": "Teto de orçamento mensal (US$)", "en": "Monthly budget ceiling (US$)"},
     "monthly_cost_ceiling_placeholder": {
-        "pt-BR": "ex.: 500 — deixe 0 se ainda não definido",
-        "en": "e.g. 500 — leave 0 if not yet set",
+        "pt-BR": "ex.: 500 - deixe 0 se ainda não definido",
+        "en": "e.g. 500 - leave 0 if not yet set",
     },
-    "roi_notes_label": {"pt-BR": "Valor de negócio / ROI", "en": "Business value / ROI"},
+    "roi_notes_label": {"pt-BR": "Valor de negócio/ROI", "en": "Business value/ROI"},
     "roi_notes_placeholder": {
         "pt-BR": "Os 5 pilares: eficiência, transformação, produtividade, custo da solução, SLAs de performance.",
         "en": "The 5 pillars: efficiency, transformation, productivity, solution cost, performance SLAs.",
@@ -153,8 +147,8 @@ UI = {
         "en": "There are separate autonomous domains with clear ownership/contracts",
     },
     "strict_auditability_label": {
-        "pt-BR": "Auditabilidade / reprodutibilidade estrita é exigida",
-        "en": "Strict auditability / reproducibility is required",
+        "pt-BR": "Auditabilidade/reprodutibilidade estrita é exigida",
+        "en": "Strict auditability/reproducibility is required",
     },
     "structured_output_label": {
         "pt-BR": "Sistemas downstream exigem saída estruturada/schema",
@@ -181,8 +175,8 @@ UI = {
         "en": "Needs live/dynamic operational data",
     },
     "long_running_context_label": {
-        "pt-BR": "Sessões longas / crescimento de contexto",
-        "en": "Long-running sessions / context growth",
+        "pt-BR": "Sessões longas/crescimento de contexto",
+        "en": "Long-running sessions/context growth",
     },
     "existing_api_label": {
         "pt-BR": "Já existe uma API/serviço maduro",
@@ -196,7 +190,7 @@ UI = {
         "pt-BR": "Um agente/serviço remoto autônomo executa tarefas complexas",
         "en": "A remote autonomous agent/service performs complex tasks",
     },
-    "sensitive_data_label": {"pt-BR": "Dados sensíveis / restritos", "en": "Sensitive / restricted data"},
+    "sensitive_data_label": {"pt-BR": "Dados sensíveis/restritos", "en": "Sensitive/restricted data"},
     "high_impact_actions_label": {
         "pt-BR": "Pode disparar efeitos colaterais de alto impacto",
         "en": "Can trigger high-impact side effects",
@@ -254,16 +248,16 @@ UI = {
     "reference_architecture_metric_label": {"pt-BR": "Arquitetura de referência", "en": "Reference architecture"},
     "feasibility_verdict_metric_label": {"pt-BR": "Veredito de viabilidade", "en": "Feasibility verdict"},
     "review_placement_metric_label": {"pt-BR": "Posicionamento de revisão", "en": "Review placement"},
-    "roi_notes_metric_label": {"pt-BR": "Valor de negócio / ROI", "en": "Business value / ROI"},
+    "roi_notes_metric_label": {"pt-BR": "Valor de negócio/ROI", "en": "Business value/ROI"},
     "rationale_heading": {"pt-BR": "### Justificativa", "en": "### Rationale"},
     "information_heading": {"pt-BR": "### Estratégia de informação", "en": "### Information strategy"},
     "model_strategy_heading": {
-        "pt-BR": "### Estratégia de modelo / fornecedor",
-        "en": "### Model / provider strategy",
+        "pt-BR": "### Estratégia de modelo/fornecedor",
+        "en": "### Model/provider strategy",
     },
     "model_comparison_screen_heading": {
-        "pt-BR": "### Comparação de Modelos / Fornecedores",
-        "en": "### Model / Provider Comparison",
+        "pt-BR": "### Comparação de Modelos/Fornecedores",
+        "en": "### Model/Provider Comparison",
     },
     "controls_heading": {"pt-BR": "### Trust & controles", "en": "### Trust & controls"},
     "evaluation_heading": {"pt-BR": "### Evaluation", "en": "### Evaluation"},
@@ -278,8 +272,8 @@ UI = {
 
     "tab_7": {"pt-BR": "6 · Modelos", "en": "6 · Models"},
     "models_intro": {
-        "pt-BR": "Adicione candidatos de modelo/fornecedor e preencha notas por critério. Isto é só estrutura de comparação — o framework não recomenda qual fornecedor escolher.",
-        "en": "Add model/provider candidates and fill in notes per criterion. This is just comparison structure — the framework doesn't recommend which vendor to pick.",
+        "pt-BR": "Adicione candidatos de modelo/fornecedor e preencha notas por critério. Isto é só estrutura de comparação - o framework não recomenda qual fornecedor escolher.",
+        "en": "Add model/provider candidates and fill in notes per criterion. This is just comparison structure - the framework doesn't recommend which vendor to pick.",
     },
     "model_candidate_a_label": {"pt-BR": "Candidato A", "en": "Candidate A"},
     "model_candidate_b_label": {"pt-BR": "Candidato B", "en": "Candidate B"},
@@ -299,27 +293,27 @@ UI = {
         "en": "Structured output support",
     },
     "model_criterion_privacy_label": {
-        "pt-BR": "Aderência de privacidade / residência",
-        "en": "Privacy / residency fit",
+        "pt-BR": "Aderência de privacidade/residência",
+        "en": "Privacy/residency fit",
     },
     "model_criterion_rate_limits_label": {
-        "pt-BR": "Limites de taxa / disponibilidade",
-        "en": "Rate limits / availability",
+        "pt-BR": "Limites de taxa/disponibilidade",
+        "en": "Rate limits/availability",
     },
     "model_criterion_portability_label": {
-        "pt-BR": "Portabilidade / risco de lock-in",
-        "en": "Portability / lock-in risk",
+        "pt-BR": "Portabilidade/risco de lock-in",
+        "en": "Portability/lock-in risk",
     },
 
     "saved_cases_header": {"pt-BR": "Casos salvos (sessão)", "en": "Saved cases (session)"},
     "saved_case_name_placeholder": {"pt-BR": "Nome do caso para salvar", "en": "Name to save as"},
-    "save_case_button": {"pt-BR": "💾 Salvar caso atual", "en": "💾 Save current case"},
+    "save_case_button": {"pt-BR": "Salvar caso atual", "en": "Save current case"},
     "load_saved_case_label": {"pt-BR": "Carregar caso salvo", "en": "Load a saved case"},
-    "load_saved_case_button": {"pt-BR": "📂 Carregar", "en": "📂 Load"},
-    "delete_saved_case_button": {"pt-BR": "🗑️ Excluir", "en": "🗑️ Delete"},
+    "load_saved_case_button": {"pt-BR": "Carregar", "en": "Load"},
+    "delete_saved_case_button": {"pt-BR": "Excluir", "en": "Delete"},
     "saved_cases_note": {
-        "pt-BR": "Mantidos só nesta sessão do navegador — nunca gravados no servidor.",
-        "en": "Kept only in this browser session — never written server-side.",
+        "pt-BR": "Mantidos só nesta sessão do navegador - nunca gravados no servidor.",
+        "en": "Kept only in this browser session - never written server-side.",
     },
     "no_saved_cases": {"pt-BR": "Nenhum caso salvo ainda.", "en": "No saved cases yet."},
     "case_saved_toast": {"pt-BR": "Caso salvo.", "en": "Case saved."},
@@ -331,18 +325,18 @@ UI = {
     },
     "import_json_success": {"pt-BR": "Plano importado.", "en": "Plan imported."},
 
-    "ai_review_expander_label": {"pt-BR": "🤖 Revisão por IA (opcional)", "en": "🤖 AI Review (optional)"},
+    "ai_review_expander_label": {"pt-BR": "Revisão por IA (opcional)", "en": "AI Review (optional)"},
     "ai_review_intro": {
-        "pt-BR": "Opcional e neutro em fornecedor: conecte qualquer endpoint compatível com a API de chat da OpenAI (OpenAI, Ollama, vLLM, gateways...) para obter uma crítica deste plano. Sua chave fica só nesta sessão — nunca é salva nem enviada para mais nenhum lugar.",
-        "en": "Optional and vendor-neutral: connect any OpenAI-chat-completions-compatible endpoint (OpenAI, Ollama, vLLM, gateways...) to get a critique of this plan. Your key stays in this session only — never saved, never sent anywhere else.",
+        "pt-BR": "Opcional e neutro em fornecedor: conecte qualquer endpoint compatível com a API de chat da OpenAI (OpenAI, Ollama, vLLM, gateways...) para obter uma crítica deste plano. Sua chave fica só nesta sessão - nunca é salva nem enviada para mais nenhum lugar.",
+        "en": "Optional and vendor-neutral: connect any OpenAI-chat-completions-compatible endpoint (OpenAI, Ollama, vLLM, gateways...) to get a critique of this plan. Your key stays in this session only - never saved, never sent anywhere else.",
     },
     "ai_review_base_url_label": {"pt-BR": "Base URL (https://...)", "en": "Base URL (https://...)"},
     "ai_review_api_key_label": {"pt-BR": "Chave de API", "en": "API key"},
     "ai_review_model_label": {"pt-BR": "Nome do modelo", "en": "Model name"},
     "ai_review_button": {"pt-BR": "Obter revisão por IA", "en": "Get AI review"},
     "ai_review_disclaimer": {
-        "pt-BR": "⚠️ Conteúdo gerado por IA — não verificado. Revise antes de confiar.",
-        "en": "⚠️ AI-generated content — unverified. Review before relying on it.",
+        "pt-BR": "⚠️ Conteúdo gerado por IA - não verificado. Revise antes de confiar.",
+        "en": "⚠️ AI-generated content - unverified. Review before relying on it.",
     },
     "ai_review_error": {"pt-BR": "Falha ao obter revisão: {error}", "en": "Failed to get a review: {error}"},
     "ai_review_system_prompt": {
@@ -362,25 +356,28 @@ MODEL_CRITERIA = [
     "model_criterion_portability_label",
 ]
 
-# Sidebar step list and tab subheaders are derived from STEPS so the letter
-# names can never go out of sync between the sidebar and the tabs.
 UI["sidebar_steps"] = {
     lang: "  \n".join(f"**{letter}** {name}" for letter, name in STEPS[lang]) for lang in LANGS
 }
 for _key, _indexes in _TAB_STEP_INDEXES.items():
     UI[_key] = {
-        lang: " / ".join(f"{STEPS[lang][i][0]} — {STEPS[lang][i][1]}" for i in _indexes) for lang in LANGS
+        lang: "/".join(f"{STEPS[lang][i][0]} - {STEPS[lang][i][1]}" for i in _indexes) for lang in LANGS
     }
 
 
 def t(lang: str, key: str) -> str:
+    """Look up a static UI string.
+
+    Args:
+        lang: The display language ("en" or "pt-BR").
+        key: The key into the `UI` dict.
+
+    Returns:
+        The string for `key` in `lang`.
+    """
     return UI[key][lang]
 
 
-# Portuguese translations for the fixed set of English strings the
-# deterministic engine returns (rationale, warnings, information strategy,
-# model strategy, controls, evaluations, operations). The engine itself stays
-# English-only/provider-neutral; unknown strings fall back to the original.
 ENGINE_PT = {
     "Separate autonomous domains plus dynamic execution can justify multiple agents, "
     "but each boundary should have a clear ownership and contract.": (
@@ -512,7 +509,6 @@ ENGINE_PT = {
         "Exija idempotência/deduplicação para efeitos colaterais reexecutados e forneça um kill-switch/feature flag "
         "para capacidades de risco."
     ),
-    # Entry point rationale
     "The capability needs to be discoverable and reusable by more than one client; expose it "
     "once through a standardized protocol server instead of rebuilding the integration per client.": (
         "A capacidade precisa ser descoberta e reaproveitada por mais de um cliente; exponha-a uma vez "
@@ -535,7 +531,6 @@ ENGINE_PT = {
         "Nenhuma experiência customizada, fluxo de engenharia ou reaproveitamento multi-cliente foi "
         "identificado; uma interface de chat/web hospedada tem o menor custo de construção para este caso."
     ),
-    # Four model properties, as the decomposition lens
     "Decide what each piece of context is for using the four model properties as the lens: "
     "next-token prediction (pattern-rich generation, weak on precise specifics), knowledge "
     "(reliable on common/stable topics, weak on rare or fast-changing ones), working memory "
@@ -548,27 +543,24 @@ ENGINE_PT = {
         "gradual) e steerability/direcionabilidade (confiável com instruções concretas/verificáveis, "
         "fraca em cadeias de raciocínio longas ou abstratas)."
     ),
-    # Model/provider strategy additions
-    "Compare delivery routes — a provider's direct API, a cloud marketplace/gateway, or a "
-    "self-hosted/open-weight runtime — on compliance, cost and latency before committing to one.": (
-        "Compare rotas de entrega — a API direta de um fornecedor, um marketplace/gateway de nuvem, "
-        "ou um runtime self-hosted/open-weight — em compliance, custo e latência antes de se "
+    "Compare delivery routes - a provider's direct API, a cloud marketplace/gateway, or a "
+    "self-hosted/open-weight runtime - on compliance, cost and latency before committing to one.": (
+        "Compare rotas de entrega - a API direta de um fornecedor, um marketplace/gateway de nuvem, "
+        "ou um runtime self-hosted/open-weight - em compliance, custo e latência antes de se "
         "comprometer com uma."
     ),
-    "Map business value to the five ROI pillars — efficiency, transformation, productivity, "
-    "solution cost and performance SLAs — before treating a feasible design as a funded one.": (
-        "Mapeie o valor de negócio aos cinco pilares de ROI — eficiência, transformação, "
-        "produtividade, custo da solução e SLAs de performance — antes de tratar um design viável "
+    "Map business value to the five ROI pillars - efficiency, transformation, productivity, "
+    "solution cost and performance SLAs - before treating a feasible design as a funded one.": (
+        "Mapeie o valor de negócio aos cinco pilares de ROI - eficiência, transformação, "
+        "produtividade, custo da solução e SLAs de performance - antes de tratar um design viável "
         "como um design financiado."
     ),
-    # Delegation criteria
     "Justify each model/system/human assignment through reversibility (can a wrong call be "
     "undone?), stakes (what does a wrong call cost?) and accountability (who must answer for it?).": (
         "Justifique cada atribuição a modelo/sistema/humano através de reversibilidade (uma decisão "
         "errada pode ser desfeita?), stakes (quanto custa uma decisão errada?) e accountability "
         "(quem precisa responder por ela?)."
     ),
-    # Fairness & transparency
     "Audit the four common bias injection points: retrieval-corpus representativeness, "
     "prompt framing, few-shot example selection and downstream routing logic; each can skew "
     "outcomes independently of model behavior.": (
@@ -581,14 +573,12 @@ ENGINE_PT = {
         "Registre o suficiente de cada decisão para reconstruí-la depois para a pessoa afetada, "
         "um regulador e seu próprio time de debug."
     ),
-    # A/B testing / structured experimentation
     "Before promoting a model, prompt or retrieval change, run a structured experiment: state the "
     "hypothesis, pick metrics tied to the eval suite, size the sample, and avoid overclaiming from a single run.": (
         "Antes de promover uma mudança de modelo, prompt ou retrieval, rode um experimento "
         "estruturado: declare a hipótese, escolha métricas ligadas à suíte de evals, dimensione a "
         "amostra, e evite superestimar a partir de uma única rodada."
     ),
-    # Feasibility warning
     "Estimated monthly cost exceeds the stated budget ceiling; narrow scope, add caching, or "
     "raise the budget before committing.": (
         "O custo mensal estimado excede o teto de orçamento informado; reduza o escopo, adicione "
@@ -601,16 +591,14 @@ PATTERN_PT = {
     "Workflow": "Workflow",
     "Agent": "Agente",
     "Multi-agent": "Multiagente",
-    "API / Tool": "API / Ferramenta",
-    "Tool Protocol / MCP": "Protocolo de Ferramentas / MCP",
+    "API/Tool": "API/Ferramenta",
+    "Tool Protocol/MCP": "Protocolo de Ferramentas/MCP",
     "Agent-to-Agent": "Agente-a-Agente",
     "None": "Nenhuma",
-    # Entry point
-    "Hosted chat / web UI": "Chat / UI web hospedado",
+    "Hosted chat/web UI": "Chat/UI web hospedado",
     "Agentic coding assistant (CLI/IDE)": "Assistente de código agêntico (CLI/IDE)",
-    "Direct API / SDK integration": "Integração direta via API / SDK",
+    "Direct API/SDK integration": "Integração direta via API/SDK",
     "Protocol server for multi-client reuse": "Servidor de protocolo para reaproveitamento multi-cliente",
-    # Reference architecture
     "Single augmented call": "Chamada única aumentada",
     "RAG pipeline": "Pipeline de RAG",
     "Document processing pipeline": "Pipeline de processamento de documentos",
@@ -619,12 +607,10 @@ PATTERN_PT = {
     "Orchestrator-workers": "Orquestrador-trabalhadores",
     "Agent (autonomous tool use)": "Agente (uso autônomo de ferramentas)",
     "Coding agent": "Agente de código",
-    # Feasibility verdict
     "Feasible as scoped": "Viável como escopado",
     "Feasible with constraints": "Viável com restrições",
     "Not feasible as scoped": "Não viável como escopado",
     "Not assessed": "Não avaliado",
-    # Review placement
     "Pre-action approval": "Aprovação prévia à ação",
     "Post-action audit": "Auditoria posterior à ação",
     "Sampled review": "Revisão por amostragem",
@@ -632,78 +618,109 @@ PATTERN_PT = {
 }
 
 CRITERIA_PT = {
-    "Quality / task success": "Qualidade / sucesso da tarefa",
+    "Quality/task success": "Qualidade/sucesso da tarefa",
     "Latency": "Latência",
     "Cost": "Custo",
-    "Risk / control": "Risco / controle",
-    "Auditability / predictability": "Auditabilidade / previsibilidade",
+    "Risk/control": "Risco/controle",
+    "Auditability/predictability": "Auditabilidade/previsibilidade",
     "Maintainability": "Manutenibilidade",
-    "Observability / debugging": "Observabilidade / depuração",
-    "Privacy / residency / compliance": "Privacidade / residência / compliance",
-    "Portability / lock-in": "Portabilidade / lock-in",
+    "Observability/debugging": "Observabilidade/depuração",
+    "Privacy/residency/compliance": "Privacidade/residência/compliance",
+    "Portability/lock-in": "Portabilidade/lock-in",
     "Fit with hard constraints": "Aderência às restrições obrigatórias",
 }
 
 
 def translate_items(lang: str, items: list[str]) -> list[str]:
+    """Translate a list of the engine's fixed English strings for display.
+
+    Args:
+        lang: The display language ("en" or "pt-BR").
+        items: The engine's English strings (e.g. `Recommendation.rationale`
+            or `.controls`).
+
+    Returns:
+        `items` unchanged if `lang` is "en"; otherwise each item translated
+        through `ENGINE_PT`, falling back to the original string for any
+        item missing a translation.
+    """
     if lang == "en":
         return items
     return [ENGINE_PT.get(item, item) for item in items]
 
 
 def translate_pattern(lang: str, pattern: str) -> str:
+    """Translate one of the engine's fixed `Literal` values for display.
+
+    Args:
+        lang: The display language ("en" or "pt-BR").
+        pattern: An engine `Literal` value (e.g. an `ArchitecturePattern`,
+            `EntryPoint`, `ReferenceArchitecture`, `FeasibilityVerdict` or
+            `ReviewPlacement` value).
+
+    Returns:
+        `pattern` unchanged if `lang` is "en"; otherwise its translation
+        through `PATTERN_PT`, falling back to `pattern` if missing.
+    """
     if lang == "en":
         return pattern
     return PATTERN_PT.get(pattern, pattern)
 
 
 def translate_criterion(lang: str, criterion: str) -> str:
+    """Translate a model/provider comparison criterion name for display.
+
+    Args:
+        lang: The display language ("en" or "pt-BR").
+        criterion: One of the `MODEL_CRITERIA` criterion names.
+
+    Returns:
+        `criterion` unchanged if `lang` is "en"; otherwise its translation
+        through `CRITERIA_PT`, falling back to `criterion` if missing.
+    """
     if lang == "en":
         return criterion
     return CRITERIA_PT.get(criterion, criterion)
 
 
-# Labels specific to the exported Markdown/DOCX document (distinct from the
-# UI's "###"-prefixed heading strings in UI, since the document builds its
-# own heading levels). Letter prefixes mirror BRAND/STEPS for each language.
 EXPORT = {
     "doc_title": {"pt-BR": "Plano de Decisão de Arquitetura", "en": "Architecture Decision Plan"},
-    "section_a": {"pt-BR": "A — Alvo", "en": "A — Aim"},
+    "section_a": {"pt-BR": "A - Alvo", "en": "A - Aim"},
     "business_problem": {"pt-BR": "Problema de negócio", "en": "Business problem"},
     "desired_outcome": {"pt-BR": "Resultado desejado", "en": "Desired outcome"},
-    "users": {"pt-BR": "Usuários / público", "en": "Users / audience"},
-    "section_r": {"pt-BR": "R — Requisitos", "en": "R — Requirements"},
+    "users": {"pt-BR": "Usuários/público", "en": "Users/audience"},
+    "section_r": {"pt-BR": "R - Requisitos", "en": "R - Requirements"},
     "quality_target": {"pt-BR": "Meta de qualidade", "en": "Quality target"},
     "latency_target": {"pt-BR": "Meta de latência", "en": "Latency target"},
     "cost_constraint": {"pt-BR": "Restrição de custo", "en": "Cost constraint"},
     "regulatory_constraints": {"pt-BR": "Restrições regulatórias", "en": "Regulatory constraints"},
     "section_responsibility": {
-        "pt-BR": "Q/U — Responsabilidade e arquitetura",
-        "en": "C/H — Responsibility and architecture",
+        "pt-BR": "Q/U - Responsabilidade e arquitetura",
+        "en": "C/H - Responsibility and architecture",
     },
     "recommended_pattern": {"pt-BR": "Padrão recomendado", "en": "Recommended pattern"},
     "rationale": {"pt-BR": "Justificativa", "en": "Rationale"},
-    "section_i": {"pt-BR": "I — Integração & Informação", "en": "I — Integration & Information"},
+    "section_i": {"pt-BR": "I - Integração & Informação", "en": "I - Integration & Information"},
     "recommended_integration": {"pt-BR": "Integração recomendada", "en": "Recommended integration"},
-    "section_model": {"pt-BR": "Estratégia de Modelo / Fornecedor", "en": "Model / Provider Strategy"},
-    "section_t": {"pt-BR": "T — Trust & Controls", "en": "T — Trust & Controls"},
-    "section_e": {"pt-BR": "E — Evaluation", "en": "E — Evaluation"},
-    "section_tradeoffs": {"pt-BR": "T — Trade-offs", "en": "C — Comparison"},
+    "section_model": {"pt-BR": "Estratégia de Modelo/Fornecedor", "en": "Model/Provider Strategy"},
+    "section_t": {"pt-BR": "T - Trust & Controls", "en": "T - Trust & Controls"},
+    "section_e": {"pt-BR": "E - Evaluation", "en": "E - Evaluation"},
+    "section_tradeoffs": {"pt-BR": "T - Trade-offs", "en": "C - Comparison"},
     "option_matrix": {"pt-BR": "Matriz de opções", "en": "Option matrix"},
     "selected_option": {"pt-BR": "Opção selecionada", "en": "Selected option"},
     "tradeoff_notes": {"pt-BR": "Notas de trade-off", "en": "Trade-off notes"},
-    "section_operations": {"pt-BR": "O — Operação", "en": "T — Telemetry"},
-    "warnings": {"pt-BR": "Avisos / decisões a validar", "en": "Warnings / decisions to validate"},
+    "section_operations": {"pt-BR": "O - Operação", "en": "T - Telemetry"},
+    "warnings": {"pt-BR": "Avisos/decisões a validar", "en": "Warnings/decisions to validate"},
     "not_defined": {"pt-BR": "Não definido", "en": "Not defined"},
     "not_selected": {"pt-BR": "Não selecionada", "en": "Not selected"},
     "no_option_matrix": {"pt-BR": "Nenhuma matriz de opções informada", "en": "No option matrix supplied"},
     "footer": {
-        "pt-BR": "Gerado com o framework ARQUITETO — um método de decisão de arquitetura de IA neutro em fornecedor.",
-        "en": "Generated with the ARCHITECT framework — a vendor-neutral AI architecture decision method.",
+        "pt-BR": "Gerado com o framework ARQUITETO - um método de decisão de arquitetura de IA neutro em fornecedor.",
+        "en": "Generated with the ARCHITECT framework - a vendor-neutral AI architecture decision method.",
     },
     "model_comparison_heading": {
-        "pt-BR": "Comparação de Modelos / Fornecedores",
-        "en": "Model / Provider Comparison",
+        "pt-BR": "Comparação de Modelos/Fornecedores",
+        "en": "Model/Provider Comparison",
     },
     "adr_title_prefix": {"pt-BR": "ADR", "en": "ADR"},
     "adr_status_heading": {"pt-BR": "Status", "en": "Status"},
@@ -723,9 +740,18 @@ EXPORT = {
     "reference_architecture": {"pt-BR": "Arquitetura de referência", "en": "Reference architecture"},
     "feasibility_verdict": {"pt-BR": "Veredito de viabilidade", "en": "Feasibility verdict"},
     "review_placement": {"pt-BR": "Posicionamento de revisão", "en": "Review placement"},
-    "roi_notes": {"pt-BR": "Valor de negócio / ROI", "en": "Business value / ROI"},
+    "roi_notes": {"pt-BR": "Valor de negócio/ROI", "en": "Business value/ROI"},
 }
 
 
 def e(lang: str, key: str) -> str:
+    """Look up an exported-document label.
+
+    Args:
+        lang: The display language ("en" or "pt-BR").
+        key: The key into the `EXPORT` dict.
+
+    Returns:
+        The label for `key` in `lang`.
+    """
     return EXPORT[key][lang]

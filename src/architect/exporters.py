@@ -1,3 +1,12 @@
+"""Bilingual document generation for a `DecisionPlan`.
+
+Four independent renderers - `to_markdown`, `to_docx_bytes`, `to_pdf_bytes`
+and `to_adr_markdown` - all take the same `(plan, lang)` signature and must
+stay structurally in sync: each surfaces the same fields, just in a
+different format. None of them call a model or make a network request;
+they only read `plan` and look up display strings through `i18n.py`.
+"""
+
 from io import BytesIO
 
 from docx import Document
@@ -9,28 +18,64 @@ from .scoring import normalized_score
 
 
 def _bullets(items: list[str], lang: str) -> str:
+    """Render a list of already-translated strings as a Markdown bullet list.
+
+    Args:
+        items: The (already translated) lines to render, one per bullet.
+        lang: The display language, used only to translate the fallback
+            "not defined" message when `items` is empty.
+
+    Returns:
+        A newline-joined Markdown bullet list, or a single "not defined"
+        bullet if `items` is empty.
+    """
     return "\n".join(f"- {item}" for item in items) if items else f"- {e(lang, 'not_defined')}"
 
 
 def model_comparison_lines(plan: DecisionPlan, lang: str) -> list[str]:
+    """Render the model/provider comparison matrix as Markdown bullet lines.
+
+    Shared by all four exporters and by the Plan tab in `app.py`, so the
+    on-screen comparison and every exported document stay identical.
+
+    Args:
+        plan: The plan whose `model_comparison` rows should be rendered.
+        lang: The display language for the "not defined" fallback.
+
+    Returns:
+        One Markdown bullet line per comparison row, or an empty list if
+        `plan.model_comparison` is empty.
+    """
     lines = []
     for row in plan.model_comparison:
-        notes = "; ".join(f"{name}: {note}" for name, note in row.notes.items() if note) or e(lang, "not_defined")
+        notes = "; ".join(f"{name}: {note}" for name, note in row.notes.items(
+        ) if note) or e(lang, "not_defined")
         lines.append(f"- **{row.criterion}:** {notes}")
     return lines
 
 
 def to_markdown(plan: DecisionPlan, lang: str = "en") -> str:
+    """Render the plan as a standalone Markdown document.
+
+    Args:
+        plan: The decision plan to render.
+        lang: The display language ("en" or "pt-BR").
+
+    Returns:
+        The complete Markdown document as a string.
+    """
     c = plan.case
     r = plan.recommendation
     not_defined = e(lang, "not_defined")
     option_lines = []
     for option in plan.option_scores:
-        option_lines.append(f"- **{option.name}:** {normalized_score(option.scores):.1%}")
+        option_lines.append(
+            f"- **{option.name}:** {normalized_score(option.scores):.1%}")
     option_text = "\n".join(option_lines) or f"- {e(lang, 'no_option_matrix')}"
     comparison_lines = model_comparison_lines(plan, lang)
     comparison_block = (
-        f"\n## {e(lang, 'model_comparison_heading')}\n" + "\n".join(comparison_lines) + "\n"
+        f"\n## {e(lang, 'model_comparison_heading')}\n" +
+        "\n".join(comparison_lines) + "\n"
         if comparison_lines
         else ""
     )
@@ -91,6 +136,15 @@ def to_markdown(plan: DecisionPlan, lang: str = "en") -> str:
 
 
 def to_docx_bytes(plan: DecisionPlan, lang: str = "en") -> bytes:
+    """Render the plan as a DOCX document.
+
+    Args:
+        plan: The decision plan to render.
+        lang: The display language ("en" or "pt-BR").
+
+    Returns:
+        The DOCX file's raw bytes.
+    """
     doc = Document()
     c = plan.case
     r = plan.recommendation
@@ -127,19 +181,22 @@ def to_docx_bytes(plan: DecisionPlan, lang: str = "en") -> bytes:
         ),
         (
             e(lang, "section_i"),
-            [f"{e(lang, 'recommended_integration')}: {translate_pattern(lang, r.integration_pattern)}", *translate_items(lang, r.information_strategy)],
+            [f"{e(lang, 'recommended_integration')}: {translate_pattern(lang, r.integration_pattern)}",
+             *translate_items(lang, r.information_strategy)],
         ),
         (
             e(lang, "section_model"),
             [
                 f"{e(lang, 'feasibility_verdict')}: {translate_pattern(lang, r.feasibility_verdict)}",
                 *translate_items(lang, r.model_strategy),
-                *([f"{e(lang, 'roi_notes')}: {c.roi_notes}"] if c.roi_notes else []),
+                *([f"{e(lang, 'roi_notes')}: {c.roi_notes}"]
+                  if c.roi_notes else []),
             ],
         ),
         (
             e(lang, "section_t"),
-            [f"{e(lang, 'review_placement')}: {translate_pattern(lang, r.review_placement)}", *translate_items(lang, r.controls)],
+            [f"{e(lang, 'review_placement')}: {translate_pattern(lang, r.review_placement)}",
+             *translate_items(lang, r.controls)],
         ),
         (e(lang, "section_e"), translate_items(lang, r.evaluations)),
         (e(lang, "section_operations"), translate_items(lang, r.operations)),
@@ -158,11 +215,14 @@ def to_docx_bytes(plan: DecisionPlan, lang: str = "en") -> bytes:
     doc.add_heading(e(lang, "section_tradeoffs"), level=1)
     if plan.option_scores:
         for option in plan.option_scores:
-            doc.add_paragraph(f"{option.name}: {normalized_score(option.scores):.1%}", style="List Bullet")
+            doc.add_paragraph(
+                f"{option.name}: {normalized_score(option.scores):.1%}", style="List Bullet")
     else:
         doc.add_paragraph(e(lang, "no_option_matrix"), style="List Bullet")
-    doc.add_paragraph(f"{e(lang, 'selected_option')}: {plan.selected_option or e(lang, 'not_selected')}")
-    doc.add_paragraph(f"{e(lang, 'tradeoff_notes')}: {plan.tradeoff_notes or not_defined}")
+    doc.add_paragraph(
+        f"{e(lang, 'selected_option')}: {plan.selected_option or e(lang, 'not_selected')}")
+    doc.add_paragraph(
+        f"{e(lang, 'tradeoff_notes')}: {plan.tradeoff_notes or not_defined}")
 
     if r.warnings:
         doc.add_heading(e(lang, "warnings"), level=1)
@@ -189,17 +249,36 @@ _PDF_TEXT_REPLACEMENTS = {
 
 
 def _pdf_safe(text: str) -> str:
-    # fpdf2's core (non-TTF) fonts only support Latin-1. Typographic
-    # characters we use elsewhere (em dash, smart quotes, bullet) are
-    # normalized to ASCII first; anything still unencodable (e.g. an emoji a
-    # user typed into a free-text field) falls back to "?" instead of
-    # crashing PDF generation.
+    """Normalize free text so fpdf2's base Latin-1 font can render it.
+
+    Common Unicode punctuation (em/en dashes, curly quotes, ellipsis,
+    bullets) is first mapped to its closest Latin-1 equivalent; anything
+    still outside Latin-1 after that (emoji, CJK, ...) is replaced rather
+    than raising, so arbitrary user-supplied text can never crash PDF
+    generation.
+
+    Args:
+        text: The text to normalize.
+
+    Returns:
+        A string safe to pass to fpdf2 with the default Helvetica font.
+    """
     for src, dst in _PDF_TEXT_REPLACEMENTS.items():
         text = text.replace(src, dst)
     return text.encode("latin-1", errors="replace").decode("latin-1")
 
 
 def _pdf_write(pdf: FPDF, text: str, *, size: int = 11, bold: bool = False, gap_before: int = 2) -> None:
+    """Write one paragraph of text to a PDF at the given style.
+
+    Args:
+        pdf: The `FPDF` document being built; mutated in place.
+        text: The text to write (run through `_pdf_safe` internally).
+        size: The font size in points.
+        bold: Whether to use the bold variant of the font.
+        gap_before: Vertical space (in document units) to add before this
+            paragraph.
+    """
     pdf.set_font("Helvetica", "B" if bold else "", size)
     pdf.set_x(pdf.l_margin)  # multi_cell doesn't reset x on its own; w=0 would
     if gap_before:  # otherwise measure from the previous call's end-x and
@@ -208,33 +287,48 @@ def _pdf_write(pdf: FPDF, text: str, *, size: int = 11, bold: bool = False, gap_
 
 
 def to_pdf_bytes(plan: DecisionPlan, lang: str = "en") -> bytes:
+    """Render the plan as a PDF document.
+
+    The PDF's content stream is left uncompressed (see `pdf.set_compression`
+    below) so the rendered text stays a literal, greppable substring of the
+    output bytes - this is what lets tests assert on PDF content without a
+    PDF-parsing dependency.
+
+    Args:
+        plan: The decision plan to render.
+        lang: The display language ("en" or "pt-BR").
+
+    Returns:
+        The PDF file's raw bytes.
+    """
     c = plan.case
     r = plan.recommendation
     not_defined = e(lang, "not_defined")
 
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
-    # These are short, text-only documents, so the compression fpdf2 applies
-    # by default saves negligible space; leaving the content stream
-    # uncompressed instead keeps the generated PDF greppable/inspectable
-    # (and lets tests assert on its text without a PDF-parsing dependency).
     pdf.set_compression(False)
     pdf.add_page()
 
     def heading(text: str) -> None:
+        """Write a top-level section heading."""
         _pdf_write(pdf, text, size=14, bold=True, gap_before=6)
 
     def subheading(text: str) -> None:
+        """Write a sub-section heading."""
         _pdf_write(pdf, text, size=12, bold=True, gap_before=3)
 
     def body(text: str) -> None:
+        """Write one paragraph of regular body text."""
         _pdf_write(pdf, text, size=11, bold=False, gap_before=1)
 
     def bullets(items: list[str]) -> None:
+        """Write each item as its own bullet, or a "not defined" placeholder if empty."""
         for item in items or [not_defined]:
             body(f"- {item}")
 
-    _pdf_write(pdf, f"{e(lang, 'doc_title')} - {c.name}", size=18, bold=True, gap_before=0)
+    _pdf_write(pdf, f"{e(lang, 'doc_title')} - {c.name}",
+               size=18, bold=True, gap_before=0)
 
     heading(e(lang, "section_a"))
     body(f"{e(lang, 'business_problem')}: {c.business_problem or not_defined}")
@@ -300,13 +394,22 @@ def to_pdf_bytes(plan: DecisionPlan, lang: str = "en") -> bytes:
 
 
 def to_adr_markdown(plan: DecisionPlan, lang: str = "en") -> str:
-    """Render the plan as a Nygard-style Architecture Decision Record."""
+    """Render the plan as a Nygard-style Architecture Decision Record.
+
+    Args:
+        plan: The decision plan to render.
+        lang: The display language ("en" or "pt-BR").
+
+    Returns:
+        The complete ADR as a Markdown string.
+    """
     c = plan.case
     r = plan.recommendation
     not_defined = e(lang, "not_defined")
     option_lines = []
     for option in plan.option_scores:
-        option_lines.append(f"- **{option.name}:** {normalized_score(option.scores):.1%}")
+        option_lines.append(
+            f"- **{option.name}:** {normalized_score(option.scores):.1%}")
     option_text = "\n".join(option_lines) or f"- {e(lang, 'no_option_matrix')}"
     decision_intro = e(lang, "adr_decision_intro").format(
         architecture=translate_pattern(lang, r.architecture_pattern),

@@ -3,7 +3,7 @@
 ## Scope and threat model
 
 This repo ships a Streamlit app with a deterministic decision core
-(`src/arquiteto/engine.py`, `models.py`, `scoring.py`): no database, no user
+(`src/architect/engine.py`, `models.py`, `scoring.py`): no database, no user
 accounts, and the engine itself never makes a network call. The attack
 surface is therefore small and concentrated in three places:
 
@@ -12,14 +12,14 @@ surface is therefore small and concentrated in three places:
 2. **CI/CD integrity** — GitHub Actions are pinned to a resolved commit SHA
    (not a mutable tag), the workflow's `GITHUB_TOKEN` is scoped to
    `contents: read`, and `main` requires its status checks to pass.
-3. **The optional AI reviewer** (`src/arquiteto/providers.py`,
+3. **The optional AI reviewer** (`src/architect/providers.py`,
    `OpenAICompatibleAdapter`) — the only code path that makes an outbound
    network request, and the only one that handles a credential (a
    user-supplied API key, kept in memory for the duration of one request
    only — never logged, never persisted, never included in any exported
    plan). Any change here must pass
    [`docs/PROVIDERS_SECURITY_CHECKLIST.md`](docs/PROVIDERS_SECURITY_CHECKLIST.md),
-   which maps each control to an OWASP LLM Top 10 / MITRE ATLAS risk,
+   which maps each control to an OWASP LLM Top 10/MITRE ATLAS risk,
    including the SSRF guard on the user-supplied endpoint URL.
 
 Data handling note: the public demo deployment is multi-tenant with no

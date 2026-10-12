@@ -1,6 +1,6 @@
 # Contributing
 
-🇧🇷 This project also has a [Portuguese README](README.pt-br.md); contributions and issues in either English or Portuguese are welcome.
+This project also has a [Portuguese README](README.pt-br.md); contributions and issues in either English or Portuguese are welcome.
 
 ## Setup
 
@@ -22,8 +22,8 @@ All three run in CI (`.github/workflows/ci.yml`) on Python 3.11 and 3.12; a PR w
 
 ## Scope
 
-- `src/arquiteto/engine.py` is the deterministic decision core — it must stay provider-neutral (no model SDK calls, no vendor-specific logic). `tests/test_vendor_neutral.py` enforces this.
-- UI strings and translations (pt-BR/en) live in `src/arquiteto/i18n.py`. See the module docstring for how the sidebar/tab headings are derived from `STEPS` — don't hardcode a step's letter+word pair in more than one place.
+- `src/architect/engine.py` is the deterministic decision core - it must stay provider-neutral (no model SDK calls, no vendor-specific logic). `tests/test_vendor_neutral.py` enforces this.
+- UI strings and translations (pt-BR/en) live in `src/architect/i18n.py`. See the module docstring for how the sidebar/tab headings are derived from `STEPS` - don't hardcode a step's letter+word pair in more than one place.
 - Keep `app.py` widget arguments (label, default value, placeholder) identical across reruns for any widget that has a `key`; Streamlit resets a keyed widget's stored value if any other argument changes between runs, which silently breaks state on a language switch. Use the `field_text`/`field_checkbox` helpers already in `app.py` rather than calling `st.text_input`/`st.checkbox` directly with a translated label.
 
 ## Pull requests

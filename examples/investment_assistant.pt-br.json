@@ -28,45 +28,45 @@
     {
       "name": "Agente + ferramentas de API",
       "scores": {
-        "Quality / task success": 4,
+        "Quality/task success": 4,
         "Latency": 3,
         "Cost": 3,
-        "Risk / control": 4,
-        "Auditability / predictability": 3,
+        "Risk/control": 4,
+        "Auditability/predictability": 3,
         "Maintainability": 4,
-        "Observability / debugging": 4,
-        "Privacy / residency / compliance": 4,
-        "Portability / lock-in": 4,
+        "Observability/debugging": 4,
+        "Privacy/residency/compliance": 4,
+        "Portability/lock-in": 4,
         "Fit with hard constraints": 5
       }
     },
     {
       "name": "Somente workflow",
       "scores": {
-        "Quality / task success": 3,
+        "Quality/task success": 3,
         "Latency": 5,
         "Cost": 4,
-        "Risk / control": 5,
-        "Auditability / predictability": 5,
+        "Risk/control": 5,
+        "Auditability/predictability": 5,
         "Maintainability": 5,
-        "Observability / debugging": 4,
-        "Privacy / residency / compliance": 4,
-        "Portability / lock-in": 4,
+        "Observability/debugging": 4,
+        "Privacy/residency/compliance": 4,
+        "Portability/lock-in": 4,
         "Fit with hard constraints": 3
       }
     },
     {
       "name": "Multiagente",
       "scores": {
-        "Quality / task success": 4,
+        "Quality/task success": 4,
         "Latency": 2,
         "Cost": 2,
-        "Risk / control": 2,
-        "Auditability / predictability": 2,
+        "Risk/control": 2,
+        "Auditability/predictability": 2,
         "Maintainability": 2,
-        "Observability / debugging": 3,
-        "Privacy / residency / compliance": 3,
-        "Portability / lock-in": 3,
+        "Observability/debugging": 3,
+        "Privacy/residency/compliance": 3,
+        "Portability/lock-in": 3,
         "Fit with hard constraints": 3
       }
     }
@@ -108,13 +108,13 @@
     {
       "criterion": "Suporte a saída estruturada",
       "notes": {
-        "Provedor de API gerenciado": "JSON schema / tool calling nativos",
+        "Provedor de API gerenciado": "JSON schema/tool calling nativos",
         "Open-weight self-hosted": "Viável via decodificação restrita (constrained decoding)",
         "Provedor regional/soberano": "Modo JSON básico"
       }
     },
     {
-      "criterion": "Aderência de privacidade / residência",
+      "criterion": "Aderência de privacidade/residência",
       "notes": {
         "Provedor de API gerenciado": "Depende do DPA do fornecedor; dados saem da nossa infraestrutura",
         "Open-weight self-hosted": "Controle total, dados nunca saem da nossa VPC",
@@ -122,7 +122,7 @@
       }
     },
     {
-      "criterion": "Limites de taxa / disponibilidade",
+      "criterion": "Limites de taxa/disponibilidade",
       "notes": {
         "Provedor de API gerenciado": "Alta (SLA do fornecedor)",
         "Open-weight self-hosted": "Limitada pela nossa própria capacidade",
@@ -130,7 +130,7 @@
       }
     },
     {
-      "criterion": "Portabilidade / risco de lock-in",
+      "criterion": "Portabilidade/risco de lock-in",
       "notes": {
         "Provedor de API gerenciado": "Lock-in maior (API proprietária)",
         "Open-weight self-hosted": "Lock-in baixo (pesos abertos)",

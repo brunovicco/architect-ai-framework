@@ -1,12 +1,12 @@
-# 🏛️ ARCHITECT — Vendor-Neutral AI Architecture Decision Framework
+# ARCHITECT - Vendor-Neutral AI Architecture Decision Framework
 
-🇧🇷 [Leia em português](README.pt-br.md)
+[Leia em português](README.pt-br.md)
 
 [![CI](https://github.com/brunovicco/architect-ai-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/brunovicco/architect-ai-framework/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)](pyproject.toml)
 
-ARCHITECT (the English rendition of the original **ARQUITETO** method) is a **provider-agnostic** decision framework and web app for designing AI/LLM systems, from business problem to production operating plan. It was built while studying for the **Claude Architect Professional** certification, as a way to put the certification's architecture-decision concepts — responsibility boundaries, workflow vs. agent, trust & controls, evaluation — into a repeatable, working tool instead of leaving them as notes.
+ARCHITECT is a **provider-agnostic** decision framework and web app for designing AI/LLM systems, from business problem to production operating plan. It turns professional AI-architecture practice - responsibility boundaries, workflow vs. agent, trust & controls, evaluation - into a repeatable, guided tool: answer a structured set of questions about your use case and get a complete, exportable Architecture Decision Plan back.
 
 It can be used with **any model family, hosting model or provider**. The core decision engine has no dependency on any specific model provider, cloud platform or runtime.
 
@@ -16,36 +16,36 @@ The project turns architecture reasoning into a repeatable, 9-step workflow, spe
 
 ## Live demo
 
-**[architect-ai-framework.streamlit.app](https://architect-ai-framework.streamlit.app)** — hosted on Streamlit Community Cloud, no install needed.
+**[architect-ai-framework.streamlit.app](https://architect-ai-framework.streamlit.app)** - hosted on Streamlit Community Cloud, no install needed.
 
 ## Screenshots
 
 <table>
 <tr>
-<td><img src="docs/screenshots/en/tab-1-a-r.png" width="420" alt="Tab 1: Aim / Requirements"><br><sub>1 · A/R — Aim &amp; Requirements</sub></td>
-<td><img src="docs/screenshots/en/tab-3-integration.png" width="420" alt="Tab 3: Integration & Information"><br><sub>3 · I — Integration &amp; Information</sub></td>
+<td><img src="docs/screenshots/en/tab-1-a-r.png" width="420" alt="Tab 1: Aim/Requirements"><br><sub>1 · A/R - Aim &amp; Requirements</sub></td>
+<td><img src="docs/screenshots/en/tab-3-integration.png" width="420" alt="Tab 3: Integration & Information"><br><sub>3 · I - Integration &amp; Information</sub></td>
 </tr>
 <tr>
-<td><img src="docs/screenshots/en/tab-5-tradeoffs.png" width="420" alt="Tab 5: Comparison"><br><sub>5 · Comparison — weighted trade-offs</sub></td>
-<td><img src="docs/screenshots/en/tab-6-plan.png" width="420" alt="Plan tab: Architecture Decision Plan"><br><sub>7 · Plan — the generated decision plan</sub></td>
+<td><img src="docs/screenshots/en/tab-5-tradeoffs.png" width="420" alt="Tab 5: Comparison"><br><sub>5 · Comparison - weighted trade-offs</sub></td>
+<td><img src="docs/screenshots/en/tab-6-plan.png" width="420" alt="Plan tab: Architecture Decision Plan"><br><sub>7 · Plan - the generated decision plan</sub></td>
 </tr>
 </table>
 
-The UI is fully bilingual (pt-BR / en) and ships with a one-click example case ("Investment Assistant") so you can see a populated plan immediately.
+The UI ships with a one-click example case ("Investment Assistant") so you can see a populated plan immediately.
 
 ## What the app does
 
 - Guides discovery of business outcomes, SLAs and hard constraints.
-- Recommends a starting architecture: Augmented LLM, Workflow, Agent or Multi-agent — plus a named reference architecture (RAG pipeline, routing, coding agent, orchestrator-workers, ...) and a vendor-neutral entry-point category (hosted chat/web UI, agentic coding assistant, direct API/SDK, protocol server for multi-client reuse).
+- Recommends a starting architecture: Augmented LLM, Workflow, Agent or Multi-agent - plus a named reference architecture (RAG pipeline, routing, coding agent, orchestrator-workers, ...) and a vendor-neutral entry-point category (hosted chat/web UI, agentic coding assistant, direct API/SDK, protocol server for multi-client reuse).
 - Separates responsibilities between probabilistic models, deterministic software and humans, justified through reversibility/stakes/accountability and named against the four model properties (next-token prediction, knowledge, working memory, steerability).
 - Helps decide between RAG, APIs/tools, protocol-based tool discovery and agent-to-agent integration.
-- Generates security/governance recommendations such as least privilege, execution-layer authorization, HITL and fail-closed behavior, input/output screening, fairness-injection-point auditing, and a stakes-driven review placement (pre-action approval / sampled review / post-action audit).
+- Generates security/governance recommendations such as least privilege, execution-layer authorization, HITL and fail-closed behavior, input/output screening, fairness-injection-point auditing, and a stakes-driven review placement (pre-action approval/sampled review/post-action audit).
 - Produces an evaluation and observability plan, including structured A/B-experiment guidance and a feasibility verdict against an optional cost ceiling.
 - Compares up to three architecture options with weighted trade-offs.
-- Compares model/provider candidates across 8 vendor-neutral criteria (quality fit, latency, cost, context window, structured output, privacy/residency, rate limits, portability) — structure only, no opinion on which vendor to pick.
-- Exports the final **Architecture Decision Plan** as Markdown, DOCX, PDF, JSON or a Nygard-style **ADR** — in either language.
+- Compares model/provider candidates across 8 vendor-neutral criteria (quality fit, latency, cost, context window, structured output, privacy/residency, rate limits, portability) - structure only, no opinion on which vendor to pick.
+- Exports the final **Architecture Decision Plan** as Markdown, DOCX, PDF, JSON or a Nygard-style **ADR** - in either language.
 - Round-trips a plan: re-import a previously exported JSON file, or save/load named drafts for the current browser session.
-- Optional, vendor-neutral **AI review**: point it at any OpenAI-chat-completions-compatible endpoint (OpenAI, Ollama, vLLM, a gateway...) to get a critique of the generated plan. Guarded against SSRF — see [Security](#security).
+- Optional, vendor-neutral **AI review**: point it at any OpenAI-chat-completions-compatible endpoint (OpenAI, Ollama, vLLM, a gateway...) to get a critique of the generated plan. Guarded against SSRF - see [Security](#security).
 
 ## Vendor-neutral by design
 
@@ -55,11 +55,11 @@ ARCHITECT treats the model as an interchangeable architecture component.
 flowchart TD
     A[Business requirements] --> B[ARCHITECT decision engine]
     B --> C[Architecture + controls + evals + operations]
-    C --> D["Model adapter / runtime (optional)"]
+    C --> D["Model adapter/runtime (optional)"]
     D --> E[Any compatible LLM or model provider]
 ```
 
-The deterministic core does **not** call an LLM. A future AI reviewer can be connected through a provider adapter (see `src/arquiteto/providers.py`) without changing the decision engine.
+The deterministic core does **not** call an LLM. A future AI reviewer can be connected through a provider adapter (see `src/architect/providers.py`) without changing the decision engine.
 
 The framework therefore works equally well with:
 
@@ -95,9 +95,26 @@ pip install -e .
 streamlit run app.py
 ```
 
-Open the local Streamlit URL and walk through the seven tabs (or click **Load example: Investment Assistant** in the sidebar). The Plan tab provides downloadable Markdown, DOCX, PDF, ADR and JSON artifacts, translated into whichever language is selected — plus a session-only saved-case library and an optional AI review.
+Open the local Streamlit URL and walk through the seven tabs (or click **Load example: Investment Assistant** in the sidebar). The Plan tab provides downloadable Markdown, DOCX, PDF, ADR and JSON artifacts, translated into whichever language is selected - plus a session-only saved-case library and an optional AI review.
 
-## Run tests / lint / type-check
+## Using the AI review
+
+The Plan tab includes an optional, vendor-neutral **AI Review** panel that sends the generated plan to any OpenAI-chat-completions-compatible endpoint and returns a critique inside the app.
+
+1. Open the **Plan** tab and expand **AI Review (optional)**.
+2. Fill in:
+   - **Base URL** - the endpoint's base URL, e.g. `https://api.openai.com/v1` for OpenAI, or the public HTTPS URL of any OpenAI-compatible gateway (Ollama, vLLM, LM Studio, a self-hosted proxy...).
+   - **API key** - your key for that endpoint.
+   - **Model name** - the model identifier the endpoint expects, e.g. `gpt-4o-mini`.
+3. Click **Get AI review**.
+
+A few things worth knowing:
+
+- The endpoint must be reachable over **public HTTPS** - `localhost` and private/internal addresses are rejected outright by the built-in SSRF guard, so a purely local Ollama/vLLM instance needs to sit behind a public hostname (a tunnel or reverse proxy) to be usable here.
+- It's entirely optional: the deterministic plan - architecture, controls, evaluation, operations - is already complete without it. The AI review only adds a second opinion on top.
+- The API key stays in memory for that one request only; it's never logged or persisted, and nothing is sent anywhere until all three fields are filled in and the button is clicked. See [Security](#security) for the full guarantee.
+
+## Run tests/lint/type-check
 
 ```bash
 pip install -e '.[dev]'
@@ -107,7 +124,7 @@ mypy src
 pip-audit
 ```
 
-All four run in CI on every push (Python 3.11 and 3.12), together with Dependabot (weekly updates for pip and GitHub Actions) and pinned, SHA-locked Actions — see [Repository structure](#repository-structure) and `.github/`.
+All four run in CI on every push (Python 3.11 and 3.12), together with Dependabot (weekly updates for pip and GitHub Actions) and pinned, SHA-locked Actions - see [Repository structure](#repository-structure) and `.github/`.
 
 ## Deploy
 
@@ -116,7 +133,7 @@ Live at **[architect-ai-framework.streamlit.app](https://architect-ai-framework.
 1. Push the repo to your own GitHub account (or fork it).
 2. Go to [share.streamlit.io](https://share.streamlit.io) and sign in with GitHub.
 3. Click **New app**, pick your repository and branch (`main`), and set the main file path to `app.py`.
-4. Deploy. Streamlit Cloud installs from `requirements.txt` and reads the Python version from `runtime.txt` automatically — no extra configuration needed.
+4. Deploy. Streamlit Cloud installs from `requirements.txt` and reads the Python version from `runtime.txt` automatically - no extra configuration needed.
 
 ## Security
 
@@ -124,13 +141,13 @@ The deterministic core never calls a model or makes a network request. The
 only network-calling, credential-handling code path is the optional AI
 review (`OpenAICompatibleAdapter`), which validates its target URL against
 an SSRF guard (rejects non-`https`, localhost, private/loopback/link-local
-addresses, including the cloud metadata IP) before ever connecting — API
+addresses, including the cloud metadata IP) before ever connecting - API
 keys stay in-memory for one request and are never logged or persisted.
 
 See [SECURITY.md](SECURITY.md) for the full threat model and how to report
 a vulnerability, and
 [docs/PROVIDERS_SECURITY_CHECKLIST.md](docs/PROVIDERS_SECURITY_CHECKLIST.md)
-for the OWASP LLM Top 10 / MITRE ATLAS-mapped checklist any new adapter must
+for the OWASP LLM Top 10/MITRE ATLAS-mapped checklist any new adapter must
 satisfy.
 
 ## Repository structure
@@ -138,7 +155,7 @@ satisfy.
 ```text
 architect-ai-framework/
 ├── app.py
-├── src/arquiteto/
+├── src/architect/
 │   ├── engine.py       # deterministic recommendation engine
 │   ├── exporters.py    # bilingual Markdown, DOCX, PDF and ADR generation
 │   ├── i18n.py          # UI strings, ARQUITETO/ARCHITECT step words, translations
@@ -170,19 +187,6 @@ architect-ai-framework/
 5. **Agentic complexity must earn its place.** Workflow is preferred when the path is known; agents are used when the system genuinely must discover the path.
 6. **Evaluation is part of architecture.** Quality, latency, cost, safety/security and cohort behavior are planned before production promotion.
 7. **Model choice follows requirements.** Capability, latency, cost, context, privacy, residency and operational constraints determine the model/runtime choice.
-
-## Roadmap
-
-- [x] Bilingual UI and exports (pt-BR / en)
-- [x] Interactive architecture diagram (Mermaid)
-- [x] Public deployment (Streamlit Community Cloud)
-- [x] CI/supply-chain hardening (Dependabot, pip-audit, pinned Actions, branch protection)
-- [x] Import/export existing JSON plans
-- [x] PDF export
-- [x] Optional vendor-neutral LLM reviewer via adapter interface (SSRF-guarded)
-- [x] Model/provider comparison matrix
-- [x] Saved case library (session-only, by design — see [Security](#security))
-- [x] Architecture Decision Record (ADR) export
 
 ## Contributing
 
