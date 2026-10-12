@@ -214,6 +214,11 @@ def to_pdf_bytes(plan: DecisionPlan, lang: str = "en") -> bytes:
 
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
+    # These are short, text-only documents, so the compression fpdf2 applies
+    # by default saves negligible space; leaving the content stream
+    # uncompressed instead keeps the generated PDF greppable/inspectable
+    # (and lets tests assert on its text without a PDF-parsing dependency).
+    pdf.set_compression(False)
     pdf.add_page()
 
     def heading(text: str) -> None:
