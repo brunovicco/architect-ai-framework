@@ -120,6 +120,14 @@ def field_checkbox(key: str, label_key: str, *, default: bool = False) -> bool:
     return value
 
 
+def field_number(key: str, label_key: str, *, placeholder_key: str | None = None) -> float:
+    st.markdown(f"**{t(lang, label_key)}**")
+    value = st.number_input(key, key=key, label_visibility="collapsed", min_value=0.0, step=50.0)
+    if placeholder_key:
+        st.caption(t(lang, placeholder_key))
+    return value
+
+
 if "lang" not in st.session_state:
     st.session_state["lang"] = DEFAULT_LANG
 
@@ -180,16 +188,20 @@ basic, execution, info, risk_eval, compare, models_tab, final = st.tabs([
 with basic:
     st.subheader(t(lang, "t1_subheader"))
     left, right = st.columns(2)
+    st.caption(t(lang, "discovery_framing_hint"))
     with left:
         name = field_text("name", "case_name_label", default_text=t(DEFAULT_LANG, "case_name_default"))
         business_problem = field_text("business_problem", "business_problem_label", area=True, placeholder_key="business_problem_placeholder")
         desired_outcome = field_text("desired_outcome", "desired_outcome_label", area=True, placeholder_key="desired_outcome_placeholder")
         users = field_text("users", "users_label", placeholder_key="users_placeholder")
+        roi_notes = field_text("roi_notes", "roi_notes_label", area=True, placeholder_key="roi_notes_placeholder")
     with right:
         quality_target = field_text("quality_target", "quality_target_label", placeholder_key="quality_target_placeholder")
         latency_target = field_text("latency_target", "latency_target_label", placeholder_key="latency_target_placeholder")
         cost_constraint = field_text("cost_constraint", "cost_constraint_label", placeholder_key="cost_constraint_placeholder")
         regulatory_constraints = field_text("regulatory_constraints", "regulatory_constraints_label", area=True, placeholder_key="regulatory_constraints_placeholder")
+        estimated_monthly_cost = field_number("estimated_monthly_cost", "estimated_monthly_cost_label", placeholder_key="estimated_monthly_cost_placeholder")
+        monthly_cost_ceiling = field_number("monthly_cost_ceiling", "monthly_cost_ceiling_label", placeholder_key="monthly_cost_ceiling_placeholder")
 
 with execution:
     st.subheader(t(lang, "t2_subheader"))
@@ -199,10 +211,13 @@ with execution:
         path_known = field_checkbox("path_known", "path_known_label", default=True)
         dynamic_next_steps = field_checkbox("dynamic_next_steps", "dynamic_next_steps_label")
         dynamic_tool_choice = field_checkbox("dynamic_tool_choice", "dynamic_tool_choice_label")
+        is_engineering_tool = field_checkbox("is_engineering_tool", "is_engineering_tool_label")
     with c2:
         independent_autonomous_domains = field_checkbox("independent_autonomous_domains", "independent_autonomous_domains_label")
         strict_auditability = field_checkbox("strict_auditability", "strict_auditability_label")
         structured_output = field_checkbox("structured_output", "structured_output_label")
+        needs_custom_user_experience = field_checkbox("needs_custom_user_experience", "needs_custom_user_experience_label")
+        reusable_across_multiple_clients = field_checkbox("reusable_across_multiple_clients", "reusable_across_multiple_clients_label")
 
 with info:
     st.subheader(t(lang, "t3_subheader"))
@@ -227,6 +242,8 @@ with risk_eval:
     with c2:
         subjective_quality = field_checkbox("subjective_quality", "subjective_quality_label", default=True)
         critical_cohorts = field_checkbox("critical_cohorts", "critical_cohorts_label")
+        differential_outcomes_risk = field_checkbox("differential_outcomes_risk", "differential_outcomes_risk_label")
+        has_calibrated_confidence_score = field_checkbox("has_calibrated_confidence_score", "has_calibrated_confidence_score_label")
         st.markdown(t(lang, "ops_note"))
 
 case = ArchitectureCase(
@@ -256,6 +273,14 @@ case = ArchitectureCase(
     structured_output=structured_output,
     subjective_quality=subjective_quality,
     critical_cohorts=critical_cohorts,
+    is_engineering_tool=is_engineering_tool,
+    needs_custom_user_experience=needs_custom_user_experience,
+    reusable_across_multiple_clients=reusable_across_multiple_clients,
+    differential_outcomes_risk=differential_outcomes_risk,
+    has_calibrated_confidence_score=has_calibrated_confidence_score,
+    estimated_monthly_cost=estimated_monthly_cost,
+    monthly_cost_ceiling=monthly_cost_ceiling,
+    roi_notes=roi_notes,
 )
 rec = recommend(case)
 
@@ -329,6 +354,21 @@ with final:
         st.metric(t(lang, "architecture_metric_label"), translate_pattern(lang, rec.architecture_pattern))
     with b:
         st.metric(t(lang, "integration_metric_label"), translate_pattern(lang, rec.integration_pattern))
+
+    c_, d_ = st.columns(2)
+    with c_:
+        st.metric(t(lang, "entry_point_metric_label"), translate_pattern(lang, rec.entry_point))
+    with d_:
+        st.metric(t(lang, "reference_architecture_metric_label"), translate_pattern(lang, rec.reference_architecture))
+
+    e_, f_ = st.columns(2)
+    with e_:
+        st.metric(t(lang, "feasibility_verdict_metric_label"), translate_pattern(lang, rec.feasibility_verdict))
+    with f_:
+        st.metric(t(lang, "review_placement_metric_label"), translate_pattern(lang, rec.review_placement))
+
+    if plan.case.roi_notes:
+        st.markdown(f"**{t(lang, 'roi_notes_metric_label')}:** {plan.case.roi_notes}")
 
     if rec.warnings:
         for warning in translate_items(lang, rec.warnings):
