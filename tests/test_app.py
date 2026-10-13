@@ -27,3 +27,21 @@ def test_changing_plan_discards_old_ai_review():
     app.text_input(key='name').set_value('A changed case').run()
     assert not app.exception
     assert 'ai_review_result' not in app.session_state
+
+
+def test_tradeoff_scores_restore_edit_and_reset_without_duplicate_defaults(monkeypatch, caplog):
+    from streamlit.elements.lib import policies
+
+    monkeypatch.setattr(policies, "_shown_default_value_warning", False)
+    app = AppTest.from_file(str(Path(__file__).parents[1] / 'app.py')).run()
+    key = '0-Quality/task success'
+    assert app.slider(key=key).value == 3
+    next(button for button in app.button if 'Investment Assistant' in button.label).click().run()
+    assert app.slider(key=key).value == 4
+    app.slider(key=key).set_value(2).run()
+    app.selectbox(key='lang').select('en').run()
+    assert app.slider(key=key).value == 2
+    next(button for button in app.button if button.label == "Clear form").click().run()
+    assert app.slider(key=key).value == 3
+    assert not app.exception
+    assert 'created with a default value' not in caplog.text
