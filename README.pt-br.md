@@ -6,13 +6,21 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)](pyproject.toml)
 
-ARQUITETO é um framework de decisão e um web app **independentes de fornecedor** para desenhar sistemas de IA/LLM, do problema de negócio até o plano operacional de produção. Ele transforma a prática profissional de arquitetura de IA - fronteiras de responsabilidade, workflow vs. agente, trust & controls, avaliação - em uma ferramenta guiada e repetível: você responde um conjunto estruturado de perguntas sobre o seu caso de uso e recebe de volta um Plano de Decisão de Arquitetura completo e exportável.
+ARQUITETO é um **framework de decisão de arquitetura de IA neutro em relação a fornecedor**, para engenheiros, arquitetos e lideranças técnicas. Comece pelo problema de negócio e pelas restrições, avalie se software determinístico basta e então considere LLM aumentado, workflow, agente ou multiagente.
 
-Pode ser usado com **qualquer família de modelo, modelo de hospedagem ou fornecedor**. O motor de decisão central não tem nenhuma dependência de um provedor de modelo, plataforma de nuvem ou runtime específico.
+O resultado é um **Architecture Decision Plan**: arquitetura proposta, justificativa, controles, orientação de avaliação, considerações operacionais e trade-offs explícitos, exportável em Markdown, DOCX, PDF, JSON ou ADR.
 
-O projeto transforma o raciocínio de arquitetura em um workflow repetível de 9 passos, que soletra a palavra **ARQUITETO**:
+**[Experimente a demo pública](https://architect-ai-framework.streamlit.app)** · [Leia o método](docs/FRAMEWORK.md) · [Conteste uma recomendação](https://github.com/brunovicco/architect-ai-framework/issues/new?template=recommendation-feedback.yml)
 
-**A**lvo → **R**equisitos → **Q**uem faz o quê → **U**so arquitetural → **I**ntegração & Informação → **T**rust & Controls → **E**valuation → **T**rade-offs → **O**peração.
+O core aplica regras Python inspecionáveis a entradas estruturadas; não pede a um LLM que escolha a arquitetura. As mesmas entradas e versão de regras produzem a mesma recomendação. Streamlit é a implementação interativa. A crítica opcional por IA fica separada do motor de decisão.
+
+## Experimente em dois minutos
+
+1. Abra a demo e clique em **Carregar exemplo: Investment Assistant** na barra lateral. Se estiver hibernando, aguarde a inicialização.
+2. Confira os sinais de execução na aba 2 e abra **7 · Plano**. A escolha dinâmica de ferramentas explica a recomendação de Agente; a aprovação de transações continua na camada de execução.
+3. Compare alternativas e exporte o plano. Use dados fictícios ou sanitizados na demo pública.
+
+**Escopo:** a alternativa de software determinístico registra sua avaliação explícita de que regras/APIs bastam; isso não é inferido do texto. Restrições em texto livre, elegibilidade das opções e afirmações sobre fornecedores exigem validação humana. Os controles gerados orientam o desenho; não são enforcement implantado nem certificação de compliance.
 
 ## Demo ao vivo
 
@@ -33,10 +41,10 @@ O projeto transforma o raciocínio de arquitetura em um workflow repetível de 9
 
 A interface vem com um caso de exemplo de um clique ("Investment Assistant") para você ver um plano preenchido imediatamente.
 
-## O que o app faz
+## O que o framework produz
 
 - Guia a descoberta de resultados de negócio, SLAs e restrições obrigatórias.
-- Recomenda uma arquitetura inicial: LLM Aumentado, Workflow, Agente ou Multiagente - além de uma reference architecture nomeada (pipeline de RAG, roteamento, agente de código, orquestrador-trabalhadores, ...) e uma categoria de ponto de entrada neutra em fornecedor (chat/UI web hospedado, assistente de código agêntico, API/SDK direto, servidor de protocolo para reaproveitamento multi-cliente).
+- Recomenda uma arquitetura inicial: Software determinístico, LLM Aumentado, Workflow, Agente ou Multiagente - além de uma reference architecture nomeada (pipeline de RAG, roteamento, agente de código, orquestrador-trabalhadores, ...) e uma categoria de ponto de entrada neutra em fornecedor (chat/UI web hospedado, assistente de código agêntico, API/SDK direto, servidor de protocolo para reaproveitamento multi-cliente).
 - Separa responsabilidades entre modelos probabilísticos, software determinístico e humanos, justificadas por reversibilidade/stakes/accountability e nomeadas conforme as quatro propriedades do modelo (previsão do próximo token, conhecimento, memória de trabalho, steerability).
 - Ajuda a decidir entre RAG, APIs/ferramentas, descoberta de ferramentas via protocolo e integração agente-a-agente.
 - Gera recomendações de segurança/governança como privilégio mínimo, autorização na camada de execução, HITL e comportamento fail-closed, input/output screening, auditoria dos pontos de injeção de viés, e um posicionamento de revisão orientado por stakes (aprovação prévia/revisão por amostragem/auditoria posterior).
@@ -59,7 +67,7 @@ flowchart TD
     D --> E[Qualquer LLM ou fornecedor de modelo compatível]
 ```
 
-O núcleo determinístico **não** chama nenhum LLM. Um futuro revisor de IA pode ser conectado através de um adaptador de fornecedor (veja `src/architect/providers.py`) sem alterar o motor de decisão.
+O núcleo determinístico **não** chama nenhum LLM. O revisor opcional de IA está conectado através de um adaptador de fornecedor (veja `src/architect/providers.py`) sem alterar o motor de decisão.
 
 O framework funciona igualmente bem com:
 
@@ -121,7 +129,7 @@ Alguns pontos importantes:
 
 - O endpoint precisa estar acessível por **HTTPS público** - `localhost` e endereços privados/internos são rejeitados de cara pela guarda SSRF embutida, então uma instância local de Ollama/vLLM precisa ficar atrás de um hostname público (um túnel ou proxy reverso) para poder ser usada aqui.
 - É totalmente opcional: o plano determinístico - arquitetura, controles, avaliação, operação - já sai completo sem isso. A revisão por IA só acrescenta uma segunda opinião por cima.
-- No modo "minha própria chave", a chave de API fica em memória só durante aquela requisição; nunca é logada nem persistida, e nada é enviado a lugar nenhum até os três campos serem preenchidos e o botão ser clicado. No modo compartilhado, a credencial vive só no secret store do deploy (nunca no repositório, nunca no navegador). Veja [Segurança](#segurança) para a garantia completa.
+- No modo "minha própria chave", a chave de API fica na memória da sessão no servidor; nunca é logada nem persistida, e nada é enviado a lugar nenhum até os três campos serem preenchidos e o botão ser clicado. No modo compartilhado, a credencial vive só no secret store do deploy (nunca no repositório, nunca no navegador). Veja [Segurança](#segurança) para a garantia completa.
 
 ## Rodar testes/lint/type-check
 
@@ -151,8 +159,7 @@ O núcleo determinístico nunca chama um modelo nem faz requisição de rede. O
 revisão por IA opcional (`OpenAICompatibleAdapter`), que valida a URL de
 destino contra uma guarda SSRF (rejeita não-`https`, localhost, endereços
 privados/loopback/link-local, incluindo o IP de metadados de nuvem) antes de
-conectar. No modo "minha própria chave", a chave fica em memória só durante
-a requisição e nunca é logada nem persistida; no modo de demonstração
+conectar. No modo "minha própria chave", a chave fica na memória da sessão no servidor e nunca é logada nem persistida; no modo de demonstração
 compartilhada, a credencial vive só no secret store do deploy e as chamadas
 são limitadas por tetos diário/por sessão e por tamanho de resposta, para
 conter o raio de impacto de uma credencial compartilhada entre visitantes
@@ -183,8 +190,6 @@ architect-ai-framework/
 │   └── screenshots/     # screenshots do README, pt-br/ e en/
 ├── examples/
 │   └── investment_assistant.json
-├── assets/
-│   └── Framework_ARQUITETO_AI.xlsx
 ├── .github/
 │   ├── workflows/ci.yml
 │   └── dependabot.yml

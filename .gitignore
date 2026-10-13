@@ -13,3 +13,6 @@ CLAUDE.md
 scripts/
 *.pages
 assets/
+
+# Local launch drafts and audit evidence; publication needs owner approval.
+launch/

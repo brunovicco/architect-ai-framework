@@ -12,7 +12,7 @@ what adapters exist. This checklist only governs the optional reviewer path.
 
 | # | Control | Risk mitigated |
 | --- | --- | --- |
-| 1 | The adapter's `base_url` (or equivalent network target) is validated against a public-address allowlist (`assert_safe_base_url`) before any request is made. Reject non-`https`, `localhost`, loopback, private, link-local (incl. `169.254.169.254` cloud metadata) and reserved/multicast ranges. | SSRF (OWASP API/Web A10; relevant to LLM05 Supply Chain when the "model endpoint" is attacker-influenced) |
+| 1 | The adapter's `base_url` (or equivalent network target) is validated against a public-address allowlist (`assert_safe_base_url`) before any request is made. HTTP redirects are rejected rather than forwarding credentials or plan content to an unvalidated target. Reject non-`https`, `localhost`, loopback, private, link-local (incl. `169.254.169.254` cloud metadata) and reserved/multicast ranges. | SSRF (OWASP API/Web A10; relevant to LLM05 Supply Chain when the "model endpoint" is attacker-influenced) |
 | 2 | Every outbound request has an explicit timeout and the failure path raises a typed `AdapterError` rather than letting the UI hang or crash. | LLM04 Model Denial of Service |
 | 3 | API keys/credentials are never logged, never written to disk, never included in `DecisionPlan`, and never echoed back in an error message. They live only in the caller's local variables/`st.session_state` for the duration of the request. | LLM06 Sensitive Information Disclosure |
 | 4 | The adapter's output is rendered as inert text/markdown in the UI — never `eval`'d, never used to construct a shell command or file path, never auto-executed as an action against the rest of the app. | LLM02 Insecure Output Handling |
@@ -32,7 +32,7 @@ deployment with a real threat model should additionally run this egress
 through a network-level allowlist (e.g. an egress proxy or firewall rule), not
 rely on this check in isolation.
 
-Control #9's caps are deliberately simple, in-process counters (an
+Control #9 reserves every attempt atomically before network I/O (including failed calls), using UTC dates. Its caps remain in-process counters (an
 `st.cache_resource` singleton for the global cap, `st.session_state` for the
 per-session cap): they reset on every app restart/redeploy, don't persist
 across horizontally-scaled instances, and the per-session cap is trivially

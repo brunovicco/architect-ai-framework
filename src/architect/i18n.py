@@ -45,6 +45,14 @@ _TAB_STEP_INDEXES = {
 }
 
 UI = {
+    "deterministic_sufficient_label": {
+        "pt-BR": "Regras explícitas e APIs existentes já satisfazem os requisitos, sem LLM",
+        "en": "Explicit rules and existing APIs already satisfy the requirements without an LLM",
+    },
+    "onboarding_hint": {
+        "pt-BR": "Comece pelo exemplo na barra lateral ou descreva seu caso. Na aba 2, avalie primeiro se regras e APIs bastam. Veja a recomendação e exporte na aba 7. As heurísticas não validam automaticamente requisitos escritos em texto livre.",
+        "en": "Load the sidebar example or describe your case. In tab 2, first assess whether rules and APIs suffice. Review and export in tab 7. Heuristics do not automatically validate free-text requirements.",
+    },
     "lang_label": {"pt-BR": "Idioma", "en": "Language"},
     "load_example_button": {
         "pt-BR": "Carregar exemplo: Investment Assistant",
@@ -224,8 +232,8 @@ UI = {
         "en": "Operational recommendations are generated automatically for tracing, retries/fallbacks, idempotency and feedback loops.",
     },
     "t5_intro": {
-        "pt-BR": "Pontue cada opção de 1 (ruim) a 5 (excelente). Restrições obrigatórias ainda sobrepõem a pontuação total.",
-        "en": "Score each option from 1 (poor) to 5 (excellent). Hard constraints still override total score.",
+        "pt-BR": "Pontue cada opção de 1 (ruim) a 5 (excelente). Elimine manualmente opções que violam restrições obrigatórias; a pontuação não faz essa validação.",
+        "en": "Score each option from 1 (poor) to 5 (excellent). Manually exclude options that violate hard constraints; scores do not perform that validation.",
     },
     "option_a_label": {"pt-BR": "Opção A", "en": "Option A"},
     "option_b_label": {"pt-BR": "Opção B", "en": "Option B"},
@@ -317,8 +325,8 @@ UI = {
     "load_saved_case_button": {"pt-BR": "Carregar", "en": "Load"},
     "delete_saved_case_button": {"pt-BR": "Excluir", "en": "Delete"},
     "saved_cases_note": {
-        "pt-BR": "Mantidos só nesta sessão do navegador - nunca gravados no servidor.",
-        "en": "Kept only in this browser session - never written server-side.",
+        "pt-BR": "Mantidos em memória no servidor, isolados por sessão; não gravados em disco.",
+        "en": "Kept in server memory, isolated per session; not written to disk.",
     },
     "no_saved_cases": {"pt-BR": "Nenhum caso salvo ainda.", "en": "No saved cases yet."},
     "case_saved_toast": {"pt-BR": "Caso salvo.", "en": "Case saved."},
@@ -415,6 +423,13 @@ def t(lang: str, key: str) -> str:
 
 
 ENGINE_PT = {
+    'The supplied assessment says rules and existing APIs satisfy the requirements; start without a language model.': 'A avaliação informada indica que regras e APIs existentes satisfazem os requisitos; comece sem um modelo de linguagem.',
+    'The deterministic baseline conflicts with autonomy signals; resolve these assumptions before accepting the plan.': 'A alternativa determinística conflita com sinais de autonomia; resolva essas premissas antes de aceitar o plano.',
+    'Use authoritative data and explicit rules; document the inputs and rule versions needed to reproduce a decision.': 'Use dados oficiais e regras explícitas; documente as entradas e versões de regras necessárias para reproduzir uma decisão.',
+    'No language model is required for this baseline; revisit only with evidence of an unmet requirement.': 'Esta alternativa não exige modelo de linguagem; reavalie apenas com evidência de um requisito não atendido.',
+    'Test business rules, boundary cases, authorization failures and task success against the stated requirements.': 'Teste regras de negócio, casos de borda, falhas de autorização e sucesso da tarefa contra os requisitos declarados.',
+    'Trace decisions and dependency failures; define safe retries, idempotency and rollback before deployment.': 'Rastreie decisões e falhas de dependências; defina retries seguros, idempotência e rollback antes da implantação.',
+
     "Separate autonomous domains plus dynamic execution can justify multiple agents, "
     "but each boundary should have a clear ownership and contract.": (
         "Domínios autônomos separados somados a execução dinâmica podem justificar múltiplos agentes, "
@@ -653,6 +668,8 @@ ENGINE_PT = {
 }
 
 PATTERN_PT = {
+    "Deterministic software": "Software determinístico",
+    "Deterministic service": "Serviço determinístico",
     "Augmented LLM": "LLM Aumentado",
     "Workflow": "Workflow",
     "Agent": "Agente",

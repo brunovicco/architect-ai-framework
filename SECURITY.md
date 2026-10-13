@@ -17,7 +17,7 @@ surface is therefore small and concentrated in three places:
    network request, and the only one that handles a credential. It offers
    two modes from the same generic, vendor-neutral adapter:
    - **Bring-your-own key** — a visitor-supplied API key, kept in memory
-     for the duration of one request only — never logged, never persisted,
+     in server-side session memory until the session ends — never logged, never persisted,
      never included in any exported plan.
    - **Shared demo credential** — a server-held key (currently NVIDIA's
      OpenAI-compatible endpoint), stored only in the deployment's secret
@@ -27,7 +27,7 @@ surface is therefore small and concentrated in three places:
      cannot read anyway). Because this key is shared across every
      anonymous visitor, its blast radius is bounded by a global daily
      request cap, a per-browser-session request cap, and a response-length
-     cap (`app.py`'s `AI_REVIEW_SHARED_*` constants) — all best-effort,
+     cap (`app.py`'s `AI_REVIEW_SHARED_*` constants) — attempts reserved atomically before I/O (including failures), with UTC daily reset; all best-effort,
      in-process limits that reset on redeploy and are not safe if this app
      is ever horizontally scaled to multiple instances.
 
@@ -39,13 +39,11 @@ surface is therefore small and concentrated in three places:
 
 Data handling note: the public demo deployment is multi-tenant with no
 authentication. "Saved cases" are kept in `st.session_state` only (per
-browser session, never written server-side), specifically so one visitor's
-data can never leak to another.
+browser session, never written server-side), isolated by browser session, without disk persistence. This is not a formal tenant-isolation guarantee.
 
 ## Supported versions
 
-Only the latest commit on `main` is supported. This is a reference/portfolio
-project, not a maintained library with a release/backport policy.
+Only the latest commit on `main` is supported. This is an early-stage decision framework; there is no backport or long-term support commitment.
 
 ## Reporting a vulnerability
 
