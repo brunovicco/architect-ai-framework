@@ -15,7 +15,6 @@ from dataclasses import dataclass
 from .engine import recommend
 from .models import ArchitectureCase, Recommendation
 
-
 TRACKED_FIELDS: tuple[str, ...] = (
     "architecture_pattern",
     "reference_architecture",
