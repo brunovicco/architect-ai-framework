@@ -79,7 +79,7 @@ def _reference_architecture(case: ArchitectureCase, architecture: ArchitecturePa
     if architecture == "Agent":
         return "Coding agent" if case.is_engineering_tool else "Agent (autonomous tool use)"
     if architecture == "Workflow":
-        if case.many_external_capabilities:
+        if case.many_external_capabilities or (case.dynamic_tool_choice and case.bounded_known_tool_set):
             return "Routing"
         if case.needs_document_knowledge and case.structured_output:
             return "Document processing pipeline"
@@ -194,10 +194,16 @@ def recommend(case: ArchitectureCase) -> Recommendation:
             "Separate autonomous domains plus dynamic execution can justify multiple agents, "
             "but each boundary should have a clear ownership and contract."
         )
-    elif case.dynamic_next_steps or case.dynamic_tool_choice:
+    elif case.dynamic_next_steps or (case.dynamic_tool_choice and not case.bounded_known_tool_set):
         architecture = "Agent"
         rationale.append(
             "The system must discover or choose next steps during execution, which favors bounded agentic behavior."
+        )
+    elif case.dynamic_tool_choice and case.bounded_known_tool_set:
+        architecture = "Workflow"
+        rationale.append(
+            "Choosing among a small, known set of tools can be scripted as a routing step; a workflow "
+            "offers more predictability and auditability than open-ended agentic behavior here."
         )
     elif case.path_known:
         architecture = "Workflow"

@@ -10,6 +10,7 @@
     "regulatory_constraints": "Suitability, auditability and human/user confirmation before transactional side effects",
     "path_known": true,
     "dynamic_tool_choice": true,
+    "bounded_known_tool_set": true,
     "needs_document_knowledge": true,
     "needs_dynamic_data": true,
     "existing_api": true,
@@ -33,18 +34,18 @@
         "Latency": 3,
         "Cost": 3,
         "Risk/control": 4,
-        "Auditability/predictability": 3,
+        "Auditability/predictability": 2,
         "Maintainability": 4,
         "Observability/debugging": 4,
         "Privacy/residency/compliance": 4,
         "Portability/lock-in": 4,
-        "Fit with hard constraints": 5
+        "Fit with hard constraints": 3
       }
     },
     {
-      "name": "Workflow-only",
+      "name": "Workflow + Routing",
       "scores": {
-        "Quality/task success": 3,
+        "Quality/task success": 4,
         "Latency": 5,
         "Cost": 4,
         "Risk/control": 5,
@@ -53,7 +54,7 @@
         "Observability/debugging": 4,
         "Privacy/residency/compliance": 4,
         "Portability/lock-in": 4,
-        "Fit with hard constraints": 3
+        "Fit with hard constraints": 5
       }
     },
     {
@@ -72,7 +73,7 @@
       }
     }
   ],
-  "tradeoff_notes": "Workflow is simpler and more auditable but can't dynamically choose which internal tool/API to call for ad-hoc portfolio questions; multi-agent adds coordination overhead we don't need yet. Revisit if the catalog of callable tools grows beyond a handful.",
+  "tradeoff_notes": "Routing among a small, known set of tools (balance, portfolio, order) gives the same dynamic tool selection an agent would, with more predictability and auditability for a regulated case; open-ended agent autonomy isn't earned here. Multi-agent adds coordination overhead we don't need yet. Revisit the agent option if intermediate results require the model to control follow-up actions, repetition and termination beyond predefined routes.",
   "model_comparison": [
     {
       "criterion": "Task quality fit",
@@ -147,5 +148,5 @@
       }
     }
   ],
-  "selected_option": "Agent + API tools"
+  "selected_option": "Workflow + Routing"
 }

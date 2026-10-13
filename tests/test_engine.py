@@ -19,6 +19,13 @@ def test_dynamic_execution_prefers_agent():
     assert result.architecture_pattern == "Agent"
 
 
+def test_bounded_known_tool_set_prefers_routing_workflow_over_agent():
+    """Dynamic tool choice over a small, known tool set is routing, not open-ended autonomy."""
+    result = recommend(ArchitectureCase(dynamic_tool_choice=True, bounded_known_tool_set=True))
+    assert result.architecture_pattern == "Workflow"
+    assert result.reference_architecture == "Routing"
+
+
 def test_multi_agent_requires_separate_autonomy_and_dynamic_execution():
     """Independent autonomous domains plus dynamic execution recommends
     Multi-agent and raises a warning to validate the added complexity.

@@ -40,22 +40,47 @@ from architect.models import ArchitectureCase, DecisionPlan, ModelComparisonRow,
 from architect.providers import AdapterError, OpenAICompatibleAdapter
 from architect.review_quota import ReviewQuota
 from architect.scoring import DEFAULT_WEIGHTS, normalized_score
+from architect.sensitivity import TRACKED_FIELDS, analyze_sensitivity
 
-EXAMPLE_PATHS = {
-    "en": ROOT/"examples"/"investment_assistant.json",
-    "pt-BR": ROOT/"examples"/"investment_assistant.pt-br.json",
+EXAMPLES: dict[str, dict[str, Path]] = {
+    "investment_assistant": {
+        "en": ROOT/"examples"/"investment_assistant.json",
+        "pt-BR": ROOT/"examples"/"investment_assistant.pt-br.json",
+    },
+    "deterministic_order_lookup": {
+        "en": ROOT/"examples"/"deterministic_order_lookup.json",
+        "pt-BR": ROOT/"examples"/"deterministic_order_lookup.pt-br.json",
+    },
+    "policy_qa_assistant": {
+        "en": ROOT/"examples"/"policy_qa_assistant.json",
+        "pt-BR": ROOT/"examples"/"policy_qa_assistant.pt-br.json",
+    },
+    "research_agent": {
+        "en": ROOT/"examples"/"research_agent.json",
+        "pt-BR": ROOT/"examples"/"research_agent.pt-br.json",
+    },
+    "support_orchestrator": {
+        "en": ROOT/"examples"/"support_orchestrator.json",
+        "pt-BR": ROOT/"examples"/"support_orchestrator.pt-br.json",
+    },
 }
 CANDIDATE_KEYS = ("model_candidate_a",
                   "model_candidate_b", "model_candidate_c")
 CANDIDATE_COLS = ("a", "b", "c")
 
-# Shared-credential AI review path (see `docs/PROVIDERS_SECURITY_CHECKLIST.md`
-# control #9): a server-held key is optionally offered so a visitor doesn't
-# have to paste their own, bounded by a global daily cap, a per-browser-session
-# cap, and a response-length cap so one shared key's blast radius stays small.
 AI_REVIEW_SHARED_DAILY_CAP = 20
 AI_REVIEW_SHARED_PER_SESSION_CAP = 3
 AI_REVIEW_SHARED_MAX_TOKENS = 5000
+
+_SENSITIVITY_METRIC_LABEL_KEYS = {
+    "architecture_pattern": "architecture_metric_label",
+    "integration_pattern": "integration_metric_label",
+    "entry_point": "entry_point_metric_label",
+    "reference_architecture": "reference_architecture_metric_label",
+    "feasibility_verdict": "feasibility_verdict_metric_label",
+    "review_placement": "review_placement_metric_label",
+}
+assert set(_SENSITIVITY_METRIC_LABEL_KEYS) == set(TRACKED_FIELDS)
 
 
 @st.cache_resource
@@ -74,13 +99,16 @@ def _ai_review_shared_quota_exceeded(lang: str) -> str | None:
     return None
 
 
-def _load_example() -> None:
-    """Load the bundled "Investment Assistant" example for the current language.
+def _load_example(example_key: str) -> None:
+    """Load one of the bundled examples for the current language.
 
-    Reads the JSON file matching `lang` from `EXAMPLE_PATHS` and seeds
-    `session_state` from it via `_apply_plan_dict`.
+    Reads the JSON file matching `lang` from `EXAMPLES[example_key]` and
+    seeds `session_state` from it via `_apply_plan_dict`.
+
+    Args:
+        example_key: A key of `EXAMPLES` (e.g. "investment_assistant").
     """
-    data = json.loads(EXAMPLE_PATHS[lang].read_text(encoding="utf-8"))
+    data = json.loads(EXAMPLES[example_key][lang].read_text(encoding="utf-8"))
     _apply_plan_dict(data)
 
 
@@ -254,8 +282,14 @@ lang = st.sidebar.selectbox(
     key="lang",
 )
 
+example_choice = st.sidebar.selectbox(
+    t(lang, "load_example_select_label"),
+    list(EXAMPLES.keys()),
+    format_func=lambda key: t(lang, f"example_{key}_label"),
+    key="example_choice",
+)
 if st.sidebar.button(t(lang, "load_example_button")):
-    _load_example()
+    _load_example(example_choice)
     st.rerun()
 if st.sidebar.button(t(lang, "clear_form_button")):
     _clear_form()
@@ -338,6 +372,8 @@ with execution:
             "dynamic_next_steps", "dynamic_next_steps_label")
         dynamic_tool_choice = field_checkbox(
             "dynamic_tool_choice", "dynamic_tool_choice_label")
+        bounded_known_tool_set = field_checkbox(
+            "bounded_known_tool_set", "bounded_known_tool_set_label")
         is_engineering_tool = field_checkbox(
             "is_engineering_tool", "is_engineering_tool_label")
     with c2:
@@ -405,6 +441,7 @@ case = ArchitectureCase(
     path_known=path_known,
     dynamic_next_steps=dynamic_next_steps,
     dynamic_tool_choice=dynamic_tool_choice,
+    bounded_known_tool_set=bounded_known_tool_set,
     independent_autonomous_domains=independent_autonomous_domains,
     needs_document_knowledge=needs_document_knowledge,
     needs_dynamic_data=needs_dynamic_data,
@@ -455,20 +492,28 @@ with compare:
                     f"{option_names[idx]} · {criterion}", 1, 5,
                     key=score_key, label_visibility="collapsed"
                 )
-    option_scores = [OptionScore(name=n, scores=s)
-                     for n, s in zip(option_names, all_option_scores)]
+    option_scores = [OptionScore(name=n.strip(), scores=s)
+                     for n, s in zip(option_names, all_option_scores) if n.strip()]
+    selectable_names = [option.name for option in option_scores]
     scores = {o.name: normalized_score(o.scores) for o in option_scores}
-    best_name = max(scores, key=scores.get)
-    st.metric(t(lang, "highest_score_label"),
-              f"{best_name} · {scores[best_name]:.1%}")
+    if scores:
+        best_name = max(scores, key=scores.get)
+        st.metric(t(lang, "highest_score_label"),
+                  f"{best_name} · {scores[best_name]:.1%}")
+    else:
+        st.info(t(lang, "no_named_options"))
     st.caption(e(lang, "option_matrix_methodology_note"))
     st.caption(f"{e(lang, 'recommended_pattern_note')}: {translate_pattern(lang, rec.architecture_pattern)}")
     st.markdown(f"**{t(lang, 'selected_option_label')}**")
-    if st.session_state.get("selected_option") not in option_names:
-        st.session_state["selected_option"] = best_name
-    selected_option = st.selectbox(
-        "selected_option", option_names, key="selected_option", label_visibility="collapsed"
-    )
+    if selectable_names:
+        if st.session_state.get("selected_option") not in selectable_names:
+            st.session_state["selected_option"] = best_name
+        selected_option = st.selectbox(
+            "selected_option", selectable_names, key="selected_option", label_visibility="collapsed"
+        )
+    else:
+        st.session_state.pop("selected_option", None)
+        selected_option = ""
     tradeoff_notes = field_text("tradeoff_notes", "tradeoff_notes_label",
                                 area=True, placeholder_key="tradeoff_notes_placeholder")
 
@@ -545,6 +590,27 @@ with final:
         for warning in translate_items(lang, rec.warnings):
             st.warning(warning)
 
+    sensitivity_findings = analyze_sensitivity(case, baseline=rec)
+    with st.expander(t(lang, "sensitivity_heading")):
+        st.caption(t(lang, "sensitivity_intro"))
+        if not sensitivity_findings:
+            st.write(t(lang, "sensitivity_empty"))
+        for finding in sensitivity_findings:
+            action = t(lang, "sensitivity_check_to" if finding.flipped_to else "sensitivity_uncheck_to")
+            st.markdown(t(lang, "sensitivity_finding_header").format(
+                action=action, field_label=t(lang, f"{finding.field}_label")))
+            for metric_field, old_value, new_value in finding.changes:
+                st.markdown("- " + t(lang, "sensitivity_change_line").format(
+                    metric_label=t(lang, _SENSITIVITY_METRIC_LABEL_KEYS[metric_field]),
+                    old_value=translate_pattern(lang, old_value),
+                    new_value=translate_pattern(lang, new_value),
+                ))
+
+            for warning in translate_items(lang, list(finding.warnings)):
+                st.warning(warning)
+            for warning in translate_items(lang, list(finding.resolved_warnings)):
+                st.info(t(lang, "sensitivity_resolved_warning").format(warning=warning))
+
     st.markdown(t(lang, "rationale_heading"))
     for item in translate_items(lang, rec.rationale):
         st.write(f"- {item}")
@@ -576,7 +642,27 @@ with final:
         st.write(f"- {item}")
 
     md = to_markdown(plan, lang)
-    review_plan_digest = hashlib.sha256(md.encode("utf-8")).hexdigest()
+
+    sensitivity_lines = [
+        "## Sensitivity findings (deterministic)",
+        "Hypothetical single-boolean changes, not validated alternative designs. "
+        "Check conflicting assumptions and scenario warnings before interpreting a change.",
+    ]
+    if sensitivity_findings:
+        for finding in sensitivity_findings:
+            action = "Checking" if finding.flipped_to else "Unchecking"
+            sensitivity_lines.append(f"- {action} `{finding.field}` would change:")
+            for metric_field, old_value, new_value in finding.changes:
+                sensitivity_lines.append(f"  - {metric_field}: {old_value} -> {new_value}")
+            for warning in finding.warnings:
+                sensitivity_lines.append(f"  - Scenario warning: {warning}")
+            for warning in finding.resolved_warnings:
+                sensitivity_lines.append(f"  - Warning no longer present: {warning}")
+    else:
+        sensitivity_lines.append("No single boolean flip changes the tracked outputs or warnings.")
+    review_user_content = md + "\n\n" + "\n".join(sensitivity_lines)
+
+    review_plan_digest = hashlib.sha256(review_user_content.encode("utf-8")).hexdigest()
     if st.session_state.get("ai_review_plan_digest") != review_plan_digest:
         st.session_state.pop("ai_review_result", None)
     st.session_state["ai_review_plan_digest"] = review_plan_digest
@@ -696,7 +782,7 @@ with final:
                                 max_tokens=AI_REVIEW_SHARED_MAX_TOKENS,
                             )
                             review = adapter.generate(
-                                system=t(lang, "ai_review_system_prompt"), user=md)
+                                system=t(lang, "ai_review_system_prompt"), user=review_user_content)
                     except (ValueError, AdapterError) as exc:
                         st.session_state.pop("ai_review_result", None)
                         st.error(t(lang, "ai_review_error").format(error=exc))
@@ -710,7 +796,7 @@ with final:
                         adapter = OpenAICompatibleAdapter(
                             base_url=ai_base_url, api_key=ai_api_key, model=ai_model)
                         review = adapter.generate(
-                            system=t(lang, "ai_review_system_prompt"), user=md)
+                            system=t(lang, "ai_review_system_prompt"), user=review_user_content)
                 except (ValueError, AdapterError) as exc:
                     st.session_state.pop("ai_review_result", None)
                     st.error(t(lang, "ai_review_error").format(error=exc))

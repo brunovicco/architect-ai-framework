@@ -1,0 +1,142 @@
+{
+  "case": {
+    "name": "Employee Policy Q&A",
+    "business_problem": "Help employees find answers in internal HR/IT policy documents without searching a wiki.",
+    "desired_outcome": "Fast, grounded answers citing the relevant policy section, reducing HR ticket volume for routine questions.",
+    "users": "Internal employees",
+    "quality_target": "High groundedness; every answer must cite the source policy section",
+    "latency_target": "p95 < 3s",
+    "cost_constraint": "Low - internal tool, modest query volume",
+    "regulatory_constraints": "No PII beyond the asking employee's own identity, used only to scope visible policies",
+    "path_known": false,
+    "needs_document_knowledge": true,
+    "subjective_quality": false,
+    "structured_output": false,
+    "estimated_monthly_cost": 150.0,
+    "monthly_cost_ceiling": 500.0,
+    "roi_notes": "Illustrative assumptions, not measurements: Efficiency: deflects an estimated 30% of routine HR/IT policy questions from a human queue. Solution cost: embeddings plus a small hosted model, well under the ceiling."
+  },
+  "option_scores": [
+    {
+      "name": "Augmented LLM + RAG",
+      "scores": {
+        "Quality/task success": 4,
+        "Latency": 5,
+        "Cost": 5,
+        "Risk/control": 4,
+        "Auditability/predictability": 4,
+        "Maintainability": 5,
+        "Observability/debugging": 4,
+        "Privacy/residency/compliance": 4,
+        "Portability/lock-in": 4,
+        "Fit with hard constraints": 5
+      }
+    },
+    {
+      "name": "Workflow with routing by topic",
+      "scores": {
+        "Quality/task success": 3,
+        "Latency": 4,
+        "Cost": 4,
+        "Risk/control": 4,
+        "Auditability/predictability": 4,
+        "Maintainability": 3,
+        "Observability/debugging": 3,
+        "Privacy/residency/compliance": 4,
+        "Portability/lock-in": 4,
+        "Fit with hard constraints": 3
+      }
+    },
+    {
+      "name": "Agent with document search tool",
+      "scores": {
+        "Quality/task success": 4,
+        "Latency": 2,
+        "Cost": 2,
+        "Risk/control": 3,
+        "Auditability/predictability": 2,
+        "Maintainability": 3,
+        "Observability/debugging": 3,
+        "Privacy/residency/compliance": 4,
+        "Portability/lock-in": 3,
+        "Fit with hard constraints": 2
+      }
+    }
+  ],
+  "tradeoff_notes": "The task is always \"find and explain a policy section\" - there's no branching logic or tool choice to orchestrate, so a single augmented call with RAG retrieval is the smallest sufficient pattern. A topic-routing workflow adds orchestration with no quality benefit here, and an agent adds latency/cost for a one-shot lookup that doesn't need runtime tool selection.",
+  "model_comparison": [
+    {
+      "criterion": "Task quality fit",
+      "notes": {
+        "Managed API provider": "Assumption to validate: Strong grounded Q&A with citation support",
+        "Self-hosted open-weight": "Assumption to validate: Adequate for well-chunked internal documents",
+        "Regional/sovereign provider": "Assumption to validate: Adequate; smaller model family"
+      }
+    },
+    {
+      "criterion": "Latency class",
+      "notes": {
+        "Managed API provider": "Assumption to validate: Low (hosted, optimized)",
+        "Self-hosted open-weight": "Assumption to validate: Medium (depends on our GPU capacity)",
+        "Regional/sovereign provider": "Assumption to validate: Medium"
+      }
+    },
+    {
+      "criterion": "Cost class",
+      "notes": {
+        "Managed API provider": "Assumption to validate: Pay-per-token, low at this volume",
+        "Self-hosted open-weight": "Assumption to validate: Fixed infra cost, not justified at this volume",
+        "Regional/sovereign provider": "Assumption to validate: Moderate, compliance premium"
+      }
+    },
+    {
+      "criterion": "Context window",
+      "notes": {
+        "Managed API provider": "Assumption to validate: Large (128k+ tokens)",
+        "Self-hosted open-weight": "Assumption to validate: Moderate (32k typical)",
+        "Regional/sovereign provider": "Assumption to validate: Moderate (32k-64k)"
+      }
+    },
+    {
+      "criterion": "Structured output support",
+      "notes": {
+        "Managed API provider": "Assumption to validate: Not required for this case, but available",
+        "Self-hosted open-weight": "Assumption to validate: Not required for this case",
+        "Regional/sovereign provider": "Assumption to validate: Not required for this case"
+      }
+    },
+    {
+      "criterion": "Privacy/residency fit",
+      "notes": {
+        "Managed API provider": "Assumption to validate: Depends on vendor DPA; internal documents leave our infra",
+        "Self-hosted open-weight": "Assumption to validate: Full control, documents never leave our VPC",
+        "Regional/sovereign provider": "Assumption to validate: In-region by default"
+      }
+    },
+    {
+      "criterion": "Rate limits/availability",
+      "notes": {
+        "Managed API provider": "Assumption to validate: High (vendor SLA), ample for internal volume",
+        "Self-hosted open-weight": "Assumption to validate: Limited by our own capacity",
+        "Regional/sovereign provider": "Assumption to validate: Moderate, smaller provider"
+      }
+    },
+    {
+      "criterion": "Portability/lock-in risk",
+      "notes": {
+        "Managed API provider": "Assumption to validate: Higher lock-in (proprietary API)",
+        "Self-hosted open-weight": "Assumption to validate: Low lock-in (open weights)",
+        "Regional/sovereign provider": "Assumption to validate: Moderate (regional proprietary API)"
+      }
+    },
+    {
+      "criterion": "Explainability/fairness auditability",
+      "notes": {
+        "Managed API provider": "Assumption to validate: Limited (black box), but low stakes for this use case",
+        "Self-hosted open-weight": "Open weights do not guarantee training-data access or bias auditability; verify evidence and license.",
+        "Regional/sovereign provider": "Assumption to validate: Moderate; depends on vendor certifications and documentation"
+      }
+    }
+  ],
+  "selected_option": "Augmented LLM + RAG"
+}

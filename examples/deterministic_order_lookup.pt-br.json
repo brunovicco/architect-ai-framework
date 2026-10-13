@@ -1,0 +1,56 @@
+{
+  "case": {
+    "name": "Consulta de Status de Pedido",
+    "business_problem": "Permitir que clientes verifiquem o status de um pedido existente sem contatar o suporte.",
+    "desired_outcome": "Status do pedido instantâneo e preciso para o cliente, com zero volume de tickets de suporte para essa pergunta.",
+    "users": "Clientes de e-commerce",
+    "quality_target": "100% de correspondência com o status atual no sistema de gestão de pedidos",
+    "latency_target": "p95 < 500ms",
+    "cost_constraint": "Custo marginal próximo de zero por consulta",
+    "regulatory_constraints": "Registro padrão de acesso a dados; sem nova exposição regulatória",
+    "deterministic_sufficient": true,
+    "path_known": true,
+    "existing_api": true,
+    "needs_dynamic_data": true,
+    "subjective_quality": false,
+    "structured_output": true,
+    "estimated_monthly_cost": 20.0,
+    "monthly_cost_ceiling": 200.0,
+    "roi_notes": "Hipóteses didáticas, não medições: Eficiência: elimina uma categoria inteira de tickets de suporte (~2 minutos/ticket) via autoatendimento. Custo da solução: praticamente só a infraestrutura de API já existente, sem custo de modelo."
+  },
+  "option_scores": [
+    {
+      "name": "Serviço determinístico",
+      "scores": {
+        "Quality/task success": 5,
+        "Latency": 5,
+        "Cost": 5,
+        "Risk/control": 5,
+        "Auditability/predictability": 5,
+        "Maintainability": 5,
+        "Observability/debugging": 5,
+        "Privacy/residency/compliance": 5,
+        "Portability/lock-in": 5,
+        "Fit with hard constraints": 5
+      }
+    },
+    {
+      "name": "Wrapper com LLM aumentado",
+      "scores": {
+        "Quality/task success": 3,
+        "Latency": 3,
+        "Cost": 2,
+        "Risk/control": 3,
+        "Auditability/predictability": 2,
+        "Maintainability": 3,
+        "Observability/debugging": 3,
+        "Privacy/residency/compliance": 4,
+        "Portability/lock-in": 3,
+        "Fit with hard constraints": 2
+      }
+    }
+  ],
+  "tradeoff_notes": "Um wrapper com LLM adiciona latência, custo e risco de alucinação para uma pergunta que a API de gestão de pedidos já responde com exatidão; não há ganho de qualidade a comprar. Revisitar só se o escopo crescer para perguntas abertas em linguagem natural sobre o pedido (ex.: \"por que meu pedido está atrasado\") que a API por si só não responde.",
+  "model_comparison": [],
+  "selected_option": "Serviço determinístico"
+}

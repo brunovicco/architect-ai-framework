@@ -1,0 +1,56 @@
+{
+  "case": {
+    "name": "Order Status Lookup",
+    "business_problem": "Let customers check the current status of an existing order without contacting support.",
+    "desired_outcome": "Instant, accurate order status for the customer, with zero support-ticket volume for this question.",
+    "users": "E-commerce customers",
+    "quality_target": "100% match with the order-management system's current status",
+    "latency_target": "p95 < 500ms",
+    "cost_constraint": "Near-zero marginal cost per lookup",
+    "regulatory_constraints": "Standard data-access logging; no new regulatory exposure",
+    "deterministic_sufficient": true,
+    "path_known": true,
+    "existing_api": true,
+    "needs_dynamic_data": true,
+    "subjective_quality": false,
+    "structured_output": true,
+    "estimated_monthly_cost": 20.0,
+    "monthly_cost_ceiling": 200.0,
+    "roi_notes": "Illustrative assumptions, not measurements: Efficiency: removes an entire support-ticket category (~2 minutes/ticket) via self-service. Solution cost: effectively just existing API infrastructure, no model cost."
+  },
+  "option_scores": [
+    {
+      "name": "Deterministic service",
+      "scores": {
+        "Quality/task success": 5,
+        "Latency": 5,
+        "Cost": 5,
+        "Risk/control": 5,
+        "Auditability/predictability": 5,
+        "Maintainability": 5,
+        "Observability/debugging": 5,
+        "Privacy/residency/compliance": 5,
+        "Portability/lock-in": 5,
+        "Fit with hard constraints": 5
+      }
+    },
+    {
+      "name": "Augmented LLM wrapper",
+      "scores": {
+        "Quality/task success": 3,
+        "Latency": 3,
+        "Cost": 2,
+        "Risk/control": 3,
+        "Auditability/predictability": 2,
+        "Maintainability": 3,
+        "Observability/debugging": 3,
+        "Privacy/residency/compliance": 4,
+        "Portability/lock-in": 3,
+        "Fit with hard constraints": 2
+      }
+    }
+  ],
+  "tradeoff_notes": "An LLM wrapper adds latency, cost and a hallucination risk for a question the order-management API already answers exactly; there is no quality upside to buy. Revisit only if scope grows to open-ended natural-language questions about the order (e.g. \"why is my order late\") that the API alone can't answer.",
+  "model_comparison": [],
+  "selected_option": "Deterministic service"
+}

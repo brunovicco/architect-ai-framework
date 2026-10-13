@@ -54,9 +54,27 @@ UI = {
         "en": "Load the sidebar example or describe your case. In tab 2, first assess whether rules and APIs suffice. Review and export in tab 7. Heuristics do not automatically validate free-text requirements.",
     },
     "lang_label": {"pt-BR": "Idioma", "en": "Language"},
-    "load_example_button": {
-        "pt-BR": "Carregar exemplo: Investment Assistant",
-        "en": "Load example: Investment Assistant",
+    "load_example_select_label": {"pt-BR": "Exemplo", "en": "Example"},
+    "load_example_button": {"pt-BR": "Carregar exemplo", "en": "Load example"},
+    "example_investment_assistant_label": {
+        "pt-BR": "Assistente de Investimentos (Workflow + Roteamento)",
+        "en": "Investment Assistant (Workflow + Routing)",
+    },
+    "example_deterministic_order_lookup_label": {
+        "pt-BR": "Consulta de Status de Pedido (Software determinístico)",
+        "en": "Order Status Lookup (Deterministic software)",
+    },
+    "example_policy_qa_assistant_label": {
+        "pt-BR": "Assistente de Políticas Internas (LLM Aumentado + RAG)",
+        "en": "Employee Policy Q&A (Augmented LLM + RAG)",
+    },
+    "example_research_agent_label": {
+        "pt-BR": "Agente de Pesquisa de Mercado (Agente)",
+        "en": "Market Research Agent (Agent)",
+    },
+    "example_support_orchestrator_label": {
+        "pt-BR": "Orquestrador de Suporte Multidomínio (Multiagente)",
+        "en": "Multi-Domain Support Orchestrator (Multi-agent)",
     },
     "clear_form_button": {"pt-BR": "Limpar formulário", "en": "Clear form"},
     "app_title": {"pt-BR": "ARQUITETO", "en": "ARCHITECT"},
@@ -149,6 +167,10 @@ UI = {
     "dynamic_tool_choice_label": {
         "pt-BR": "O modelo precisa escolher ferramentas/ações dinamicamente",
         "en": "The model must dynamically choose tools/actions",
+    },
+    "bounded_known_tool_set_label": {
+        "pt-BR": "O conjunto de ferramentas disponíveis é pequeno e conhecido de antemão",
+        "en": "The available tool set is small and known in advance",
     },
     "independent_autonomous_domains_label": {
         "pt-BR": "Existem domínios autônomos separados com responsabilidade/contratos claros",
@@ -257,6 +279,33 @@ UI = {
     "feasibility_verdict_metric_label": {"pt-BR": "Veredito de viabilidade", "en": "Feasibility verdict"},
     "review_placement_metric_label": {"pt-BR": "Posicionamento de revisão", "en": "Review placement"},
     "roi_notes_metric_label": {"pt-BR": "Valor de negócio/ROI", "en": "Business value/ROI"},
+    "no_named_options": {
+        "pt-BR": "Dê nome a pelo menos uma alternativa para comparar e selecionar. O plano pode ser exportado sem matriz.",
+        "en": "Name at least one option to compare and select. The plan can be exported without a matrix.",
+    },
+    "sensitivity_resolved_warning": {
+        "pt-BR": "Aviso que deixa de aparecer neste cenário: {warning}",
+        "en": "Warning no longer present in this scenario: {warning}",
+    },
+    "sensitivity_heading": {"pt-BR": "Análise de sensibilidade", "en": "Sensitivity analysis"},
+    "sensitivity_intro": {
+        "pt-BR": "O motor é determinístico, mas as respostas do formulário são julgamento humano. Isto mostra quais sinais, se invertidos, mudariam a recomendação - são cenários hipotéticos, não alternativas validadas. Confira os avisos e resolva premissas contraditórias antes de aceitar a mudança.",
+        "en": "The engine is deterministic, but the form's answers are human judgment. This shows which signals, if flipped, would change the recommendation - these are hypothetical scenarios, not validated alternatives. Check warnings and resolve conflicting assumptions before accepting a change.",
+    },
+    "sensitivity_empty": {
+        "pt-BR": "Nenhum sinal único inverteria a recomendação; o resultado é estável a mudanças isoladas.",
+        "en": "No single signal would flip the recommendation; the result is stable to one-at-a-time changes.",
+    },
+    "sensitivity_check_to": {"pt-BR": "marcar", "en": "check"},
+    "sensitivity_uncheck_to": {"pt-BR": "desmarcar", "en": "uncheck"},
+    "sensitivity_finding_header": {
+        "pt-BR": "Se você {action} **\"{field_label}\"**:",
+        "en": "If you {action} **\"{field_label}\"**:",
+    },
+    "sensitivity_change_line": {
+        "pt-BR": "{metric_label}: {old_value} → {new_value}",
+        "en": "{metric_label}: {old_value} → {new_value}",
+    },
     "rationale_heading": {"pt-BR": "### Justificativa", "en": "### Rationale"},
     "information_heading": {"pt-BR": "### Estratégia de informação", "en": "### Information strategy"},
     "model_strategy_heading": {
@@ -383,8 +432,8 @@ UI = {
     },
     "ai_review_error": {"pt-BR": "Falha ao obter revisão: {error}", "en": "Failed to get a review: {error}"},
     "ai_review_system_prompt": {
-        "pt-BR": "Você é um revisor sênior de arquitetura de IA/LLM. Analise criticamente o plano de decisão de arquitetura a seguir e aponte riscos, lacunas ou suposições questionáveis. Seja direto e específico. Responda em português.",
-        "en": "You are a senior AI/LLM architecture reviewer. Critically analyze the following architecture decision plan and point out risks, gaps, or questionable assumptions. Be direct and specific. Respond in English.",
+        "pt-BR": "Você é um revisor sênior de arquitetura de IA/LLM. Analise criticamente o plano de decisão de arquitetura a seguir e aponte riscos, lacunas ou suposições questionáveis. Se uma seção \"Sensitivity findings\" estiver presente, comente se os campos de texto livre do caso sustentam ou contradizem os sinais booleanos ali apontados como decisivos. Seja direto e específico. Responda em português.",
+        "en": "You are a senior AI/LLM architecture reviewer. Critically analyze the following architecture decision plan and point out risks, gaps, or questionable assumptions. If a \"Sensitivity findings\" section is present, comment on whether the case's free-text fields support or contradict the boolean signals flagged there as decisive. Be direct and specific. Respond in English.",
     },
 }
 
@@ -441,6 +490,12 @@ ENGINE_PT = {
     ),
     "The execution path is known in advance, so a workflow offers greater predictability and auditability.": (
         "O caminho de execução é conhecido com antecedência, então um workflow oferece maior previsibilidade e auditabilidade."
+    ),
+    "Choosing among a small, known set of tools can be scripted as a routing step; a workflow "
+    "offers more predictability and auditability than open-ended agentic behavior here.": (
+        "Escolher entre um conjunto pequeno e conhecido de ferramentas pode ser roteirizado como uma "
+        "etapa de roteamento; um workflow oferece mais previsibilidade e auditabilidade do que um "
+        "comportamento de agente aberto neste caso."
     ),
     "No orchestration requirement was identified; start with the smallest useful augmented-model pattern.": (
         "Nenhuma necessidade de orquestração foi identificada; comece com o padrão de modelo aumentado mais simples possível."

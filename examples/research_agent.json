@@ -1,0 +1,147 @@
+{
+  "case": {
+    "name": "Autonomous Market Research Agent",
+    "business_problem": "Produce an evidence-backed market research brief. The model uses a known set of search and retrieval tools, evaluates intermediate results, chooses follow-up queries and decides when sufficient evidence has been gathered.",
+    "desired_outcome": "A structured research brief with citations, assembled without a human manually orchestrating each data source for every request.",
+    "users": "Internal strategy/product team",
+    "quality_target": "High factual grounding with citations; completeness over the research topic",
+    "latency_target": "Minutes, not seconds - this is an asynchronous research task, not a chat turn",
+    "cost_constraint": "Moderate - a handful of research runs per week, not high-volume",
+    "regulatory_constraints": "None - internal strategic use, no customer-facing output",
+    "path_known": false,
+    "dynamic_tool_choice": true,
+    "bounded_known_tool_set": true,
+    "many_external_capabilities": true,
+    "needs_document_knowledge": true,
+    "needs_dynamic_data": true,
+    "structured_output": true,
+    "subjective_quality": true,
+    "estimated_monthly_cost": 300.0,
+    "monthly_cost_ceiling": 600.0,
+    "roi_notes": "Illustrative assumptions, not measurements: Productivity: cuts a roughly one-day manual research task down to under an hour of review time. Solution cost: dominated by tool/API calls across sources, scales with research volume, not headcount.",
+    "dynamic_next_steps": true
+  },
+  "option_scores": [
+    {
+      "name": "Agent + tool protocol",
+      "scores": {
+        "Quality/task success": 4,
+        "Latency": 3,
+        "Cost": 3,
+        "Risk/control": 3,
+        "Auditability/predictability": 3,
+        "Maintainability": 4,
+        "Observability/debugging": 4,
+        "Privacy/residency/compliance": 4,
+        "Portability/lock-in": 4,
+        "Fit with hard constraints": 5
+      }
+    },
+    {
+      "name": "Workflow with a fixed source list",
+      "scores": {
+        "Quality/task success": 2,
+        "Latency": 4,
+        "Cost": 4,
+        "Risk/control": 4,
+        "Auditability/predictability": 5,
+        "Maintainability": 2,
+        "Observability/debugging": 4,
+        "Privacy/residency/compliance": 4,
+        "Portability/lock-in": 4,
+        "Fit with hard constraints": 2
+      }
+    },
+    {
+      "name": "Multi-agent (one agent per source type)",
+      "scores": {
+        "Quality/task success": 4,
+        "Latency": 2,
+        "Cost": 2,
+        "Risk/control": 2,
+        "Auditability/predictability": 2,
+        "Maintainability": 2,
+        "Observability/debugging": 3,
+        "Privacy/residency/compliance": 3,
+        "Portability/lock-in": 3,
+        "Fit with hard constraints": 3
+      }
+    }
+  ],
+  "tradeoff_notes": "Agent autonomy is proposed because retrieved evidence determines follow-up queries, repetition and termination, not because the tool catalog is large or unknown. The same small tool set can support this exploratory trajectory. Compare with a workflow if the required research steps and stopping rules can instead be scripted; validate any quality gain against latency, cost and error propagation. Multiple agents are not justified solely by different source types.",
+  "model_comparison": [
+    {
+      "criterion": "Task quality fit",
+      "notes": {
+        "Managed API provider": "Assumption to validate: Strong on multi-step tool use and synthesis",
+        "Self-hosted open-weight": "Assumption to validate: Weaker on long tool-use chains, needs validation",
+        "Regional/sovereign provider": "Assumption to validate: Adequate; smaller model family"
+      }
+    },
+    {
+      "criterion": "Latency class",
+      "notes": {
+        "Managed API provider": "Assumption to validate: Medium-high (many sequential tool calls)",
+        "Self-hosted open-weight": "Assumption to validate: High (depends on our GPU capacity and tool round-trips)",
+        "Regional/sovereign provider": "Assumption to validate: Medium-high"
+      }
+    },
+    {
+      "criterion": "Cost class",
+      "notes": {
+        "Managed API provider": "Assumption to validate: Pay-per-token, higher per run due to tool-call volume",
+        "Self-hosted open-weight": "Assumption to validate: Upfront infra cost, lower marginal cost at volume",
+        "Regional/sovereign provider": "Assumption to validate: Premium pricing for compliance guarantees"
+      }
+    },
+    {
+      "criterion": "Context window",
+      "notes": {
+        "Managed API provider": "Assumption to validate: Large (128k+ tokens), needed for long tool-use transcripts",
+        "Self-hosted open-weight": "Assumption to validate: Moderate (32k typical) - may need summarization",
+        "Regional/sovereign provider": "Assumption to validate: Moderate (32k-64k)"
+      }
+    },
+    {
+      "criterion": "Structured output support",
+      "notes": {
+        "Managed API provider": "Assumption to validate: Native JSON schema/tool calling for the final brief",
+        "Self-hosted open-weight": "Assumption to validate: Workable via constrained decoding",
+        "Regional/sovereign provider": "Assumption to validate: Basic JSON mode"
+      }
+    },
+    {
+      "criterion": "Privacy/residency fit",
+      "notes": {
+        "Managed API provider": "Assumption to validate: Depends on vendor DPA; internal, not customer, data",
+        "Self-hosted open-weight": "Assumption to validate: Full control, data never leaves our VPC",
+        "Regional/sovereign provider": "Assumption to validate: In-region by default"
+      }
+    },
+    {
+      "criterion": "Rate limits/availability",
+      "notes": {
+        "Managed API provider": "Assumption to validate: High (vendor SLA)",
+        "Self-hosted open-weight": "Assumption to validate: Limited by our own capacity",
+        "Regional/sovereign provider": "Assumption to validate: Moderate, smaller provider"
+      }
+    },
+    {
+      "criterion": "Portability/lock-in risk",
+      "notes": {
+        "Managed API provider": "Assumption to validate: Higher lock-in (proprietary tool-calling format)",
+        "Self-hosted open-weight": "Assumption to validate: Low lock-in (open weights)",
+        "Regional/sovereign provider": "Assumption to validate: Moderate (regional proprietary API)"
+      }
+    },
+    {
+      "criterion": "Explainability/fairness auditability",
+      "notes": {
+        "Managed API provider": "Assumption to validate: Limited (black box); low stakes, internal use only",
+        "Self-hosted open-weight": "Open weights do not guarantee training-data access or bias auditability; verify evidence and license.",
+        "Regional/sovereign provider": "Assumption to validate: Moderate; depends on vendor certifications and documentation"
+      }
+    }
+  ],
+  "selected_option": "Agent + tool protocol"
+}
