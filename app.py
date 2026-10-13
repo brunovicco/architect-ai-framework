@@ -449,9 +449,11 @@ with compare:
         cols = st.columns(3)
         for idx, col in enumerate(cols):
             with col:
+                score_key = f"{idx}-{criterion}"
+                st.session_state.setdefault(score_key, 3)
                 all_option_scores[idx][criterion] = st.slider(
-                    f"{option_names[idx]} · {criterion}", 1, 5, 3,
-                    key=f"{idx}-{criterion}", label_visibility="collapsed"
+                    f"{option_names[idx]} · {criterion}", 1, 5,
+                    key=score_key, label_visibility="collapsed"
                 )
     option_scores = [OptionScore(name=n, scores=s)
                      for n, s in zip(option_names, all_option_scores)]
