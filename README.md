@@ -6,17 +6,21 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)](pyproject.toml)
 
-ARCHITECT is a **provider-agnostic** decision framework and web app for designing AI/LLM systems, from business problem to production operating plan. It turns professional AI-architecture practice - responsibility boundaries, workflow vs. agent, trust & controls, evaluation - into a repeatable, guided tool: answer a structured set of questions about your use case and get a complete, exportable Architecture Decision Plan back.
+ARCHITECT is a **vendor-neutral AI architecture decision framework** for engineers, architects and technical leads. Start with the business problem and hard constraints, assess whether deterministic software is sufficient, then consider an augmented LLM, workflow, agent or multi-agent system.
 
-It can be used with **any model family, hosting model or provider**. The core decision engine has no dependency on any specific model provider, cloud platform or runtime.
+The result is an **Architecture Decision Plan**: a proposed architecture, rationale, controls, evaluation guidance, operational considerations and explicit trade-offs, exportable as Markdown, DOCX, PDF, JSON or ADR.
 
-The project turns architecture reasoning into a repeatable, 9-step workflow, spelled out as the word **ARCHITECT**:
+**[Try the public demo](https://architect-ai-framework.streamlit.app)** · [Read the method](docs/FRAMEWORK.md) · [Challenge a recommendation](https://github.com/brunovicco/architect-ai-framework/issues/new?template=recommendation-feedback.yml)
 
-**A**im → **R**equirements → **C**omposition → **H**arness → **I**ntegration & Information → **T**rust & Controls → **E**valuation → **C**omparison → **T**elemetry.
+The core applies inspectable Python rules to structured inputs; it does not ask an LLM to select the architecture. The same inputs and rule version produce the same recommendation. Streamlit is the interactive implementation. An optional AI critique is separate from the decision engine.
 
-## Live demo
+## Try it in two minutes
 
-**[architect-ai-framework.streamlit.app](https://architect-ai-framework.streamlit.app)** - hosted on Streamlit Community Cloud, no install needed.
+1. Open the demo and click **Load example: Investment Assistant** in the sidebar. A sleeping deployment may need time to wake up.
+2. Inspect execution signals in tab 2, then open **7 · Plan**. Dynamic tool choice explains the Agent recommendation; transaction approval remains an execution boundary.
+3. Compare alternatives and export the plan. Use fictional or sanitized inputs on the public demo.
+
+**Scope:** the deterministic-software branch records your explicit assessment that rules/APIs suffice; it does not infer this from prose. Free-text constraints, option eligibility and provider claims require human validation. Generated controls are design guidance, not deployed enforcement or a compliance certification.
 
 ## Screenshots
 
@@ -33,10 +37,10 @@ The project turns architecture reasoning into a repeatable, 9-step workflow, spe
 
 The UI ships with a one-click example case ("Investment Assistant") so you can see a populated plan immediately.
 
-## What the app does
+## What the framework produces
 
 - Guides discovery of business outcomes, SLAs and hard constraints.
-- Recommends a starting architecture: Augmented LLM, Workflow, Agent or Multi-agent - plus a named reference architecture (RAG pipeline, routing, coding agent, orchestrator-workers, ...) and a vendor-neutral entry-point category (hosted chat/web UI, agentic coding assistant, direct API/SDK, protocol server for multi-client reuse).
+- Recommends a starting architecture: Deterministic software, Augmented LLM, Workflow, Agent or Multi-agent - plus a named reference architecture (RAG pipeline, routing, coding agent, orchestrator-workers, ...) and a vendor-neutral entry-point category (hosted chat/web UI, agentic coding assistant, direct API/SDK, protocol server for multi-client reuse).
 - Separates responsibilities between probabilistic models, deterministic software and humans, justified through reversibility/stakes/accountability and named against the four model properties (next-token prediction, knowledge, working memory, steerability).
 - Helps decide between RAG, APIs/tools, protocol-based tool discovery and agent-to-agent integration.
 - Generates security/governance recommendations such as least privilege, execution-layer authorization, HITL and fail-closed behavior, input/output screening, fairness-injection-point auditing, and a stakes-driven review placement (pre-action approval/sampled review/post-action audit).
@@ -59,7 +63,7 @@ flowchart TD
     D --> E[Any compatible LLM or model provider]
 ```
 
-The deterministic core does **not** call an LLM. A future AI reviewer can be connected through a provider adapter (see `src/architect/providers.py`) without changing the decision engine.
+The deterministic core does **not** call an LLM. The optional AI reviewer is connected through a provider adapter (see `src/architect/providers.py`) without changing the decision engine.
 
 The framework therefore works equally well with:
 
@@ -121,7 +125,7 @@ A few things worth knowing:
 
 - The endpoint must be reachable over **public HTTPS** - `localhost` and private/internal addresses are rejected outright by the built-in SSRF guard, so a purely local Ollama/vLLM instance needs to sit behind a public hostname (a tunnel or reverse proxy) to be usable here.
 - It's entirely optional: the deterministic plan - architecture, controls, evaluation, operations - is already complete without it. The AI review only adds a second opinion on top.
-- In "my own key" mode, the API key stays in memory for that one request only; it's never logged or persisted, and nothing is sent anywhere until all three fields are filled in and the button is clicked. In shared-key mode, the credential lives only in the deployment's secret store (never in the repo, never in the browser). See [Security](#security) for the full guarantee.
+- In "my own key" mode, the API key stays in memory for the browser session; it's never logged or persisted, and nothing is sent anywhere until all three fields are filled in and the button is clicked. In shared-key mode, the credential lives only in the deployment's secret store (never in the repo, never in the browser). See [Security](#security) for the full guarantee.
 
 ## Run tests/lint/type-check
 
@@ -151,7 +155,7 @@ only network-calling, credential-handling code path is the optional AI
 review (`OpenAICompatibleAdapter`), which validates its target URL against
 an SSRF guard (rejects non-`https`, localhost, private/loopback/link-local
 addresses, including the cloud metadata IP) before ever connecting. In "my
-own key" mode, the key stays in-memory for one request and is never logged
+own key" mode, the key stays in server session memory and is never logged
 or persisted; in shared-demo-key mode, the credential lives only in the
 deployment's secret store and calls are bounded by daily/session request
 caps and a response-size cap, to contain the blast radius of a credential
@@ -182,8 +186,6 @@ architect-ai-framework/
 │   └── screenshots/     # README screenshots, pt-br/ and en/
 ├── examples/
 │   └── investment_assistant.json
-├── assets/
-│   └── Framework_ARQUITETO_AI.xlsx
 ├── .github/
 │   ├── workflows/ci.yml
 │   └── dependabot.yml

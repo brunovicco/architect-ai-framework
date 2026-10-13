@@ -23,7 +23,7 @@
     "differential_outcomes_risk": true,
     "estimated_monthly_cost": 650.0,
     "monthly_cost_ceiling": 800.0,
-    "roi_notes": "Eficiência: reduz o tempo médio de atendimento a perguntas de portfólio de ~6 minutos (humano) para menos de 30 segundos. Produtividade: libera assessores para casos complexos/de alto valor. Custo da solução: estimado em US$ 650/mês no volume atual, dentro do teto de US$ 800."
+    "roi_notes": "Hipóteses didáticas, não medições: Eficiência: reduz o tempo médio de atendimento a perguntas de portfólio de ~6 minutos (humano) para menos de 30 segundos. Produtividade: libera assessores para casos complexos/de alto valor. Custo da solução: estimado em US$ 650/mês no volume atual, dentro do teto de US$ 800."
   },
   "option_scores": [
     {
@@ -77,74 +77,75 @@
     {
       "criterion": "Aderência de qualidade à tarefa",
       "notes": {
-        "Provedor de API gerenciado": "Forte em raciocínio complexo e uso de ferramentas",
-        "Open-weight self-hosted": "Suficiente para consultas rotineiras, mais fraco em casos de borda",
-        "Provedor regional/soberano": "Adequado; família de modelos menor"
+        "Provedor de API gerenciado": "Hipótese a validar: Forte em raciocínio complexo e uso de ferramentas",
+        "Open-weight self-hosted": "Hipótese a validar: Suficiente para consultas rotineiras, mais fraco em casos de borda",
+        "Provedor regional/soberano": "Hipótese a validar: Adequado; família de modelos menor"
       }
     },
     {
       "criterion": "Classe de latência",
       "notes": {
-        "Provedor de API gerenciado": "Baixa (hospedado, otimizado)",
-        "Open-weight self-hosted": "Média (depende da nossa capacidade de GPU)",
-        "Provedor regional/soberano": "Média-alta"
+        "Provedor de API gerenciado": "Hipótese a validar: Baixa (hospedado, otimizado)",
+        "Open-weight self-hosted": "Hipótese a validar: Média (depende da nossa capacidade de GPU)",
+        "Provedor regional/soberano": "Hipótese a validar: Média-alta"
       }
     },
     {
       "criterion": "Classe de custo",
       "notes": {
-        "Provedor de API gerenciado": "Pago por token, maior em escala",
-        "Open-weight self-hosted": "Custo inicial de infraestrutura, custo marginal menor em volume",
-        "Provedor regional/soberano": "Preço premium pelas garantias de compliance"
+        "Provedor de API gerenciado": "Hipótese a validar: Pago por token, maior em escala",
+        "Open-weight self-hosted": "Hipótese a validar: Custo inicial de infraestrutura, custo marginal menor em volume",
+        "Provedor regional/soberano": "Hipótese a validar: Preço premium pelas garantias de compliance"
       }
     },
     {
       "criterion": "Janela de contexto",
       "notes": {
-        "Provedor de API gerenciado": "Grande (128k+ tokens)",
-        "Open-weight self-hosted": "Moderada (32k típico)",
-        "Provedor regional/soberano": "Moderada (32k-64k)"
+        "Provedor de API gerenciado": "Hipótese a validar: Grande (128k+ tokens)",
+        "Open-weight self-hosted": "Hipótese a validar: Moderada (32k típico)",
+        "Provedor regional/soberano": "Hipótese a validar: Moderada (32k-64k)"
       }
     },
     {
       "criterion": "Suporte a saída estruturada",
       "notes": {
-        "Provedor de API gerenciado": "JSON schema/tool calling nativos",
-        "Open-weight self-hosted": "Viável via decodificação restrita (constrained decoding)",
-        "Provedor regional/soberano": "Modo JSON básico"
+        "Provedor de API gerenciado": "Hipótese a validar: JSON schema/tool calling nativos",
+        "Open-weight self-hosted": "Hipótese a validar: Viável via decodificação restrita (constrained decoding)",
+        "Provedor regional/soberano": "Hipótese a validar: Modo JSON básico"
       }
     },
     {
       "criterion": "Aderência de privacidade/residência",
       "notes": {
-        "Provedor de API gerenciado": "Depende do DPA do fornecedor; dados saem da nossa infraestrutura",
-        "Open-weight self-hosted": "Controle total, dados nunca saem da nossa VPC",
-        "Provedor regional/soberano": "Em região por padrão, atende nossa restrição de residência"
+        "Provedor de API gerenciado": "Hipótese a validar: Depende do DPA do fornecedor; dados saem da nossa infraestrutura",
+        "Open-weight self-hosted": "Hipótese a validar: Controle total, dados nunca saem da nossa VPC",
+        "Provedor regional/soberano": "Hipótese a validar: Em região por padrão, atende nossa restrição de residência"
       }
     },
     {
       "criterion": "Limites de taxa/disponibilidade",
       "notes": {
-        "Provedor de API gerenciado": "Alta (SLA do fornecedor)",
-        "Open-weight self-hosted": "Limitada pela nossa própria capacidade",
-        "Provedor regional/soberano": "Moderada, fornecedor menor"
+        "Provedor de API gerenciado": "Hipótese a validar: Alta (SLA do fornecedor)",
+        "Open-weight self-hosted": "Hipótese a validar: Limitada pela nossa própria capacidade",
+        "Provedor regional/soberano": "Hipótese a validar: Moderada, fornecedor menor"
       }
     },
     {
       "criterion": "Portabilidade/risco de lock-in",
       "notes": {
-        "Provedor de API gerenciado": "Lock-in maior (API proprietária)",
-        "Open-weight self-hosted": "Lock-in baixo (pesos abertos)",
-        "Provedor regional/soberano": "Moderado (API proprietária regional)"
+        "Provedor de API gerenciado": "Hipótese a validar: Lock-in maior (API proprietária)",
+        "Open-weight self-hosted": "Hipótese a validar: Lock-in baixo (pesos abertos)",
+        "Provedor regional/soberano": "Hipótese a validar: Moderado (API proprietária regional)"
       }
     },
     {
       "criterion": "Explicabilidade/auditabilidade de viés",
       "notes": {
-        "Provedor de API gerenciado": "Limitada (caixa-preta); poucos fornecedores expõem atribuição ou pesos para auditoria",
-        "Open-weight self-hosted": "Alta - pesos e dados de treino auditáveis internamente, mas exige expertise própria",
-        "Provedor regional/soberano": "Moderada; depende de certificações e documentação do fornecedor"
+        "Provedor de API gerenciado": "Hipótese a validar: Limitada (caixa-preta); poucos fornecedores expõem atribuição ou pesos para auditoria",
+        "Open-weight self-hosted": "Pesos abertos não garantem acesso aos dados de treinamento nem auditabilidade de viés; verificar evidências e licença.",
+        "Provedor regional/soberano": "Hipótese a validar: Moderada; depende de certificações e documentação do fornecedor"
       }
     }
-  ]
+  ],
+  "selected_option": "Agente + ferramentas de API"
 }

@@ -23,7 +23,7 @@
     "differential_outcomes_risk": true,
     "estimated_monthly_cost": 650.0,
     "monthly_cost_ceiling": 800.0,
-    "roi_notes": "Efficiency: cuts average portfolio-question handling time from ~6 minutes (human) to under 30 seconds. Productivity: frees advisors to focus on complex/high-value cases. Solution cost: estimated at $650/month at current volume, within the $800 budget ceiling."
+    "roi_notes": "Illustrative assumptions, not measurements: Efficiency: cuts average portfolio-question handling time from ~6 minutes (human) to under 30 seconds. Productivity: frees advisors to focus on complex/high-value cases. Solution cost: estimated at $650/month at current volume, within the $800 budget ceiling."
   },
   "option_scores": [
     {
@@ -77,74 +77,75 @@
     {
       "criterion": "Task quality fit",
       "notes": {
-        "Managed API provider": "Strong on complex reasoning and tool use",
-        "Self-hosted open-weight": "Good enough for routine queries, weaker on edge cases",
-        "Regional/sovereign provider": "Adequate; smaller model family"
+        "Managed API provider": "Assumption to validate: Strong on complex reasoning and tool use",
+        "Self-hosted open-weight": "Assumption to validate: Good enough for routine queries, weaker on edge cases",
+        "Regional/sovereign provider": "Assumption to validate: Adequate; smaller model family"
       }
     },
     {
       "criterion": "Latency class",
       "notes": {
-        "Managed API provider": "Low (hosted, optimized)",
-        "Self-hosted open-weight": "Medium (depends on our GPU capacity)",
-        "Regional/sovereign provider": "Medium-high"
+        "Managed API provider": "Assumption to validate: Low (hosted, optimized)",
+        "Self-hosted open-weight": "Assumption to validate: Medium (depends on our GPU capacity)",
+        "Regional/sovereign provider": "Assumption to validate: Medium-high"
       }
     },
     {
       "criterion": "Cost class",
       "notes": {
-        "Managed API provider": "Pay-per-token, higher at scale",
-        "Self-hosted open-weight": "Upfront infra cost, lower marginal cost at volume",
-        "Regional/sovereign provider": "Premium pricing for compliance guarantees"
+        "Managed API provider": "Assumption to validate: Pay-per-token, higher at scale",
+        "Self-hosted open-weight": "Assumption to validate: Upfront infra cost, lower marginal cost at volume",
+        "Regional/sovereign provider": "Assumption to validate: Premium pricing for compliance guarantees"
       }
     },
     {
       "criterion": "Context window",
       "notes": {
-        "Managed API provider": "Large (128k+ tokens)",
-        "Self-hosted open-weight": "Moderate (32k typical)",
-        "Regional/sovereign provider": "Moderate (32k-64k)"
+        "Managed API provider": "Assumption to validate: Large (128k+ tokens)",
+        "Self-hosted open-weight": "Assumption to validate: Moderate (32k typical)",
+        "Regional/sovereign provider": "Assumption to validate: Moderate (32k-64k)"
       }
     },
     {
       "criterion": "Structured output support",
       "notes": {
-        "Managed API provider": "Native JSON schema/tool calling",
-        "Self-hosted open-weight": "Workable via constrained decoding",
-        "Regional/sovereign provider": "Basic JSON mode"
+        "Managed API provider": "Assumption to validate: Native JSON schema/tool calling",
+        "Self-hosted open-weight": "Assumption to validate: Workable via constrained decoding",
+        "Regional/sovereign provider": "Assumption to validate: Basic JSON mode"
       }
     },
     {
       "criterion": "Privacy/residency fit",
       "notes": {
-        "Managed API provider": "Depends on vendor DPA; data leaves our infra",
-        "Self-hosted open-weight": "Full control, data never leaves our VPC",
-        "Regional/sovereign provider": "In-region by default, meets our residency constraint"
+        "Managed API provider": "Assumption to validate: Depends on vendor DPA; data leaves our infra",
+        "Self-hosted open-weight": "Assumption to validate: Full control, data never leaves our VPC",
+        "Regional/sovereign provider": "Assumption to validate: In-region by default, meets our residency constraint"
       }
     },
     {
       "criterion": "Rate limits/availability",
       "notes": {
-        "Managed API provider": "High (vendor SLA)",
-        "Self-hosted open-weight": "Limited by our own capacity",
-        "Regional/sovereign provider": "Moderate, smaller provider"
+        "Managed API provider": "Assumption to validate: High (vendor SLA)",
+        "Self-hosted open-weight": "Assumption to validate: Limited by our own capacity",
+        "Regional/sovereign provider": "Assumption to validate: Moderate, smaller provider"
       }
     },
     {
       "criterion": "Portability/lock-in risk",
       "notes": {
-        "Managed API provider": "Higher lock-in (proprietary API)",
-        "Self-hosted open-weight": "Low lock-in (open weights)",
-        "Regional/sovereign provider": "Moderate (regional proprietary API)"
+        "Managed API provider": "Assumption to validate: Higher lock-in (proprietary API)",
+        "Self-hosted open-weight": "Assumption to validate: Low lock-in (open weights)",
+        "Regional/sovereign provider": "Assumption to validate: Moderate (regional proprietary API)"
       }
     },
     {
       "criterion": "Explainability/fairness auditability",
       "notes": {
-        "Managed API provider": "Limited (black box); few vendors expose attribution or weights for audit",
-        "Self-hosted open-weight": "High - weights and training data auditable in-house, but requires your own expertise",
-        "Regional/sovereign provider": "Moderate; depends on vendor certifications and documentation"
+        "Managed API provider": "Assumption to validate: Limited (black box); few vendors expose attribution or weights for audit",
+        "Self-hosted open-weight": "Open weights do not guarantee training-data access or bias auditability; verify evidence and license.",
+        "Regional/sovereign provider": "Assumption to validate: Moderate; depends on vendor certifications and documentation"
       }
     }
-  ]
+  ],
+  "selected_option": "Agent + API tools"
 }

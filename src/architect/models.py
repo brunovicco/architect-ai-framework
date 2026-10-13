@@ -13,7 +13,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-ArchitecturePattern = Literal["Augmented LLM",
+ArchitecturePattern = Literal["Deterministic software", "Augmented LLM",
                               "Workflow", "Agent", "Multi-agent"]
 IntegrationPattern = Literal["API/Tool",
                              "Tool Protocol/MCP", "Agent-to-Agent", "None"]
@@ -26,6 +26,7 @@ EntryPoint = Literal[
 ]
 
 ReferenceArchitecture = Literal[
+    "Deterministic service",
     "Single augmented call",
     "RAG pipeline",
     "Document processing pipeline",
@@ -68,6 +69,9 @@ class ArchitectureCase(BaseModel):
         latency_target: The latency/throughput requirement.
         cost_constraint: The cost requirement, in free text.
         regulatory_constraints: Any regulatory/compliance requirement.
+        deterministic_sufficient: Explicit human assessment that rules/APIs
+            satisfy the requirements without a language model. Defaults to
+            False for compatibility with existing cases.
         path_known: Whether the execution path is known in advance.
         dynamic_next_steps: Whether the system must decide its own next
             step during execution.
@@ -129,6 +133,7 @@ class ArchitectureCase(BaseModel):
     cost_constraint: str = ""
     regulatory_constraints: str = ""
 
+    deterministic_sufficient: bool = False
     path_known: bool = True
     dynamic_next_steps: bool = False
     dynamic_tool_choice: bool = False
@@ -173,7 +178,7 @@ class Recommendation(BaseModel):
 
     Attributes:
         architecture_pattern: The recommended abstract pattern (Augmented
-            LLM, Workflow, Agent or Multi-agent).
+            LLM, Workflow, Agent, Multi-agent or Deterministic software).
         integration_pattern: The recommended integration approach.
         entry_point: The recommended delivery surface, as a vendor-neutral
             category.

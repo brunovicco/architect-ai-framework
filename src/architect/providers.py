@@ -15,8 +15,19 @@ import ipaddress
 import json
 import socket
 from typing import Protocol
+from urllib.error import HTTPError
 from urllib.parse import urlsplit
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, Request, build_opener
+
+
+class _RejectRedirects(HTTPRedirectHandler):
+    """Do not forward a plan or credential to an unvalidated redirect target."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        raise HTTPError(req.full_url, code, "Redirects are disabled", headers, fp)
+
+
+urlopen = build_opener(_RejectRedirects()).open
 
 
 class ModelAdapter(Protocol):

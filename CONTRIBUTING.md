@@ -16,9 +16,10 @@ pip install -e '.[dev]'
 pytest
 ruff check .
 mypy src
+pip-audit
 ```
 
-All three run in CI (`.github/workflows/ci.yml`) on Python 3.11 and 3.12; a PR won't merge cleanly until they pass.
+All four run in CI (`.github/workflows/ci.yml`) on Python 3.11 and 3.12; a PR won't merge cleanly until they pass.
 
 ## Scope
 
@@ -36,3 +37,7 @@ All three run in CI (`.github/workflows/ci.yml`) on Python 3.11 and 3.12; a PR w
 ## License
 
 By contributing, you agree that your contributions will be licensed under the project's [MIT License](LICENSE).
+
+## Disagree with a recommendation
+
+Use the recommendation-feedback issue form with a sanitized case, the actual and expected patterns, and the missing criterion. Include the version/commit. A useful contribution is a minimal counterexample plus a regression test; changing a heuristic should document which existing cases change and why. Do not attach customer data, credentials or private plans.

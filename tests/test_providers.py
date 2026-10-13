@@ -59,3 +59,19 @@ def test_generate_wraps_timeout_in_adapter_error(monkeypatch):
     adapter = OpenAICompatibleAdapter(base_url="https://example.com", api_key="x", model="x")
     with pytest.raises(AdapterError, match="model endpoint request failed"):
         adapter.generate(system="s", user="u")
+
+
+def test_redirect_cannot_forward_credentials_to_private_target():
+    from email.message import Message
+    from io import BytesIO
+    from urllib.error import HTTPError
+    from urllib.request import Request
+
+    from architect.providers import _RejectRedirects
+
+    request = Request('https://example.com/chat/completions', data=b'plan',
+                      headers={'Authorization': 'Bearer synthetic-test-key'})
+    headers = Message()
+    headers['Location'] = 'http://127.0.0.1/private'
+    with pytest.raises(HTTPError):
+        _RejectRedirects().http_error_302(request, BytesIO(), 302, 'Found', headers)

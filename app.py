@@ -11,6 +11,7 @@ Run with `streamlit run app.py`.
 """
 
 import datetime
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -37,6 +38,7 @@ from architect.i18n import (
 )
 from architect.models import ArchitectureCase, DecisionPlan, ModelComparisonRow, OptionScore
 from architect.providers import AdapterError, OpenAICompatibleAdapter
+from architect.review_quota import ReviewQuota
 from architect.scoring import DEFAULT_WEIGHTS, normalized_score
 
 EXAMPLE_PATHS = {
@@ -57,41 +59,19 @@ AI_REVIEW_SHARED_MAX_TOKENS = 5000
 
 
 @st.cache_resource
-def _ai_review_shared_quota_state() -> dict:
-    """Process-wide (best-effort) counter for the shared AI review credential.
-
-    `st.cache_resource` hands back the same dict to every visitor's session in
-    this process, so it's the global backstop against a runaway bill - it
-    resets whenever the app restarts/redeploys, and isn't safe if this app is
-    ever horizontally scaled to multiple instances. The per-session cap
-    (`AI_REVIEW_SHARED_PER_SESSION_CAP`, tracked in `st.session_state`) is the
-    other half of the check and doesn't share this limitation.
-    """
-    return {"date": None, "count": 0}
+def _ai_review_shared_quota_state() -> ReviewQuota:
+    """One atomic request-attempt budget per server process."""
+    return ReviewQuota(AI_REVIEW_SHARED_DAILY_CAP)
 
 
 def _ai_review_shared_quota_exceeded(lang: str) -> str | None:
-    """Return a translated warning if the shared-credential quota is used up,
-    else None. Read-only - call `_ai_review_consume_shared_quota()` only after
-    a successful response, so a failed call never burns a visitor's quota.
-    """
-    state = _ai_review_shared_quota_state()
-    today = datetime.date.today().isoformat()
-    if state["date"] != today:
-        state["date"] = today
-        state["count"] = 0
-    if state["count"] >= AI_REVIEW_SHARED_DAILY_CAP:
-        return t(lang, "ai_review_shared_daily_limit")
+    """Reserve budget before a request; errors also consume the reservation."""
     if st.session_state.get("ai_review_shared_uses", 0) >= AI_REVIEW_SHARED_PER_SESSION_CAP:
         return t(lang, "ai_review_shared_session_limit")
-    return None
-
-
-def _ai_review_consume_shared_quota() -> None:
-    """Record one successful shared-credential AI review against both caps."""
-    state = _ai_review_shared_quota_state()
-    state["count"] += 1
+    if not _ai_review_shared_quota_state().reserve(datetime.datetime.now(datetime.UTC).date()):
+        return t(lang, "ai_review_shared_daily_limit")
     st.session_state["ai_review_shared_uses"] = st.session_state.get("ai_review_shared_uses", 0) + 1
+    return None
 
 
 def _load_example() -> None:
@@ -118,6 +98,7 @@ def _clear_form() -> None:
     st.session_state["option_a_name"] = t(DEFAULT_LANG, "option_a_default")
     st.session_state["option_b_name"] = t(DEFAULT_LANG, "option_b_default")
     st.session_state["option_c_name"] = t(DEFAULT_LANG, "option_c_default")
+    st.session_state.pop("selected_option", None)
     st.session_state["tradeoff_notes"] = ""
     for idx in range(3):
         for criterion in DEFAULT_WEIGHTS:
@@ -158,6 +139,7 @@ def _apply_plan_dict(data: dict) -> None:
             st.session_state[f"{idx}-{criterion}"] = entry.get(
                 "scores", {}).get(criterion, 3)
 
+    st.session_state["selected_option"] = data.get("selected_option", "")
     st.session_state["tradeoff_notes"] = data.get("tradeoff_notes", "")
 
     comparison = data.get("model_comparison") or []
@@ -287,19 +269,23 @@ if pending_case_name is not None:
 
 uploaded_plan = st.sidebar.file_uploader(t(lang, "import_json_label"), type=[
                                          "json"], key="import_json_uploader")
-if uploaded_plan is not None and st.session_state.get("_last_import_name") != uploaded_plan.name:
+import_digest = hashlib.sha256(uploaded_plan.getvalue()).hexdigest() if uploaded_plan is not None else None
+if uploaded_plan is None:
+    st.session_state.pop("_last_import_digest", None)
+if uploaded_plan is not None and st.session_state.get("_last_import_digest") != import_digest:
     try:
         validated = DecisionPlan.model_validate_json(uploaded_plan.getvalue())
     except Exception as exc:  # noqa: BLE001 - surfaced to the user, not swallowed
         st.sidebar.error(t(lang, "import_json_error").format(error=exc))
     else:
         _apply_plan_dict(validated.model_dump())
-        st.session_state["_last_import_name"] = uploaded_plan.name
+        st.session_state["_last_import_digest"] = import_digest
         st.sidebar.success(t(lang, "import_json_success"))
         st.rerun()
 
 st.title(t(lang, "app_title"))
 st.caption(t(lang, "app_caption"))
+st.info(t(lang, "onboarding_hint"))
 
 with st.sidebar:
     st.header(t(lang, "sidebar_header"))
@@ -343,6 +329,7 @@ with basic:
 with execution:
     st.subheader(t(lang, "t2_subheader"))
     st.write(t(lang, "t2_intro"))
+    deterministic_sufficient = field_checkbox("deterministic_sufficient", "deterministic_sufficient_label")
     c1, c2 = st.columns(2)
     with c1:
         path_known = field_checkbox(
@@ -414,6 +401,7 @@ case = ArchitectureCase(
     latency_target=latency_target,
     cost_constraint=cost_constraint,
     regulatory_constraints=regulatory_constraints,
+    deterministic_sufficient=deterministic_sufficient,
     path_known=path_known,
     dynamic_next_steps=dynamic_next_steps,
     dynamic_tool_choice=dynamic_tool_choice,
@@ -474,8 +462,10 @@ with compare:
     st.caption(e(lang, "option_matrix_methodology_note"))
     st.caption(f"{e(lang, 'recommended_pattern_note')}: {translate_pattern(lang, rec.architecture_pattern)}")
     st.markdown(f"**{t(lang, 'selected_option_label')}**")
+    if st.session_state.get("selected_option") not in option_names:
+        st.session_state["selected_option"] = best_name
     selected_option = st.selectbox(
-        "selected_option", option_names, index=option_names.index(best_name), label_visibility="collapsed"
+        "selected_option", option_names, key="selected_option", label_visibility="collapsed"
     )
     tradeoff_notes = field_text("tradeoff_notes", "tradeoff_notes_label",
                                 area=True, placeholder_key="tradeoff_notes_placeholder")
@@ -584,6 +574,10 @@ with final:
         st.write(f"- {item}")
 
     md = to_markdown(plan, lang)
+    review_plan_digest = hashlib.sha256(md.encode("utf-8")).hexdigest()
+    if st.session_state.get("ai_review_plan_digest") != review_plan_digest:
+        st.session_state.pop("ai_review_result", None)
+    st.session_state["ai_review_plan_digest"] = review_plan_digest
     docx = to_docx_bytes(plan, lang)
     pdf = to_pdf_bytes(plan, lang)
     adr = to_adr_markdown(plan, lang)
@@ -705,7 +699,6 @@ with final:
                         st.session_state.pop("ai_review_result", None)
                         st.error(t(lang, "ai_review_error").format(error=exc))
                     else:
-                        _ai_review_consume_shared_quota()
                         st.session_state["ai_review_result"] = review
             elif not (ai_base_url and ai_api_key and ai_model):
                 st.warning(t(lang, "ai_review_intro"))

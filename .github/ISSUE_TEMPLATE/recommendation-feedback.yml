@@ -1,0 +1,48 @@
+name: Recommendation feedback
+description: ARCHITECT recommended X, but I expected Y
+title: "[Recommendation] "
+body:
+  - type: markdown
+    attributes:
+      value: "Use fictional or sanitized examples. Never include credentials, customer data or confidential plans. English and Portuguese welcome."
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context and responsibility boundaries
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Hard constraints and execution signals
+      description: Include reversibility, impact, approval policy and dynamic tool/step selection.
+    validations:
+      required: true
+  - type: input
+    id: actual
+    attributes:
+      label: Actual recommendation
+    validations:
+      required: true
+  - type: input
+    id: expected
+    attributes:
+      label: Expected recommendation
+    validations:
+      required: true
+  - type: textarea
+    id: reasoning
+    attributes:
+      label: Reasoning and evidence
+    validations:
+      required: true
+  - type: textarea
+    id: criterion
+    attributes:
+      label: Missing criterion or minimal sanitized reproducer

@@ -2,8 +2,8 @@
 
 This module has no opinion on which option should win - it only normalizes
 a set of per-criterion scores (1-5) into a single 0-1 figure using a weight
-map. Hard constraints are expected to override a high aggregate score; that
-override is enforced by the caller (`app.py`/`engine.py`), not here.
+map. Hard constraints are expected to override a high aggregate score; users must manually exclude ineligible options. Neither this function nor
+the UI infers eligibility from free-text constraints.
 """
 
 DEFAULT_WEIGHTS = {

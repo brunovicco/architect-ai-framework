@@ -252,3 +252,41 @@ def test_feasibility_with_constraints_when_warnings_present():
                          independent_autonomous_domains=True)
     )
     assert result.feasibility_verdict == "Feasible with constraints"
+
+
+def test_explicit_human_approval_overrides_confidence_and_low_risk():
+    for high_impact in (False, True):
+        result = recommend(ArchitectureCase(human_approval_required=True,
+            high_impact_actions=high_impact, has_calibrated_confidence_score=True))
+        assert result.review_placement == "Pre-action approval"
+
+
+def test_deterministic_baseline_preserves_controls_and_cost_gate():
+    result = recommend(ArchitectureCase(deterministic_sufficient=True,
+        existing_api=True, human_approval_required=True, high_impact_actions=True,
+        estimated_monthly_cost=200, monthly_cost_ceiling=100))
+    assert result.architecture_pattern == "Deterministic software"
+    assert result.integration_pattern == "API/Tool"
+    assert result.review_placement == "Pre-action approval"
+    assert result.feasibility_verdict == "Not feasible as scoped"
+    assert any("fail-closed" in item for item in result.controls)
+    assert not any("RAG" in item for item in result.information_strategy)
+
+
+def test_deterministic_baseline_surfaces_conflicting_autonomy():
+    result = recommend(ArchitectureCase(deterministic_sufficient=True, dynamic_tool_choice=True))
+    assert result.architecture_pattern == "Deterministic software"
+    assert any("conflicts" in item for item in result.warnings)
+
+
+def test_deterministic_baseline_is_translated_in_exports():
+    from architect.exporters import to_adr_markdown, to_markdown
+    from architect.i18n import ENGINE_PT
+    from architect.models import DecisionPlan
+    case = ArchitectureCase(deterministic_sufficient=True, dynamic_next_steps=True)
+    result = recommend(case)
+    for field in ("rationale", "warnings", "controls", "evaluations", "operations", "information_strategy", "model_strategy"):
+        assert all(item in ENGINE_PT for item in getattr(result, field))
+    plan = DecisionPlan(case=case, recommendation=result)
+    assert "Software determinístico" in to_markdown(plan, "pt-BR")
+    assert "Software determinístico" in to_adr_markdown(plan, "pt-BR")

@@ -7,7 +7,7 @@ ARCHITECT is a repeatable, vendor-neutral decision flow for AI/LLM architecture.
 | **A - Aim** | What business outcome must change? | Problem + measurable success |
 | **R - Requirements** | What are the hard constraints and SLAs? | Decision criteria + feasibility verdict |
 | **C - Composition** | Probabilistic model, deterministic software or human? | Responsibility boundaries |
-| **H - Harness** | Augmented LLM, workflow, agent or multi-agent? | Architecture pattern + named reference architecture + entry point |
+| **H - Harness** | Deterministic software, augmented LLM, workflow, agent or multi-agent? | Architecture pattern + named reference architecture + entry point |
 | **I - Integration & Information** | Prompt/context, RAG, API/tool, tool protocol or A2A? | Context + integration map |
 | **T - Trust & Controls** | What happens when model/tool behavior is wrong? | Auth, least privilege, HITL, fail-closed + review placement |
 | **E - Evaluation** | How do we prove the system works? | Dataset, metrics and evaluators |
@@ -15,6 +15,8 @@ ARCHITECT is a repeatable, vendor-neutral decision flow for AI/LLM architecture.
 | **T - Telemetry** | How do we observe and evolve it? | Operational plan + feedback loop |
 
 ## Decision heuristics
+
+- Explicit assessment that rules/APIs suffice → deterministic software; conflicting autonomy signals produce a warning.
 
 - Known path → prefer a workflow.
 - Path discovered during execution → bounded agentic behavior may be justified.
@@ -60,12 +62,12 @@ model is at the task in isolation.
 
 ## Reference architectures
 
-`H — Harness` picks one of four abstract patterns (Augmented LLM /
-Workflow/Agent/Multi-agent). Within that, a reference architecture names
+`H — Harness` first records whether explicit rules and APIs suffice (`deterministic_sufficient`). When selected, it returns Deterministic software and warns about conflicting autonomy signals. This is a human-supplied assessment, not an inference from free text. Otherwise it picks Augmented LLM, Workflow, Agent or Multi-agent. Within that, a reference architecture names
 the concrete, recognizable shape:
 
 | Reference architecture | Typical `architecture_pattern` | Fits when |
 | --- | --- | --- |
+| Deterministic service | Deterministic software | Explicit rules/APIs already meet the stated requirements |
 | Single augmented call | Augmented LLM | One bounded, verifiable task, no document knowledge needed |
 | RAG pipeline | Augmented LLM | The task needs stable document/knowledge-base context |
 | Chaining | Workflow | The task decomposes into stages with clean handoffs |
@@ -113,7 +115,7 @@ leaving feasibility implicit:
 flow, driven by reversibility, cost and whether a calibrated confidence
 signal exists to route on:
 
-- **Pre-action approval** — anything irreversible, or high-impact without a calibrated confidence score to route by.
+- **Pre-action approval** — explicit mandatory human approval, anything irreversible, or high-impact without a calibrated confidence score to route by.
 - **Sampled review** — high-impact, but a calibrated confidence score lets you gate only the low-confidence fraction and sample the rest.
 - **Post-action audit** — sensitive but reversible, lower-cost decisions; the action runs, a person checks afterward.
 - **No review needed** — none of the above risk signals are present.
@@ -188,3 +190,7 @@ worth clearing at all.
 ## Central rule
 
 > Prefer the simplest architecture that satisfies hard requirements and keep critical enforcement outside probabilistic model behavior whenever possible.
+
+## Interpretation limits
+
+Recommendations are proposed designs. The engine does not parse free-text requirements, test the proposed system or certify feasibility. The cost verdict compares supplied estimates, not measured TCO. Weighted scores summarize user judgments; callers must manually eliminate options that violate hard constraints. A low-confidence fraction requires a separately implemented routing policy; the framework does not implement it.

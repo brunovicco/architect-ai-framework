@@ -101,7 +101,7 @@ def _review_placement(case: ArchitectureCase) -> ReviewPlacement:
     Returns:
         The recommended `ReviewPlacement`.
     """
-    if case.irreversible_actions:
+    if case.human_approval_required or case.irreversible_actions:
         return "Pre-action approval"
     if case.high_impact_actions:
         return "Sampled review" if case.has_calibrated_confidence_score else "Pre-action approval"
@@ -156,6 +156,36 @@ def recommend(case: ArchitectureCase) -> Recommendation:
     """
     rationale: list[str] = []
     warnings: list[str] = []
+
+    if case.deterministic_sufficient:
+        rationale.append("The supplied assessment says rules and existing APIs satisfy the requirements; start without a language model.")
+        if case.dynamic_next_steps or case.dynamic_tool_choice or case.independent_autonomous_domains:
+            warnings.append("The deterministic baseline conflicts with autonomy signals; resolve these assumptions before accepting the plan.")
+        baseline_controls = [
+            "Apply least privilege to tools, data and capabilities.",
+            "Propagate real user/service identity to authorization checks at execution time.",
+        ]
+        if case.sensitive_data:
+            baseline_controls.append("Enforce data isolation and access policy outside the model prompt; log access evidence where appropriate.")
+        if case.high_impact_actions or case.irreversible_actions:
+            baseline_controls.append("Use fail-closed behavior when authorization or policy evidence is unavailable.")
+        if _review_placement(case) == "Pre-action approval":
+            baseline_controls.append("Place human approval immediately before the governed side effect, with the final action details visible to the reviewer.")
+        return Recommendation(
+            architecture_pattern="Deterministic software",
+            integration_pattern="API/Tool" if case.existing_api or case.needs_dynamic_data else "None",
+            entry_point="Direct API/SDK integration",
+            reference_architecture="Deterministic service",
+            feasibility_verdict=_feasibility_verdict(case, warnings),
+            review_placement=_review_placement(case),
+            rationale=rationale,
+            warnings=warnings,
+            information_strategy=["Use authoritative data and explicit rules; document the inputs and rule versions needed to reproduce a decision."],
+            model_strategy=["No language model is required for this baseline; revisit only with evidence of an unmet requirement."],
+            controls=baseline_controls,
+            evaluations=["Test business rules, boundary cases, authorization failures and task success against the stated requirements."],
+            operations=["Trace decisions and dependency failures; define safe retries, idempotency and rollback before deployment."],
+        )
 
     architecture: ArchitecturePattern
     if case.independent_autonomous_domains and case.dynamic_next_steps:
