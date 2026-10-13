@@ -77,6 +77,12 @@ class ArchitectureCase(BaseModel):
             step during execution.
         dynamic_tool_choice: Whether the system must choose which tool to
             call at runtime.
+        bounded_known_tool_set: Whether the tools available for
+            dynamic_tool_choice are a small, known set a routing rule could
+            enumerate in advance, rather than an open-ended/discoverable
+            catalog. Only meaningful when dynamic_tool_choice is True.
+            Defaults to False, so existing cases keep recommending Agent
+            unless this is set explicitly.
         independent_autonomous_domains: Whether separate autonomous domains
             with distinct ownership are involved.
         needs_document_knowledge: Whether the task needs stable
@@ -137,6 +143,7 @@ class ArchitectureCase(BaseModel):
     path_known: bool = True
     dynamic_next_steps: bool = False
     dynamic_tool_choice: bool = False
+    bounded_known_tool_set: bool = False
     independent_autonomous_domains: bool = False
 
     needs_document_knowledge: bool = False

@@ -41,3 +41,5 @@ By contributing, you agree that your contributions will be licensed under the pr
 ## Disagree with a recommendation
 
 Use the recommendation-feedback issue form with a sanitized case, the actual and expected patterns, and the missing criterion. Include the version/commit. A useful contribution is a minimal counterexample plus a regression test; changing a heuristic should document which existing cases change and why. Do not attach customer data, credentials or private plans.
+
+Once a disagreement is confirmed as a genuine rule gap (not a missing input), add it as a new `LabeledCase` to `tests/cases.py` with the corrected expectation and a one-line `reason`, rather than only a one-off assert in `test_engine.py`. `tests/test_labeled_cases.py` checks every labeled case on each CI run, so this keeps the suite a living, append-only record of resolved disagreements instead of losing that history in a closed issue.

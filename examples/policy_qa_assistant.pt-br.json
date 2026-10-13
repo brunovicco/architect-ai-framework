@@ -1,0 +1,142 @@
+{
+  "case": {
+    "name": "Assistente de Políticas Internas",
+    "business_problem": "Ajudar colaboradores a encontrar respostas em documentos internos de políticas de RH/TI sem precisar buscar numa wiki.",
+    "desired_outcome": "Respostas rápidas e fundamentadas, citando a seção de política relevante, reduzindo o volume de tickets de RH para perguntas rotineiras.",
+    "users": "Colaboradores internos",
+    "quality_target": "Alta fundamentação; toda resposta precisa citar a seção de política de origem",
+    "latency_target": "p95 < 3s",
+    "cost_constraint": "Baixo - ferramenta interna, volume modesto de consultas",
+    "regulatory_constraints": "Nenhum dado pessoal além da identidade do próprio colaborador que pergunta, usada só para delimitar as políticas visíveis",
+    "path_known": false,
+    "needs_document_knowledge": true,
+    "subjective_quality": false,
+    "structured_output": false,
+    "estimated_monthly_cost": 150.0,
+    "monthly_cost_ceiling": 500.0,
+    "roi_notes": "Hipóteses didáticas, não medições: Eficiência: desvia uma estimativa de 30% das perguntas rotineiras de política de RH/TI da fila humana. Custo da solução: embeddings mais um modelo hospedado pequeno, bem abaixo do teto."
+  },
+  "option_scores": [
+    {
+      "name": "LLM aumentado + RAG",
+      "scores": {
+        "Quality/task success": 4,
+        "Latency": 5,
+        "Cost": 5,
+        "Risk/control": 4,
+        "Auditability/predictability": 4,
+        "Maintainability": 5,
+        "Observability/debugging": 4,
+        "Privacy/residency/compliance": 4,
+        "Portability/lock-in": 4,
+        "Fit with hard constraints": 5
+      }
+    },
+    {
+      "name": "Workflow com roteamento por tópico",
+      "scores": {
+        "Quality/task success": 3,
+        "Latency": 4,
+        "Cost": 4,
+        "Risk/control": 4,
+        "Auditability/predictability": 4,
+        "Maintainability": 3,
+        "Observability/debugging": 3,
+        "Privacy/residency/compliance": 4,
+        "Portability/lock-in": 4,
+        "Fit with hard constraints": 3
+      }
+    },
+    {
+      "name": "Agente com ferramenta de busca de documentos",
+      "scores": {
+        "Quality/task success": 4,
+        "Latency": 2,
+        "Cost": 2,
+        "Risk/control": 3,
+        "Auditability/predictability": 2,
+        "Maintainability": 3,
+        "Observability/debugging": 3,
+        "Privacy/residency/compliance": 4,
+        "Portability/lock-in": 3,
+        "Fit with hard constraints": 2
+      }
+    }
+  ],
+  "tradeoff_notes": "A tarefa é sempre \"encontrar e explicar uma seção de política\" - não há lógica de ramificação nem escolha de ferramenta para orquestrar, então uma única chamada aumentada com recuperação RAG é o padrão mínimo suficiente. Um workflow com roteamento por tópico adiciona orquestração sem ganho de qualidade aqui, e um agente adiciona latência/custo para uma consulta pontual que não precisa de escolha de ferramenta em tempo de execução.",
+  "model_comparison": [
+    {
+      "criterion": "Aderência de qualidade à tarefa",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: Forte em Q&A fundamentado com suporte a citação",
+        "Open-weight self-hosted": "Hipótese a validar: Adequado para documentos internos bem segmentados (chunking)",
+        "Provedor regional/soberano": "Hipótese a validar: Adequado; família de modelos menor"
+      }
+    },
+    {
+      "criterion": "Classe de latência",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: Baixa (hospedado, otimizado)",
+        "Open-weight self-hosted": "Hipótese a validar: Média (depende da nossa capacidade de GPU)",
+        "Provedor regional/soberano": "Hipótese a validar: Média"
+      }
+    },
+    {
+      "criterion": "Classe de custo",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: Pago por token, baixo neste volume",
+        "Open-weight self-hosted": "Hipótese a validar: Custo fixo de infraestrutura, não se justifica neste volume",
+        "Provedor regional/soberano": "Hipótese a validar: Moderado, prêmio de compliance"
+      }
+    },
+    {
+      "criterion": "Janela de contexto",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: Grande (128k+ tokens)",
+        "Open-weight self-hosted": "Hipótese a validar: Moderada (32k típico)",
+        "Provedor regional/soberano": "Hipótese a validar: Moderada (32k-64k)"
+      }
+    },
+    {
+      "criterion": "Suporte a saída estruturada",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: Não exigido neste caso, mas disponível",
+        "Open-weight self-hosted": "Hipótese a validar: Não exigido neste caso",
+        "Provedor regional/soberano": "Hipótese a validar: Não exigido neste caso"
+      }
+    },
+    {
+      "criterion": "Aderência de privacidade/residência",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: Depende do DPA do fornecedor; documentos internos saem da nossa infraestrutura",
+        "Open-weight self-hosted": "Hipótese a validar: Controle total, documentos nunca saem da nossa VPC",
+        "Provedor regional/soberano": "Hipótese a validar: Em região por padrão"
+      }
+    },
+    {
+      "criterion": "Limites de taxa/disponibilidade",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: Alta (SLA do fornecedor), ampla para o volume interno",
+        "Open-weight self-hosted": "Hipótese a validar: Limitada pela nossa própria capacidade",
+        "Provedor regional/soberano": "Hipótese a validar: Moderada, fornecedor menor"
+      }
+    },
+    {
+      "criterion": "Portabilidade/risco de lock-in",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: Lock-in maior (API proprietária)",
+        "Open-weight self-hosted": "Hipótese a validar: Lock-in baixo (pesos abertos)",
+        "Provedor regional/soberano": "Hipótese a validar: Moderado (API proprietária regional)"
+      }
+    },
+    {
+      "criterion": "Explicabilidade/auditabilidade de viés",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: Limitada (caixa-preta), mas stakes baixos para este caso",
+        "Open-weight self-hosted": "Pesos abertos não garantem acesso aos dados de treinamento nem auditabilidade de viés; verificar evidências e licença.",
+        "Provedor regional/soberano": "Hipótese a validar: Moderada; depende de certificações e documentação do fornecedor"
+      }
+    }
+  ],
+  "selected_option": "LLM aumentado + RAG"
+}

@@ -1,0 +1,147 @@
+{
+  "case": {
+    "name": "Orquestrador de Suporte Multidomínio",
+    "business_problem": "Resolver pedidos de suporte ao cliente que podem atravessar cobrança, suporte técnico e segurança de conta - domínios hoje pertencentes a equipes/sistemas separados.",
+    "desired_outcome": "Uma única conversa voltada ao cliente que coordena de forma transparente entre domínios, sem o cliente precisar se re-explicar para cada equipe.",
+    "users": "Clientes de varejo que contatam o suporte",
+    "quality_target": "Roteamento e resolução corretos por domínio, medidos pelo próprio critério de sucesso de cada domínio",
+    "latency_target": "p95 < 15s por salto entre domínios",
+    "cost_constraint": "Moderado - precisa ficar abaixo do custo combinado atual dos handoffs manuais entre equipes",
+    "regulatory_constraints": "Ações de segurança de conta exigem verificação step-up; ações de cobrança precisam ser auditáveis",
+    "path_known": false,
+    "dynamic_next_steps": true,
+    "independent_autonomous_domains": true,
+    "many_external_capabilities": true,
+    "sensitive_data": true,
+    "high_impact_actions": true,
+    "human_approval_required": true,
+    "subjective_quality": true,
+    "critical_cohorts": true,
+    "estimated_monthly_cost": 900.0,
+    "monthly_cost_ceiling": 1500.0,
+    "roi_notes": "Hipóteses didáticas, não medições: Eficiência: remove handoffs manuais entre as equipes de cobrança/técnico/segurança para tickets que cruzam domínios. Custo da solução: mais alto que um assistente de domínio único, devido à sobrecarga de coordenação entre domínios."
+  },
+  "option_scores": [
+    {
+      "name": "Orquestrador multiagente",
+      "scores": {
+        "Quality/task success": 4,
+        "Latency": 3,
+        "Cost": 2,
+        "Risk/control": 3,
+        "Auditability/predictability": 3,
+        "Maintainability": 3,
+        "Observability/debugging": 3,
+        "Privacy/residency/compliance": 4,
+        "Portability/lock-in": 3,
+        "Fit with hard constraints": 5
+      }
+    },
+    {
+      "name": "Workflow único com handoff manual entre equipes",
+      "scores": {
+        "Quality/task success": 3,
+        "Latency": 2,
+        "Cost": 4,
+        "Risk/control": 4,
+        "Auditability/predictability": 5,
+        "Maintainability": 4,
+        "Observability/debugging": 4,
+        "Privacy/residency/compliance": 4,
+        "Portability/lock-in": 4,
+        "Fit with hard constraints": 2
+      }
+    },
+    {
+      "name": "Agente único cobrindo todos os domínios",
+      "scores": {
+        "Quality/task success": 3,
+        "Latency": 3,
+        "Cost": 3,
+        "Risk/control": 2,
+        "Auditability/predictability": 2,
+        "Maintainability": 2,
+        "Observability/debugging": 2,
+        "Privacy/residency/compliance": 3,
+        "Portability/lock-in": 3,
+        "Fit with hard constraints": 2
+      }
+    }
+  ],
+  "tradeoff_notes": "Cobrança, suporte técnico e segurança de conta têm propriedade, ferramental e perfil de risco distintos (ações de segurança exigem verificação step-up; cobrança precisa da própria trilha de auditoria) - reduzir tudo a um único agente indiferenciado borra exatamente as fronteiras que tornam cada domínio auditável por si só. Um workflow único com handoff manual é mais seguro, mas reintroduz o problema de re-explicação que este caso existe para eliminar. Validar se a sobrecarga de coordenação multiagente adicionada é realmente necessária antes de seguir adiante - veja o próprio warning do motor sobre esta recomendação.",
+  "model_comparison": [
+    {
+      "criterion": "Aderência de qualidade à tarefa",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: Forte em coordenação multi-turno e uso de ferramentas entre domínios",
+        "Open-weight self-hosted": "Hipótese a validar: Viável por domínio, mais fraco na qualidade do handoff entre domínios",
+        "Provedor regional/soberano": "Hipótese a validar: Adequado; família de modelos menor"
+      }
+    },
+    {
+      "criterion": "Classe de latência",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: Média (múltiplos saltos de agente por pedido)",
+        "Open-weight self-hosted": "Hipótese a validar: Média-alta (depende da nossa capacidade de GPU)",
+        "Provedor regional/soberano": "Hipótese a validar: Média-alta"
+      }
+    },
+    {
+      "criterion": "Classe de custo",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: Pago por token, mais alto pela sobrecarga de orquestração multiagente",
+        "Open-weight self-hosted": "Hipótese a validar: Custo inicial de infraestrutura, custo marginal menor em volume",
+        "Provedor regional/soberano": "Hipótese a validar: Preço premium pelas garantias de compliance"
+      }
+    },
+    {
+      "criterion": "Janela de contexto",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: Grande (128k+ tokens), útil para contexto de handoff entre domínios",
+        "Open-weight self-hosted": "Hipótese a validar: Moderada (32k típico)",
+        "Provedor regional/soberano": "Hipótese a validar: Moderada (32k-64k)"
+      }
+    },
+    {
+      "criterion": "Suporte a saída estruturada",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: JSON schema/tool calling nativos para os payloads de handoff entre domínios",
+        "Open-weight self-hosted": "Hipótese a validar: Viável via decodificação restrita (constrained decoding)",
+        "Provedor regional/soberano": "Hipótese a validar: Modo JSON básico"
+      }
+    },
+    {
+      "criterion": "Aderência de privacidade/residência",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: Depende do DPA do fornecedor; dados de conta/segurança do cliente saem da nossa infraestrutura",
+        "Open-weight self-hosted": "Hipótese a validar: Controle total, dados nunca saem da nossa VPC",
+        "Provedor regional/soberano": "Hipótese a validar: Em região por padrão, atende nossa restrição de residência"
+      }
+    },
+    {
+      "criterion": "Limites de taxa/disponibilidade",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: Alta (SLA do fornecedor)",
+        "Open-weight self-hosted": "Hipótese a validar: Limitada pela nossa própria capacidade",
+        "Provedor regional/soberano": "Hipótese a validar: Moderada, fornecedor menor"
+      }
+    },
+    {
+      "criterion": "Portabilidade/risco de lock-in",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: Lock-in maior (primitivas proprietárias de orquestração multiagente)",
+        "Open-weight self-hosted": "Hipótese a validar: Lock-in baixo (pesos abertos)",
+        "Provedor regional/soberano": "Hipótese a validar: Moderado (API proprietária regional)"
+      }
+    },
+    {
+      "criterion": "Explicabilidade/auditabilidade de viés",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: Limitada (caixa-preta); poucos fornecedores expõem atribuição para auditoria",
+        "Open-weight self-hosted": "Pesos abertos não garantem acesso aos dados de treinamento nem auditabilidade de viés; verificar evidências e licença.",
+        "Provedor regional/soberano": "Hipótese a validar: Moderada; depende de certificações e documentação do fornecedor"
+      }
+    }
+  ],
+  "selected_option": "Orquestrador multiagente"
+}

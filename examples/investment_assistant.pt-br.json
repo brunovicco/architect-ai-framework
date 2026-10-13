@@ -10,6 +10,7 @@
     "regulatory_constraints": "Adequação (suitability), auditabilidade e confirmação humana/do usuário antes de efeitos colaterais transacionais",
     "path_known": true,
     "dynamic_tool_choice": true,
+    "bounded_known_tool_set": true,
     "needs_document_knowledge": true,
     "needs_dynamic_data": true,
     "existing_api": true,
@@ -33,18 +34,18 @@
         "Latency": 3,
         "Cost": 3,
         "Risk/control": 4,
-        "Auditability/predictability": 3,
+        "Auditability/predictability": 2,
         "Maintainability": 4,
         "Observability/debugging": 4,
         "Privacy/residency/compliance": 4,
         "Portability/lock-in": 4,
-        "Fit with hard constraints": 5
+        "Fit with hard constraints": 3
       }
     },
     {
-      "name": "Somente workflow",
+      "name": "Workflow + Roteamento",
       "scores": {
-        "Quality/task success": 3,
+        "Quality/task success": 4,
         "Latency": 5,
         "Cost": 4,
         "Risk/control": 5,
@@ -53,7 +54,7 @@
         "Observability/debugging": 4,
         "Privacy/residency/compliance": 4,
         "Portability/lock-in": 4,
-        "Fit with hard constraints": 3
+        "Fit with hard constraints": 5
       }
     },
     {
@@ -72,7 +73,7 @@
       }
     }
   ],
-  "tradeoff_notes": "Workflow é mais simples e auditável, mas não consegue escolher dinamicamente qual ferramenta/API interna chamar para perguntas ad-hoc sobre portfólio; multiagente adiciona uma sobrecarga de coordenação que ainda não precisamos. Revisitar se o catálogo de ferramentas chamáveis crescer.",
+  "tradeoff_notes": "O workflow roteia entre consultas de saldo, portfólio e ordem por caminhos predefinidos, com aprovação antes dos efeitos transacionais. Isso não exige que o modelo controle uma trajetória exploratória. Reavalie agente se resultados intermediários exigirem que o modelo escolha próximas ações, repetições e encerramento além das rotas previstas; o tamanho do catálogo, por si só, não justifica essa mudança.",
   "model_comparison": [
     {
       "criterion": "Aderência de qualidade à tarefa",
@@ -147,5 +148,5 @@
       }
     }
   ],
-  "selected_option": "Agente + ferramentas de API"
+  "selected_option": "Workflow + Roteamento"
 }

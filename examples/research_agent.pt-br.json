@@ -1,0 +1,147 @@
+{
+  "case": {
+    "name": "Agente Autônomo de Pesquisa de Mercado",
+    "business_problem": "Produzir um relatório de pesquisa de mercado fundamentado em evidências. O modelo usa um conjunto conhecido de ferramentas de busca e recuperação, avalia resultados intermediários, escolhe novas consultas e decide quando reuniu evidência suficiente.",
+    "desired_outcome": "Um briefing de pesquisa estruturado com citações, montado sem um humano orquestrando manualmente cada fonte de dados em cada pedido.",
+    "users": "Equipe interna de estratégia/produto",
+    "quality_target": "Alta fundamentação factual com citações; completude sobre o tema de pesquisa",
+    "latency_target": "Minutos, não segundos - é uma tarefa de pesquisa assíncrona, não um turno de chat",
+    "cost_constraint": "Moderado - algumas execuções de pesquisa por semana, não alto volume",
+    "regulatory_constraints": "Nenhuma - uso estratégico interno, sem saída voltada ao cliente",
+    "path_known": false,
+    "dynamic_tool_choice": true,
+    "bounded_known_tool_set": true,
+    "many_external_capabilities": true,
+    "needs_document_knowledge": true,
+    "needs_dynamic_data": true,
+    "structured_output": true,
+    "subjective_quality": true,
+    "estimated_monthly_cost": 300.0,
+    "monthly_cost_ceiling": 600.0,
+    "roi_notes": "Hipóteses didáticas, não medições: Produtividade: reduz uma tarefa de pesquisa manual de cerca de um dia para menos de uma hora de revisão. Custo da solução: dominado por chamadas de ferramentas/API entre fontes, escala com o volume de pesquisa, não com headcount.",
+    "dynamic_next_steps": true
+  },
+  "option_scores": [
+    {
+      "name": "Agente + protocolo de ferramentas",
+      "scores": {
+        "Quality/task success": 4,
+        "Latency": 3,
+        "Cost": 3,
+        "Risk/control": 3,
+        "Auditability/predictability": 3,
+        "Maintainability": 4,
+        "Observability/debugging": 4,
+        "Privacy/residency/compliance": 4,
+        "Portability/lock-in": 4,
+        "Fit with hard constraints": 5
+      }
+    },
+    {
+      "name": "Workflow com lista fixa de fontes",
+      "scores": {
+        "Quality/task success": 2,
+        "Latency": 4,
+        "Cost": 4,
+        "Risk/control": 4,
+        "Auditability/predictability": 5,
+        "Maintainability": 2,
+        "Observability/debugging": 4,
+        "Privacy/residency/compliance": 4,
+        "Portability/lock-in": 4,
+        "Fit with hard constraints": 2
+      }
+    },
+    {
+      "name": "Multiagente (um agente por tipo de fonte)",
+      "scores": {
+        "Quality/task success": 4,
+        "Latency": 2,
+        "Cost": 2,
+        "Risk/control": 2,
+        "Auditability/predictability": 2,
+        "Maintainability": 2,
+        "Observability/debugging": 3,
+        "Privacy/residency/compliance": 3,
+        "Portability/lock-in": 3,
+        "Fit with hard constraints": 3
+      }
+    }
+  ],
+  "tradeoff_notes": "A autonomia de agente é proposta porque as evidências recuperadas determinam novas consultas, repetição e encerramento, não porque o catálogo de ferramentas é grande ou desconhecido. O mesmo conjunto pequeno de ferramentas pode sustentar essa trajetória exploratória. Compare com um workflow se as etapas e os critérios de encerramento puderem ser programados; valide ganhos de qualidade contra latência, custo e propagação de erros. Tipos diferentes de fonte, por si só, não justificam multiagentes.",
+  "model_comparison": [
+    {
+      "criterion": "Aderência de qualidade à tarefa",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: Forte em uso de ferramentas multi-etapa e síntese",
+        "Open-weight self-hosted": "Hipótese a validar: Mais fraco em cadeias longas de uso de ferramentas, precisa validação",
+        "Provedor regional/soberano": "Hipótese a validar: Adequado; família de modelos menor"
+      }
+    },
+    {
+      "criterion": "Classe de latência",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: Média-alta (muitas chamadas de ferramenta sequenciais)",
+        "Open-weight self-hosted": "Hipótese a validar: Alta (depende da nossa capacidade de GPU e das idas e voltas às ferramentas)",
+        "Provedor regional/soberano": "Hipótese a validar: Média-alta"
+      }
+    },
+    {
+      "criterion": "Classe de custo",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: Pago por token, mais alto por execução devido ao volume de chamadas de ferramenta",
+        "Open-weight self-hosted": "Hipótese a validar: Custo inicial de infraestrutura, custo marginal menor em volume",
+        "Provedor regional/soberano": "Hipótese a validar: Preço premium pelas garantias de compliance"
+      }
+    },
+    {
+      "criterion": "Janela de contexto",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: Grande (128k+ tokens), necessária para transcrições longas de uso de ferramentas",
+        "Open-weight self-hosted": "Hipótese a validar: Moderada (32k típico) - pode precisar de sumarização",
+        "Provedor regional/soberano": "Hipótese a validar: Moderada (32k-64k)"
+      }
+    },
+    {
+      "criterion": "Suporte a saída estruturada",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: JSON schema/tool calling nativos para o briefing final",
+        "Open-weight self-hosted": "Hipótese a validar: Viável via decodificação restrita (constrained decoding)",
+        "Provedor regional/soberano": "Hipótese a validar: Modo JSON básico"
+      }
+    },
+    {
+      "criterion": "Aderência de privacidade/residência",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: Depende do DPA do fornecedor; dados internos, não de clientes",
+        "Open-weight self-hosted": "Hipótese a validar: Controle total, dados nunca saem da nossa VPC",
+        "Provedor regional/soberano": "Hipótese a validar: Em região por padrão"
+      }
+    },
+    {
+      "criterion": "Limites de taxa/disponibilidade",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: Alta (SLA do fornecedor)",
+        "Open-weight self-hosted": "Hipótese a validar: Limitada pela nossa própria capacidade",
+        "Provedor regional/soberano": "Hipótese a validar: Moderada, fornecedor menor"
+      }
+    },
+    {
+      "criterion": "Portabilidade/risco de lock-in",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: Lock-in maior (formato proprietário de tool calling)",
+        "Open-weight self-hosted": "Hipótese a validar: Lock-in baixo (pesos abertos)",
+        "Provedor regional/soberano": "Hipótese a validar: Moderado (API proprietária regional)"
+      }
+    },
+    {
+      "criterion": "Explicabilidade/auditabilidade de viés",
+      "notes": {
+        "Provedor de API gerenciado": "Hipótese a validar: Limitada (caixa-preta); stakes baixos, uso só interno",
+        "Open-weight self-hosted": "Pesos abertos não garantem acesso aos dados de treinamento nem auditabilidade de viés; verificar evidências e licença.",
+        "Provedor regional/soberano": "Hipótese a validar: Moderada; depende de certificações e documentação do fornecedor"
+      }
+    }
+  ],
+  "selected_option": "Agente + protocolo de ferramentas"
+}

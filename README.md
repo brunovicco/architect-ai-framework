@@ -16,11 +16,11 @@ The core applies inspectable Python rules to structured inputs; it does not ask 
 
 ## Try it in two minutes
 
-1. Open the demo and click **Load example: Investment Assistant** in the sidebar. A sleeping deployment may need time to wake up.
-2. Inspect execution signals in tab 2, then open **7 · Plan**. Dynamic tool choice explains the Agent recommendation; transaction approval remains an execution boundary.
+1. Open the demo, pick **Investment Assistant** from the **Example** dropdown in the sidebar, and click **Load example**. A sleeping deployment may need time to wake up.
+2. Inspect execution signals in tab 2, then open **7 · Plan**. A small, known set of tools (balance, portfolio, order) explains the Workflow + Routing recommendation; transaction approval remains an execution boundary.
 3. Compare alternatives and export the plan. Use fictional or sanitized inputs on the public demo.
 
-**Scope:** the deterministic-software branch records your explicit assessment that rules/APIs suffice; it does not infer this from prose. Free-text constraints, option eligibility and provider claims require human validation. Generated controls are design guidance, not deployed enforcement or a compliance certification.
+**Scope:** the deterministic-software branch records your explicit assessment that rules/APIs suffice; it does not infer this from prose. Free-text constraints, option eligibility and provider claims require human validation. Generated controls are design guidance, not deployed enforcement or a compliance certification. Each run also models one orchestration/capability decision at a time - a product that mixes a read-only lookup, a document question and an irreversible action (as this example does) needs one pass per capability, combined afterward by the architect, not a single architecture for the whole surface.
 
 ## Screenshots
 
@@ -35,7 +35,7 @@ The core applies inspectable Python rules to structured inputs; it does not ask 
 </tr>
 </table>
 
-The UI ships with a one-click example case ("Investment Assistant") so you can see a populated plan immediately.
+The UI ships with five bundled example cases, one per architecture pattern - Deterministic software (Order Status Lookup), Augmented LLM/RAG (Employee Policy Q&A), Workflow/Routing (Investment Assistant), Agent (Market Research Agent) and Multi-agent (Multi-Domain Support Orchestrator) - so you can see a populated plan immediately and compare how the recommendation differs across patterns.
 
 ## What the framework produces
 
@@ -47,6 +47,7 @@ The UI ships with a one-click example case ("Investment Assistant") so you can s
 - Produces an evaluation and observability plan, including structured A/B-experiment guidance and a feasibility verdict against an optional cost ceiling.
 - Compares up to three architecture options with weighted trade-offs.
 - Compares model/provider candidates across 9 vendor-neutral criteria (quality fit, latency, cost, context window, structured output, privacy/residency, rate limits, portability, explainability/fairness auditability) - structure only, no opinion on which vendor to pick.
+- **Sensitivity analysis**: deterministically flips each execution signal one at a time and reports which flips would change the recommendation - turning the plan into a discussion instrument ("what would need to be different for this answer to change?") instead of a single opaque verdict. When the optional AI review is used, the reviewer also comments on whether the case's own free text supports the flags it flags as pivotal.
 - Exports the final **Architecture Decision Plan** as Markdown, DOCX, PDF, JSON or a Nygard-style **ADR** - in either language.
 - Round-trips a plan: re-import a previously exported JSON file, or save/load named drafts for the current browser session.
 - Optional, vendor-neutral **AI review**: use a shared, rate-limited demo key when available, or point it at any OpenAI-chat-completions-compatible endpoint (OpenAI, Ollama, vLLM, a gateway...) with your own key, to get a critique of the generated plan. Guarded against SSRF - see [Security](#security).
@@ -96,6 +97,8 @@ flowchart TB
 
 AI architecture discussions often jump too early to model brands, agents, RAG or tool protocols. ARCHITECT starts with the business problem and hard constraints, then separates responsibilities between probabilistic model behavior, deterministic software and humans.
 
+The Augmented LLM/Workflow/Agent/Multi-agent taxonomy used in the Harness step follows Anthropic's ["Building Effective Agents"](https://www.anthropic.com/research/building-effective-agents); this framework adds the decision rules, entry points, controls and review placement that select and govern them.
+
 > Prefer the simplest architecture that satisfies hard requirements and keep critical enforcement outside probabilistic model behavior whenever possible.
 
 ## Quick start
@@ -107,7 +110,7 @@ pip install -e .
 streamlit run app.py
 ```
 
-Open the local Streamlit URL and walk through the seven tabs (or click **Load example: Investment Assistant** in the sidebar). The Plan tab provides downloadable Markdown, DOCX, PDF, ADR and JSON artifacts, translated into whichever language is selected - plus a session-only saved-case library and an optional AI review.
+Open the local Streamlit URL and walk through the seven tabs (or pick a bundled example from the sidebar's **Example** dropdown and click **Load example**). The Plan tab provides downloadable Markdown, DOCX, PDF, ADR and JSON artifacts, translated into whichever language is selected - plus a session-only saved-case library and an optional AI review.
 
 ## Using the AI review
 
@@ -138,6 +141,8 @@ pip-audit
 ```
 
 All four run in CI on every push (Python 3.11 and 3.12), together with Dependabot (weekly updates for pip and GitHub Actions) and pinned, SHA-locked Actions - see [Repository structure](#repository-structure) and `.github/`.
+
+A hand-labeled reference suite (`tests/cases.py`) checks `recommend()`'s output against stated expectations and a one-line reason for each, on every CI run - see [Disagree with a recommendation](CONTRIBUTING.md) to turn a confirmed disagreement into a new case there instead of a one-off assertion.
 
 ## Deploy
 
@@ -178,14 +183,16 @@ architect-ai-framework/
 │   ├── i18n.py          # UI strings, ARQUITETO/ARCHITECT step words, translations
 │   ├── models.py       # domain models
 │   ├── providers.py    # optional model-adapter contract + SSRF-guarded adapter
-│   └── scoring.py      # weighted trade-off matrix
+│   ├── review_quota.py # shared-key AI review rate limiting
+│   ├── scoring.py      # weighted trade-off matrix
+│   └── sensitivity.py  # deterministic what-if/sensitivity analysis
 ├── docs/
 │   ├── FRAMEWORK.md
 │   ├── PROVIDER_NEUTRALITY.md
 │   ├── PROVIDERS_SECURITY_CHECKLIST.md
 │   └── screenshots/     # README screenshots, pt-br/ and en/
 ├── examples/
-│   └── investment_assistant.json
+│   ├── investment_assistant.json       # + 4 more bundled example pairs (en/pt-br), one per architecture pattern
 ├── .github/
 │   ├── workflows/ci.yml
 │   └── dependabot.yml

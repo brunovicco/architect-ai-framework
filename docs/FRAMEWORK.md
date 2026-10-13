@@ -2,6 +2,8 @@
 
 ARCHITECT is a repeatable, vendor-neutral decision flow for AI/LLM architecture.
 
+The Deterministic software/Augmented LLM/Workflow/Agent/Multi-agent taxonomy used in the Harness step follows Anthropic's ["Building Effective Agents"](https://www.anthropic.com/research/building-effective-agents); this framework adds the decision rules, entry points, controls and review placement that select and govern them.
+
 | Step | Question | Output |
 | --- | --- | --- |
 | **A - Aim** | What business outcome must change? | Problem + measurable success |
@@ -71,7 +73,7 @@ the concrete, recognizable shape:
 | Single augmented call | Augmented LLM | One bounded, verifiable task, no document knowledge needed |
 | RAG pipeline | Augmented LLM | The task needs stable document/knowledge-base context |
 | Chaining | Workflow | The task decomposes into stages with clean handoffs |
-| Routing | Workflow | Inputs vary in kind and need different downstream handling |
+| Routing | Workflow | Inputs vary in kind and need different downstream handling, or dynamic tool choice is bounded to a small, known catalog a routing rule could enumerate in advance |
 | Document processing pipeline | Workflow | Structured extraction from semi-structured documents, with a schema check |
 | Agent (autonomous tool use) | Agent | The path can't be enumerated in advance, bounded by tool scope and turn budget |
 | Coding agent | Agent | The work is an engineering workflow with agentic exploration and deterministic edit/test/review steps |
@@ -87,6 +89,14 @@ speech: define it concretely — a cap on tool calls per turn, a max
 planning/turn budget, and persisted intermediate state/decisions so a run
 can be audited or resumed. An agent whose bound is never written down
 usually turns out to have none.
+
+Routing is appropriate when tool selection follows predefined execution paths.
+Tool count alone does not distinguish a workflow from an agent: even two known
+tools can support an exploratory loop. Set `dynamic_next_steps` when the model
+controls follow-up actions, repetition and termination based on intermediate
+results. This signal takes precedence over `bounded_known_tool_set`. The latter
+supports routing only when no dynamic-trajectory requirement is present; an
+unknown catalog by itself is not evidence that autonomy improves the outcome.
 
 ## Entry point
 
@@ -119,6 +129,20 @@ signal exists to route on:
 - **Sampled review** — high-impact, but a calibrated confidence score lets you gate only the low-confidence fraction and sample the rest.
 - **Post-action audit** — sensitive but reversible, lower-cost decisions; the action runs, a person checks afterward.
 - **No review needed** — none of the above risk signals are present.
+
+## Sensitivity
+
+The engine is deterministic, but the questionnaire's boolean answers are
+human judgment. Sensitivity analysis flips each execution signal one at a
+time and reports which flips would change the architecture pattern, entry
+point, reference architecture, integration pattern, feasibility verdict or
+review placement — turning the output into a discussion instrument ("what
+would need to be different for this answer to change?") rather than a
+single opaque verdict. It never touches the free-text fields or the cost
+inputs, since there's no single natural "flip" for those; when the
+optional AI review is used, the reviewer is separately asked to comment on
+whether the case's own free text supports the flags the sensitivity
+analysis found pivotal.
 
 Routing everything to a person by volume (instead of by stakes) overwhelms
 reviewers and degrades review quality; routing nothing lets a high-stakes,
@@ -193,4 +217,4 @@ worth clearing at all.
 
 ## Interpretation limits
 
-Recommendations are proposed designs. The engine does not parse free-text requirements, test the proposed system or certify feasibility. The cost verdict compares supplied estimates, not measured TCO. Weighted scores summarize user judgments; callers must manually eliminate options that violate hard constraints. A low-confidence fraction requires a separately implemented routing policy; the framework does not implement it.
+Recommendations are proposed designs. The engine does not parse free-text requirements, test the proposed system or certify feasibility. The cost verdict compares supplied estimates, not measured TCO. Weighted scores summarize user judgments; callers must manually eliminate options that violate hard constraints. A low-confidence fraction requires a separately implemented routing policy; the framework does not implement it. A case models one orchestration/capability decision at a time; a composite product (e.g. a balance lookup, a portfolio question and an order action under one assistant) needs one pass per capability, with the results combined by the architect — the engine does not decompose a case automatically.

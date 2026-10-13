@@ -1,0 +1,147 @@
+{
+  "case": {
+    "name": "Multi-Domain Support Orchestrator",
+    "business_problem": "Resolve customer support requests that can span billing, technical troubleshooting and account security - domains owned by separate teams/systems today.",
+    "desired_outcome": "A single customer-facing conversation that transparently coordinates across domains without customers re-explaining themselves to each team.",
+    "users": "Retail customers contacting support",
+    "quality_target": "Correct domain routing and resolution, measured per domain's own success criteria",
+    "latency_target": "p95 < 15s per domain hop",
+    "cost_constraint": "Moderate - must stay below the current blended cost of multi-team human handoffs",
+    "regulatory_constraints": "Account security actions require step-up verification; billing actions must be auditable",
+    "path_known": false,
+    "dynamic_next_steps": true,
+    "independent_autonomous_domains": true,
+    "many_external_capabilities": true,
+    "sensitive_data": true,
+    "high_impact_actions": true,
+    "human_approval_required": true,
+    "subjective_quality": true,
+    "critical_cohorts": true,
+    "estimated_monthly_cost": 900.0,
+    "monthly_cost_ceiling": 1500.0,
+    "roi_notes": "Illustrative assumptions, not measurements: Efficiency: removes manual handoffs between billing/technical/security teams for cross-domain tickets. Solution cost: higher than a single-domain assistant due to cross-domain coordination overhead."
+  },
+  "option_scores": [
+    {
+      "name": "Multi-agent orchestrator",
+      "scores": {
+        "Quality/task success": 4,
+        "Latency": 3,
+        "Cost": 2,
+        "Risk/control": 3,
+        "Auditability/predictability": 3,
+        "Maintainability": 3,
+        "Observability/debugging": 3,
+        "Privacy/residency/compliance": 4,
+        "Portability/lock-in": 3,
+        "Fit with hard constraints": 5
+      }
+    },
+    {
+      "name": "Single workflow with manual team handoff",
+      "scores": {
+        "Quality/task success": 3,
+        "Latency": 2,
+        "Cost": 4,
+        "Risk/control": 4,
+        "Auditability/predictability": 5,
+        "Maintainability": 4,
+        "Observability/debugging": 4,
+        "Privacy/residency/compliance": 4,
+        "Portability/lock-in": 4,
+        "Fit with hard constraints": 2
+      }
+    },
+    {
+      "name": "Single agent across all domains",
+      "scores": {
+        "Quality/task success": 3,
+        "Latency": 3,
+        "Cost": 3,
+        "Risk/control": 2,
+        "Auditability/predictability": 2,
+        "Maintainability": 2,
+        "Observability/debugging": 2,
+        "Privacy/residency/compliance": 3,
+        "Portability/lock-in": 3,
+        "Fit with hard constraints": 2
+      }
+    }
+  ],
+  "tradeoff_notes": "Billing, technical support and account security each have distinct ownership, tooling and risk profiles (security actions need step-up verification; billing needs its own audit trail) - collapsing them into one undifferentiated agent blurs exactly the boundaries that make each domain auditable on its own. A single workflow with manual handoff is safer but reintroduces the re-explaining problem this case exists to remove. Validate the added multi-agent coordination complexity is actually needed before committing - see the engine's own warning on this recommendation.",
+  "model_comparison": [
+    {
+      "criterion": "Task quality fit",
+      "notes": {
+        "Managed API provider": "Assumption to validate: Strong on multi-turn coordination and tool use across domains",
+        "Self-hosted open-weight": "Assumption to validate: Workable per-domain, weaker on cross-domain handoff quality",
+        "Regional/sovereign provider": "Assumption to validate: Adequate; smaller model family"
+      }
+    },
+    {
+      "criterion": "Latency class",
+      "notes": {
+        "Managed API provider": "Assumption to validate: Medium (multiple agent hops per request)",
+        "Self-hosted open-weight": "Assumption to validate: Medium-high (depends on our GPU capacity)",
+        "Regional/sovereign provider": "Assumption to validate: Medium-high"
+      }
+    },
+    {
+      "criterion": "Cost class",
+      "notes": {
+        "Managed API provider": "Assumption to validate: Pay-per-token, higher due to multi-agent orchestration overhead",
+        "Self-hosted open-weight": "Assumption to validate: Upfront infra cost, lower marginal cost at volume",
+        "Regional/sovereign provider": "Assumption to validate: Premium pricing for compliance guarantees"
+      }
+    },
+    {
+      "criterion": "Context window",
+      "notes": {
+        "Managed API provider": "Assumption to validate: Large (128k+ tokens), useful for cross-domain handoff context",
+        "Self-hosted open-weight": "Assumption to validate: Moderate (32k typical)",
+        "Regional/sovereign provider": "Assumption to validate: Moderate (32k-64k)"
+      }
+    },
+    {
+      "criterion": "Structured output support",
+      "notes": {
+        "Managed API provider": "Assumption to validate: Native JSON schema/tool calling for domain handoff payloads",
+        "Self-hosted open-weight": "Assumption to validate: Workable via constrained decoding",
+        "Regional/sovereign provider": "Assumption to validate: Basic JSON mode"
+      }
+    },
+    {
+      "criterion": "Privacy/residency fit",
+      "notes": {
+        "Managed API provider": "Assumption to validate: Depends on vendor DPA; customer account/security data leaves our infra",
+        "Self-hosted open-weight": "Assumption to validate: Full control, data never leaves our VPC",
+        "Regional/sovereign provider": "Assumption to validate: In-region by default, meets our residency constraint"
+      }
+    },
+    {
+      "criterion": "Rate limits/availability",
+      "notes": {
+        "Managed API provider": "Assumption to validate: High (vendor SLA)",
+        "Self-hosted open-weight": "Assumption to validate: Limited by our own capacity",
+        "Regional/sovereign provider": "Assumption to validate: Moderate, smaller provider"
+      }
+    },
+    {
+      "criterion": "Portability/lock-in risk",
+      "notes": {
+        "Managed API provider": "Assumption to validate: Higher lock-in (proprietary multi-agent orchestration primitives)",
+        "Self-hosted open-weight": "Assumption to validate: Low lock-in (open weights)",
+        "Regional/sovereign provider": "Assumption to validate: Moderate (regional proprietary API)"
+      }
+    },
+    {
+      "criterion": "Explainability/fairness auditability",
+      "notes": {
+        "Managed API provider": "Assumption to validate: Limited (black box); few vendors expose attribution for audit",
+        "Self-hosted open-weight": "Open weights do not guarantee training-data access or bias auditability; verify evidence and license.",
+        "Regional/sovereign provider": "Assumption to validate: Moderate; depends on vendor certifications and documentation"
+      }
+    }
+  ],
+  "selected_option": "Multi-agent orchestrator"
+}

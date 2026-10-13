@@ -16,11 +16,11 @@ O core aplica regras Python inspecionáveis a entradas estruturadas; não pede a
 
 ## Experimente em dois minutos
 
-1. Abra a demo e clique em **Carregar exemplo: Investment Assistant** na barra lateral. Se estiver hibernando, aguarde a inicialização.
-2. Confira os sinais de execução na aba 2 e abra **7 · Plano**. A escolha dinâmica de ferramentas explica a recomendação de Agente; a aprovação de transações continua na camada de execução.
+1. Abra a demo, escolha **Investment Assistant** no menu **Exemplo** da barra lateral e clique em **Carregar exemplo**. Se estiver hibernando, aguarde a inicialização.
+2. Confira os sinais de execução na aba 2 e abra **7 · Plano**. Um conjunto pequeno e conhecido de ferramentas (saldo, portfólio, ordem) explica a recomendação de Workflow + Roteamento; a aprovação de transações continua na camada de execução.
 3. Compare alternativas e exporte o plano. Use dados fictícios ou sanitizados na demo pública.
 
-**Escopo:** a alternativa de software determinístico registra sua avaliação explícita de que regras/APIs bastam; isso não é inferido do texto. Restrições em texto livre, elegibilidade das opções e afirmações sobre fornecedores exigem validação humana. Os controles gerados orientam o desenho; não são enforcement implantado nem certificação de compliance.
+**Escopo:** a alternativa de software determinístico registra sua avaliação explícita de que regras/APIs bastam; isso não é inferido do texto. Restrições em texto livre, elegibilidade das opções e afirmações sobre fornecedores exigem validação humana. Os controles gerados orientam o desenho; não são enforcement implantado nem certificação de compliance. Cada execução também modela uma decisão de orquestração/capacidade por vez - um produto que mistura uma consulta somente leitura, uma pergunta documental e uma ação irreversível (como neste exemplo) precisa de uma passada por capacidade, combinadas depois pelo arquiteto, não de uma única arquitetura para toda a superfície.
 
 ## Demo ao vivo
 
@@ -39,7 +39,7 @@ O core aplica regras Python inspecionáveis a entradas estruturadas; não pede a
 </tr>
 </table>
 
-A interface vem com um caso de exemplo de um clique ("Investment Assistant") para você ver um plano preenchido imediatamente.
+A interface vem com cinco casos de exemplo, um por padrão de arquitetura - Software determinístico (Consulta de Status de Pedido), LLM Aumentado/RAG (Assistente de Políticas Internas), Workflow/Roteamento (Investment Assistant), Agente (Agente de Pesquisa de Mercado) e Multiagente (Orquestrador de Suporte Multidomínio) - para você ver um plano preenchido imediatamente e comparar como a recomendação muda entre padrões.
 
 ## O que o framework produz
 
@@ -51,6 +51,7 @@ A interface vem com um caso de exemplo de um clique ("Investment Assistant") par
 - Produz um plano de avaliação e observabilidade, incluindo orientação de experimento A/B estruturado e um veredito de viabilidade contra um teto de custo opcional.
 - Compara até três opções de arquitetura com trade-offs ponderados.
 - Compara candidatos de modelo/fornecedor em 9 critérios neutros em fornecedor (aderência de qualidade, latência, custo, janela de contexto, saída estruturada, privacidade/residência, limites de taxa, portabilidade, explicabilidade/auditabilidade de viés) - só estrutura, sem opinião sobre qual fornecedor escolher.
+- **Análise de sensibilidade**: inverte deterministicamente cada sinal de execução, um por vez, e mostra quais inversões mudariam a recomendação - transformando o plano num instrumento de discussão ("o que precisaria ser diferente para essa resposta mudar?") em vez de um veredito único e opaco. Quando a revisão por IA opcional é usada, o revisor também comenta se o texto livre do caso sustenta os sinais apontados como decisivos.
 - Exporta o **Plano de Decisão de Arquitetura** final em Markdown, DOCX, PDF, JSON ou um **ADR** no estilo Nygard - em qualquer um dos dois idiomas.
 - Permite retomar um plano: reimporte um JSON exportado anteriormente, ou salve/carregue rascunhos nomeados durante a sessão atual do navegador.
 - **Revisão por IA** opcional e neutra em fornecedor: use uma chave de demonstração compartilhada (com limite de uso) quando disponível, ou aponte para qualquer endpoint compatível com a API de chat da OpenAI (OpenAI, Ollama, vLLM, um gateway...) com sua própria chave, para obter uma crítica do plano gerado. Protegida contra SSRF - veja [Segurança](#segurança).
@@ -100,6 +101,8 @@ flowchart TB
 
 Discussões de arquitetura de IA costumam pular cedo demais para marcas de modelo, agentes, RAG ou protocolos de ferramentas. O ARQUITETO começa pelo problema de negócio e pelas restrições obrigatórias, e só depois separa responsabilidades entre comportamento probabilístico do modelo, software determinístico e humanos.
 
+A taxonomia LLM aumentado/Workflow/Agente/Multiagente usada na etapa Harness segue o artigo da Anthropic ["Building Effective Agents"](https://www.anthropic.com/research/building-effective-agents); este framework adiciona as regras de decisão, pontos de entrada, controles e posicionamento de revisão que os selecionam e governam.
+
 > Prefira a arquitetura mais simples que satisfaça os requisitos obrigatórios e mantenha a aplicação crítica fora do comportamento probabilístico do modelo sempre que possível.
 
 ## Começando rápido
@@ -111,7 +114,7 @@ pip install -e .
 streamlit run app.py
 ```
 
-Abra a URL local do Streamlit e percorra as sete abas (ou clique em **Carregar exemplo: Investment Assistant** no menu lateral). A aba Plano oferece Markdown, DOCX, PDF, ADR e JSON para download, traduzidos para o idioma selecionado - além de uma biblioteca de casos salvos (só na sessão) e uma revisão por IA opcional.
+Abra a URL local do Streamlit e percorra as sete abas (ou escolha um exemplo no menu **Exemplo** da barra lateral e clique em **Carregar exemplo**). A aba Plano oferece Markdown, DOCX, PDF, ADR e JSON para download, traduzidos para o idioma selecionado - além de uma biblioteca de casos salvos (só na sessão) e uma revisão por IA opcional.
 
 ## Usando a revisão por IA
 
@@ -142,6 +145,8 @@ pip-audit
 ```
 
 Os quatro rodam no CI a cada push (Python 3.11 e 3.12), junto com o Dependabot (atualizações semanais de pip e GitHub Actions) e Actions fixadas por SHA - veja [Estrutura do repositório](#estrutura-do-repositório) e `.github/`.
+
+Uma suíte de referência rotulada à mão (`tests/cases.py`) confere a saída de `recommend()` contra expectativas declaradas e um motivo de uma linha para cada uma, em todo CI - veja [Discordar de uma recomendação](CONTRIBUTING.md) para transformar uma discordância confirmada em um novo caso ali, em vez de um assert isolado.
 
 ## Deploy
 
@@ -182,14 +187,16 @@ architect-ai-framework/
 │   ├── i18n.py          # textos da UI, palavras do método, traduções
 │   ├── models.py       # modelos de domínio
 │   ├── providers.py    # contrato de adaptador + adaptador protegido contra SSRF
-│   └── scoring.py      # matriz de trade-off ponderada
+│   ├── review_quota.py # limite de uso da revisão por IA com chave compartilhada
+│   ├── scoring.py      # matriz de trade-off ponderada
+│   └── sensitivity.py  # análise de sensibilidade/what-if determinística
 ├── docs/
 │   ├── FRAMEWORK.md
 │   ├── PROVIDER_NEUTRALITY.md
 │   ├── PROVIDERS_SECURITY_CHECKLIST.md
 │   └── screenshots/     # screenshots do README, pt-br/ e en/
 ├── examples/
-│   └── investment_assistant.json
+│   ├── investment_assistant.json       # + mais 4 pares de exemplo (en/pt-br), um por padrão de arquitetura
 ├── .github/
 │   ├── workflows/ci.yml
 │   └── dependabot.yml
